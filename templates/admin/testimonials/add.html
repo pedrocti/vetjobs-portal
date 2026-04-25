@@ -1,0 +1,48 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Add New Testimonial{% endblock %}
+
+{% block admin_content %}
+<div class="container py-4">
+    <h2 class="text-white mb-4">
+        <i class="fas fa-comment-medical me-2"></i>Add Testimonial
+    </h2>
+
+    <form method="POST" action="{{ url_for('admin.add_testimonial') }}" enctype="multipart/form-data" class="card p-4 bg-dark border-secondary">
+        <div class="mb-3">
+            <label class="form-label text-white">Name</label>
+            <input type="text" class="form-control" name="name" placeholder="Full name" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label text-white">User Type</label>
+            <select name="user_type" class="form-select" required>
+                <option value="veteran">Veteran</option>
+                <option value="employer">Employer</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label text-white">Role / Position</label>
+            <input type="text" class="form-control" name="role" placeholder="e.g. Software Engineer or HR Manager">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label text-white">Message</label>
+            <textarea name="message" class="form-control" rows="4" placeholder="Write testimonial message..." required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label text-white">Upload Image</label>
+            <input type="file" name="image" class="form-control" accept="image/*">
+            <small class="text-muted">Allowed formats: JPG, PNG (Max size: 2MB)</small>
+        </div>
+
+
+        <button type="submit" class="btn btn-success">
+            <i class="fas fa-save me-2"></i>Save Testimonial
+        </button>
+        <a href="{{ url_for('admin.manage_testimonials') }}" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+</div>
+{% endblock %}

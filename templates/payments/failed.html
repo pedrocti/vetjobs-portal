@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5 text-center">
+    <h2 class="text-danger">❌ Payment Failed</h2>
+    <p>Something went wrong while verifying your payment.</p>
+    <a href="{{ url_for('dashboard.veteran') }}" class="btn btn-secondary mt-3">
+        Back to Dashboard
+    </a>
+</div>
+{% endblock %}

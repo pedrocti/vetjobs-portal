@@ -1,0 +1,429 @@
+{% extends "admin/base.html" %}
+{% block title %}Admin Dashboard — VetJobs Portal{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid p-0">
+
+  <!-- ── WELCOME HEADER ──────────────────────────────────── -->
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+      <p class="section-label mb-1">Admin Dashboard</p>
+      <h1 style="font-family:var(--font-display);font-size:clamp(24px,4vw,36px);font-weight:700;color:#ffffff;margin:0;line-height:1.2;">
+        Platform <em style="color:var(--gold);font-style:italic;">Overview</em>
+      </h1>
+      <p style="color:rgba(255,255,255,0.4);font-size:13px;margin-top:4px;font-family:var(--font-body);">
+        Last updated: {{ current_time }}
+      </p>
+    </div>
+    <span class="vp-sidebar-badge" style="padding:6px 16px;font-size:11px;">
+      <i class="fas fa-user-shield me-1"></i>Administrator
+    </span>
+  </div>
+
+
+  <!-- ── PENDING ALERTS ──────────────────────────────────── -->
+  {% if stats.pending_verifications > 0 or stats.pending_job_approvals > 0 or stats.pending_app_reviews > 0 %}
+  <div class="vp-dash-alert vp-dash-alert-warning mb-4">
+    <i class="fas fa-exclamation-triangle"></i>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;flex:1;">
+      {% if stats.pending_verifications > 0 %}
+      <a href="{{ url_for('admin.verification_management') }}"
+         style="color:#fbbf24;text-decoration:none;font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+        <i class="fas fa-user-check me-1"></i>{{ stats.pending_verifications }} Verification{{ 's' if stats.pending_verifications != 1 }}
+      </a>
+      {% endif %}
+      {% if stats.pending_job_approvals > 0 %}
+      <a href="{{ url_for('admin.job_moderation') }}"
+         style="color:#fbbf24;text-decoration:none;font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+        <i class="fas fa-briefcase me-1"></i>{{ stats.pending_job_approvals }} Job{{ 's' if stats.pending_job_approvals != 1 }} Pending
+      </a>
+      {% endif %}
+      {% if stats.pending_app_reviews > 0 %}
+      <a href="{{ url_for('admin.application_monitoring') }}"
+         style="color:#fbbf24;text-decoration:none;font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+        <i class="fas fa-file-alt me-1"></i>{{ stats.pending_app_reviews }} Application{{ 's' if stats.pending_app_reviews != 1 }} Pending
+      </a>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+
+  <!-- ── KEY METRIC STATS ────────────────────────────────── -->
+  <div class="row g-3 mb-4">
+
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number">{{ stats.total_veterans }}</div>
+          <div class="vp-dash-stat-label">Total Veterans</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;">
+            {{ stats.verified_veterans }} verified
+          </div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(212,175,55,0.1);color:var(--gold);">
+          <i class="fas fa-medal"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number">{{ stats.total_employers }}</div>
+          <div class="vp-dash-stat-label">Employers</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;">
+            {{ stats.active_employers }} active
+          </div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(74,222,128,0.1);color:#4ade80;">
+          <i class="fas fa-building"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number">{{ stats.total_job_posts }}</div>
+          <div class="vp-dash-stat-label">Job Posts</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;">
+            {{ stats.active_job_posts }} active
+          </div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(96,165,250,0.1);color:#60a5fa;">
+          <i class="fas fa-briefcase"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number">{{ stats.total_applications }}</div>
+          <div class="vp-dash-stat-label">Applications</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;">
+            {{ stats.accepted_applications }} accepted
+          </div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24;">
+          <i class="fas fa-file-alt"></i>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ── REVENUE STATS ───────────────────────────────────── -->
+  <div class="row g-3 mb-4">
+
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number" style="font-size:20px;">
+            ₦{{ "{:,.0f}".format(stats.total_revenue) }}
+          </div>
+          <div class="vp-dash-stat-label">Total Revenue</div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(74,222,128,0.1);color:#4ade80;">
+          <i class="fas fa-money-bill-wave"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number">{{ stats.total_payments }}</div>
+          <div class="vp-dash-stat-label">Payments</div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(96,165,250,0.1);color:#60a5fa;">
+          <i class="fas fa-credit-card"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number">{{ stats.active_subscriptions }}</div>
+          <div class="vp-dash-stat-label">Subscriptions</div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(212,175,55,0.1);color:var(--gold);">
+          <i class="fas fa-crown"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number" style="font-size:20px;">
+            ₦{% if stats.total_payments > 0 %}{{ "%.0f"|format(stats.total_revenue / stats.total_payments) }}{% else %}0{% endif %}
+          </div>
+          <div class="vp-dash-stat-label">Avg. Transaction</div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24;">
+          <i class="fas fa-chart-line"></i>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ── CHARTS + ACTIVITY ───────────────────────────────── -->
+  <div class="row g-4">
+
+    <!-- Charts + Recent Activity -->
+    <div class="col-lg-8">
+
+      <!-- Charts row -->
+      <div class="row g-4 mb-4">
+
+        <div class="col-md-6">
+          <div class="vp-dash-card">
+            <div class="vp-dash-card-header">
+              <span><i class="fas fa-users me-2"></i>User Distribution</span>
+            </div>
+            <div class="vp-dash-card-body">
+              <canvas id="userTypesChart" style="max-height:240px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="vp-dash-card">
+            <div class="vp-dash-card-header">
+              <span><i class="fas fa-chart-pie me-2"></i>Application Status</span>
+            </div>
+            <div class="vp-dash-card-body">
+              <canvas id="applicationStatusChart" style="max-height:240px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Recent Applications table -->
+      <div class="vp-dash-card">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-clock me-2"></i>Recent Activity</span>
+        </div>
+        <div class="vp-dash-card-body" style="padding:0;">
+
+          {% if recent_applications %}
+          <div class="table-responsive">
+            <table class="table mb-0" style="border-color:rgba(255,255,255,0.05);">
+              <thead>
+                <tr>
+                  <th style="background:rgba(212,175,55,0.08);color:var(--gold);font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid rgba(212,175,55,0.2);padding:14px 20px;">Veteran</th>
+                  <th style="background:rgba(212,175,55,0.08);color:var(--gold);font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid rgba(212,175,55,0.2);padding:14px 20px;">Job</th>
+                  <th style="background:rgba(212,175,55,0.08);color:var(--gold);font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid rgba(212,175,55,0.2);padding:14px 20px;">Company</th>
+                  <th style="background:rgba(212,175,55,0.08);color:var(--gold);font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid rgba(212,175,55,0.2);padding:14px 20px;">Applied</th>
+                  <th style="background:rgba(212,175,55,0.08);color:var(--gold);font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid rgba(212,175,55,0.2);padding:14px 20px;">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for application, job_post, veteran in recent_applications %}
+                <tr style="border-color:rgba(255,255,255,0.04);transition:background 0.2s ease;"
+                    onmouseover="this.style.background='rgba(212,175,55,0.04)'"
+                    onmouseout="this.style.background='transparent'">
+                  <td style="padding:14px 20px;color:rgba(255,255,255,0.8);vertical-align:middle;border-color:rgba(255,255,255,0.04);">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                      <div class="vp-user-avatar" style="width:30px;height:30px;font-size:11px;flex-shrink:0;">
+                        <i class="fas fa-user" style="font-size:11px;"></i>
+                      </div>
+                      {{ veteran.full_name }}
+                    </div>
+                  </td>
+                  <td style="padding:14px 20px;color:rgba(255,255,255,0.7);font-size:13px;vertical-align:middle;border-color:rgba(255,255,255,0.04);">
+                    {{ job_post.job_title }}
+                  </td>
+                  <td style="padding:14px 20px;color:rgba(255,255,255,0.5);font-size:13px;vertical-align:middle;border-color:rgba(255,255,255,0.04);">
+                    {{ job_post.company_name }}
+                  </td>
+                  <td style="padding:14px 20px;color:rgba(255,255,255,0.4);font-size:12px;font-family:var(--font-cond);vertical-align:middle;border-color:rgba(255,255,255,0.04);">
+                    {{ application.created_at.strftime('%b %d, %H:%M') }}
+                  </td>
+                  <td style="padding:14px 20px;vertical-align:middle;border-color:rgba(255,255,255,0.04);">
+                    <span class="badge" style="background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);font-family:var(--font-cond);font-size:10px;letter-spacing:1px;padding:4px 10px;border-radius:2px;">
+                      {{ application.get_status_display() }}
+                    </span>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          {% else %}
+          <div class="vp-empty-state py-4">
+            <i class="fas fa-inbox fa-2x mb-3" style="color:rgba(212,175,55,0.3);"></i>
+            <p class="section-label mb-1">No Recent Activity</p>
+            <p style="color:rgba(255,255,255,0.3);font-size:13px;">Applications will appear here as veterans apply.</p>
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ── RIGHT SIDEBAR COLUMN ────────────────────────── -->
+    <div class="col-lg-4">
+
+      <!-- Platform Health -->
+      <div class="vp-dash-card mb-4">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-heartbeat me-2"></i>Platform Health</span>
+        </div>
+        <div class="vp-dash-card-body">
+
+          <div class="vp-checklist-item">
+            <i class="fas fa-check-circle vp-check-yes"></i>
+            <span style="flex:1;">User Activity</span>
+            <span style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#4ade80;">Healthy</span>
+          </div>
+          <div class="vp-checklist-item">
+            <i class="fas fa-check-circle vp-check-yes"></i>
+            <span style="flex:1;">Application Flow</span>
+            <span style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#4ade80;">Normal</span>
+          </div>
+          <div class="vp-checklist-item" style="border-bottom:none;">
+            <i class="fas fa-check-circle vp-check-yes"></i>
+            <span style="flex:1;">System Performance</span>
+            <span style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#4ade80;">Optimal</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="vp-dash-card mb-4">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-bolt me-2"></i>Quick Actions</span>
+        </div>
+        <div class="vp-dash-card-body">
+          <a href="{{ url_for('admin.verification_management') }}" class="vp-resource-btn">
+            <i class="fas fa-user-check"></i> Review Verifications
+          </a>
+          <a href="{{ url_for('admin.job_moderation') }}" class="vp-resource-btn">
+            <i class="fas fa-briefcase"></i> Moderate Jobs
+          </a>
+          <a href="{{ url_for('admin.application_monitoring') }}" class="vp-resource-btn">
+            <i class="fas fa-file-alt"></i> Monitor Applications
+          </a>
+          <div class="vp-sidebar-rule" style="margin:12px 0;"></div>
+          <a href="{{ url_for('admin.veteran_management') }}" class="vp-resource-btn">
+            <i class="fas fa-users"></i> Manage Veterans
+          </a>
+          <a href="{{ url_for('admin.employer_management') }}" class="vp-resource-btn">
+            <i class="fas fa-building"></i> Manage Employers
+          </a>
+          <a href="{{ url_for('admin.manage_partners') }}" class="vp-resource-btn">
+            <i class="fas fa-handshake"></i> Manage Partners
+          </a>
+        </div>
+      </div>
+
+      <!-- System Info -->
+      <div class="vp-dash-card">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-info-circle me-2"></i>System Info</span>
+        </div>
+        <div class="vp-dash-card-body">
+          <div class="vp-checklist-item">
+            <span style="color:rgba(255,255,255,0.35);font-size:12px;font-family:var(--font-cond);letter-spacing:1px;text-transform:uppercase;width:80px;flex-shrink:0;">Platform</span>
+            <span style="font-size:13px;">VetJobs Portal</span>
+          </div>
+          <div class="vp-checklist-item">
+            <span style="color:rgba(255,255,255,0.35);font-size:12px;font-family:var(--font-cond);letter-spacing:1px;text-transform:uppercase;width:80px;flex-shrink:0;">Version</span>
+            <span style="font-size:13px;">v1.0.0</span>
+          </div>
+          <div class="vp-checklist-item">
+            <span style="color:rgba(255,255,255,0.35);font-size:12px;font-family:var(--font-cond);letter-spacing:1px;text-transform:uppercase;width:80px;flex-shrink:0;">Env</span>
+            <span style="font-size:13px;">Production</span>
+          </div>
+          <div class="vp-checklist-item" style="border-bottom:none;">
+            <span style="color:rgba(255,255,255,0.35);font-size:12px;font-family:var(--font-cond);letter-spacing:1px;text-transform:uppercase;width:80px;flex-shrink:0;">Deploy</span>
+            <span style="font-size:13px;">Sept 05, 2025</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /.row -->
+
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const chartData = {{ chart_data | tojson }};
+
+// ── Shared chart defaults — match navy/gold palette ──────
+Chart.defaults.color = 'rgba(255,255,255,0.45)';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+
+// User Types Doughnut
+new Chart(document.getElementById('userTypesChart'), {
+  type: 'doughnut',
+  data: {
+    labels: chartData.user_types.labels,
+    datasets: [{
+      data: chartData.user_types.data,
+      backgroundColor: [
+        'rgba(212,175,55,0.75)',   // gold — veterans
+        'rgba(74,222,128,0.75)',   // green — employers
+        'rgba(248,113,113,0.75)'   // red — admins
+      ],
+      borderColor: '#04080f',
+      borderWidth: 2
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { padding: 16, usePointStyle: true, font: { family: "'Barlow Condensed', sans-serif", size: 11, weight: '700' } }
+      }
+    }
+  }
+});
+
+// Application Status Bar
+new Chart(document.getElementById('applicationStatusChart'), {
+  type: 'bar',
+  data: {
+    labels: chartData.application_status.labels,
+    datasets: [{
+      data: chartData.application_status.data,
+      backgroundColor: [
+        'rgba(251,191,36,0.7)',
+        'rgba(96,165,250,0.7)',
+        'rgba(74,222,128,0.7)',
+        'rgba(248,113,113,0.7)'
+      ],
+      borderRadius: 4,
+      borderWidth: 0
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { font: { family: "'Barlow Condensed', sans-serif", size: 11 } } },
+      y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { stepSize: 1, font: { family: "'Barlow Condensed', sans-serif", size: 11 } } }
+    }
+  }
+});
+</script>
+{% endblock %}

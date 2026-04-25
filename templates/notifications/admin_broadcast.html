@@ -1,0 +1,192 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Broadcast Notification - Admin Dashboard{% endblock %}
+
+{% block header %}
+<div class="d-flex justify-content-between align-items-center">
+    <div>
+        <h2 class="fw-bold">
+            <i class="fas fa-bullhorn me-2"></i>Broadcast Notification
+        </h2>
+        <p class="text-muted mb-0">Send announcements to all users or specific groups</p>
+    </div>
+    <div>
+        <a href="{{ url_for('notifications.admin_broadcast_history') }}" class="btn btn-outline-primary">
+            <i class="fas fa-history me-2"></i>View History
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-plus me-2"></i>Create Broadcast
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <!-- Title -->
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="title" name="title" required 
+                               placeholder="Enter notification title">
+                        <div class="form-text">Keep it concise and attention-grabbing</div>
+                    </div>
+                    
+                    <!-- Message -->
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="message" name="message" rows="4" required
+                                  placeholder="Enter your message..."></textarea>
+                        <div class="form-text">Provide clear and useful information to users</div>
+                    </div>
+                    
+                    <!-- Target Audience -->
+                    <div class="mb-3">
+                        <label for="target_audience" class="form-label">Target Audience</label>
+                        <select class="form-select" id="target_audience" name="target_audience">
+                            <option value="all">All Users</option>
+                            <option value="veterans">Veterans Only</option>
+                            <option value="employers">Employers Only</option>
+                        </select>
+                        <div class="form-text">Choose who should receive this notification</div>
+                    </div>
+                    
+                    <!-- Priority -->
+                    <div class="mb-3">
+                        <label for="priority" class="form-label">Priority Level</label>
+                        <select class="form-select" id="priority" name="priority">
+                            <option value="low">Low - General information</option>
+                            <option value="normal" selected>Normal - Regular updates</option>
+                            <option value="high">High - Important announcements</option>
+                            <option value="urgent">Urgent - Critical alerts</option>
+                        </select>
+                        <div class="form-text">Higher priority notifications are more prominent</div>
+                    </div>
+                    
+                    <!-- Action Button (Optional) -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="action_url" class="form-label">Action URL (Optional)</label>
+                            <input type="url" class="form-control" id="action_url" name="action_url" 
+                                   placeholder="https://example.com/action">
+                            <div class="form-text">Link for users to take action</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="action_text" class="form-label">Action Button Text</label>
+                            <input type="text" class="form-control" id="action_text" name="action_text" 
+                                   placeholder="Learn More">
+                            <div class="form-text">Text displayed on the action button</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Delivery Options -->
+                    <div class="mb-4">
+                        <label class="form-label">Delivery Channels</label>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="send_push" name="send_push" checked disabled>
+                                    <label class="form-check-label" for="send_push">
+                                        <i class="fas fa-bell me-1"></i>In-App Notification
+                                    </label>
+                                    <div class="form-text">Always enabled for broadcasts</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="send_email" name="send_email">
+                                    <label class="form-check-label" for="send_email">
+                                        <i class="fas fa-envelope me-1"></i>Email Notification
+                                    </label>
+                                    <div class="form-text">Send via email (respects user preferences)</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="send_sms" name="send_sms">
+                                    <label class="form-check-label" for="send_sms">
+                                        <i class="fas fa-sms me-1"></i>SMS Notification
+                                    </label>
+                                    <div class="form-text">Send via SMS (urgent only recommended)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Preview -->
+                    <div class="mb-4">
+                        <h6>Preview</h6>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div class="d-flex align-items-start">
+                                    <div class="me-2">
+                                        <i class="fas fa-bullhorn text-primary"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-bold" id="preview-title">Notification Title</div>
+                                        <div class="text-muted" id="preview-message">Notification message will appear here...</div>
+                                        <small class="text-muted">Just now</small>
+                                    </div>
+                                    <div class="badge bg-primary" id="preview-priority">Normal</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary" onclick="return confirmBroadcast()">
+                            <i class="fas fa-paper-plane me-2"></i>Send Broadcast
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Live preview
+function updatePreview() {
+    const title = document.getElementById('title').value || 'Notification Title';
+    const message = document.getElementById('message').value || 'Notification message will appear here...';
+    const priority = document.getElementById('priority').value;
+    
+    document.getElementById('preview-title').textContent = title;
+    document.getElementById('preview-message').textContent = message;
+    document.getElementById('preview-priority').textContent = priority.charAt(0).toUpperCase() + priority.slice(1);
+    
+    // Update priority badge color
+    const badge = document.getElementById('preview-priority');
+    badge.className = 'badge bg-' + (priority === 'urgent' ? 'danger' : priority === 'high' ? 'warning' : priority === 'low' ? 'secondary' : 'primary');
+}
+
+// Update preview on input
+document.getElementById('title').addEventListener('input', updatePreview);
+document.getElementById('message').addEventListener('input', updatePreview);
+document.getElementById('priority').addEventListener('change', updatePreview);
+
+// Confirm before sending
+function confirmBroadcast() {
+    const audience = document.getElementById('target_audience').value;
+    const audienceText = audience === 'all' ? 'all users' : audience;
+    
+    return confirm(`Are you sure you want to send this broadcast to ${audienceText}? This action cannot be undone.`);
+}
+
+// Enable/disable action text based on URL
+document.getElementById('action_url').addEventListener('input', function() {
+    const actionText = document.getElementById('action_text');
+    actionText.disabled = !this.value;
+    if (!this.value) actionText.value = '';
+});
+</script>
+{% endblock %}

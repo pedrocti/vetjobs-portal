@@ -1,0 +1,479 @@
+{% extends "base.html" %}
+{% block title %}Complete Your Profile - VetJobs Portal{% endblock %}
+
+{% block content %}
+<div class="vp-auth-wrapper" style="align-items:flex-start;padding:40px 20px;">
+  <div class="vp-auth-card" style="max-width:900px;width:100%;">
+
+    <!-- Header -->
+    <div class="vp-auth-header">
+      <div class="hero-top-accent" style="position:relative;height:2px;border-radius:0;"></div>
+      <div class="vp-auth-header-inner">
+        <div class="vp-auth-logo-ring">
+          <i class="fas fa-id-card"></i>
+        </div>
+        <p class="section-label mb-1">VetJobPortal</p>
+        <h2 class="vp-auth-title">Complete Your Profile</h2>
+        <p class="vp-auth-subtitle" style="max-width:640px;margin:0 auto;">
+          Share your military service or spouse background to connect with veteran-friendly
+          employers and unlock tailored career opportunities across Africa.
+        </p>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="vp-auth-body" style="padding:40px 48px;">
+
+      <!-- Verification Alert -->
+      <div class="alert alert-info mb-4" style="background:rgba(212,175,55,0.08);border-left:3px solid var(--gold);border-radius:8px;padding:16px 20px;">
+        <i class="fas fa-shield-alt me-2" style="color:var(--gold);"></i>
+        <strong style="color:var(--gold);">Verification Required:</strong>
+        <span style="color:rgba(255,255,255,0.65);font-size:14px;">
+          Accurate service details and documents allow employers to trust your profile.
+          All uploads are securely reviewed.
+        </span>
+      </div>
+
+      <!-- Profile Completion -->
+      {% if profile %}
+      <div class="vp-profile-completion mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="section-label" style="margin:0;">Profile Completion</span>
+          <span style="font-family:var(--font-cond);font-size:20px;font-weight:800;color:var(--gold);">
+            {{ profile.profile_completion_percentage() }}%
+          </span>
+        </div>
+        <div class="vp-step-bar">
+          <div class="vp-step-fill" style="width:{{ profile.profile_completion_percentage() }}%;"></div>
+        </div>
+        {% if profile.profile_completion_percentage() < 70 %}
+        <small class="vp-form-hint mt-2 d-block">
+          Add resume & spouse details (if applicable) to reach 90%+
+        </small>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Form -->
+      <form method="POST" enctype="multipart/form-data" id="profileForm">
+        <input type="hidden" name="is_military_spouse_hidden" id="is_military_spouse_hidden"
+               value="{{ 'true' if profile and profile.is_military_spouse else 'false' }}">
+
+
+        <!-- ── PERSONAL DETAILS ──────────────────────────────── -->
+        <div class="vp-profile-section">
+          <div class="vp-profile-section-header">
+            <div class="vp-detail-icon"><i class="fas fa-user"></i></div>
+            <h5 class="vp-profile-section-title">Personal Details</h5>
+          </div>
+          <div class="vp-divider left"></div>
+
+          <div class="row g-4 mb-2">
+            <div class="col-md-6">
+              <label class="form-label">Age <span class="vp-required">*</span></label>
+              <input type="number" class="form-control" name="age"
+                     min="18" max="100"
+                     value="{{ profile.age if profile else '' }}"
+                     placeholder="Your age" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Current Location <span class="vp-required">*</span></label>
+              <input type="text" class="form-control" name="location"
+                     value="{{ profile.location if profile else '' }}"
+                     placeholder="e.g. Lagos, Nigeria" required>
+              <small class="vp-form-hint">e.g., Lagos, Nigeria • Nairobi, Kenya • Accra, Ghana</small>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- ── PROFILE TYPE ───────────────────────────────────── -->
+        <div class="vp-profile-section">
+          <div class="vp-profile-section-header">
+            <div class="vp-detail-icon"><i class="fas fa-users"></i></div>
+            <h5 class="vp-profile-section-title">I Am A...</h5>
+          </div>
+          <div class="vp-divider left"></div>
+
+          <div class="vp-role-cards mb-2">
+            <label class="vp-role-card">
+              <input type="radio" name="profile_type" id="type_veteran" value="veteran"
+                     {% if not profile or not profile.is_military_spouse %}checked{% endif %}>
+              <div class="vp-role-card-inner">
+                <div class="vp-role-icon"><i class="fas fa-shield-alt"></i></div>
+                <strong>Veteran / Ex-Service Member</strong>
+                <small>I served in the military and am transitioning to civilian work</small>
+              </div>
+            </label>
+            <label class="vp-role-card">
+              <input type="radio" name="profile_type" id="type_spouse" value="spouse"
+                     {% if profile and profile.is_military_spouse %}checked{% endif %}>
+              <div class="vp-role-card-inner">
+                <div class="vp-role-icon"><i class="fas fa-heart"></i></div>
+                <strong>Military Spouse</strong>
+                <small>My partner serves or has served in the military</small>
+              </div>
+            </label>
+          </div>
+        </div>
+
+
+        <!-- ── VETERAN: MILITARY SERVICE ─────────────────────── -->
+        <div id="veteran-fields">
+          <div class="vp-profile-section">
+            <div class="vp-profile-section-header">
+              <div class="vp-detail-icon"><i class="fas fa-flag"></i></div>
+              <h5 class="vp-profile-section-title">Military Service Record</h5>
+            </div>
+            <div class="vp-divider left"></div>
+
+            <div class="row g-4 mb-2">
+              <div class="col-md-6">
+                <label class="form-label">Service Branch <span class="vp-required">*</span></label>
+                <select class="form-select" name="service_branch" id="service_branch" required>
+                  <option value="">Select Branch</option>
+                  <option value="army"     {% if profile and profile.service_branch == 'army'     %}selected{% endif %}>Army</option>
+                  <option value="navy"     {% if profile and profile.service_branch == 'navy'     %}selected{% endif %}>Navy</option>
+                  <option value="airforce" {% if profile and profile.service_branch == 'airforce' %}selected{% endif %}>Air Force</option>
+                  <option value="other"    {% if profile and profile.service_branch == 'other'    %}selected{% endif %}>Other</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Rank <span class="vp-required">*</span></label>
+                <input type="text" class="form-control" name="rank" id="rank"
+                       value="{{ profile.rank if profile else '' }}"
+                       placeholder="e.g. Sergeant, Captain" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Service Number <span class="vp-required">*</span></label>
+                <input type="text" class="form-control" name="service_number" id="service_number"
+                       value="{{ profile.service_number if profile else '' }}"
+                       placeholder="Your service number" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Years of Service <span class="vp-required">*</span></label>
+                <input type="number" class="form-control" name="years_of_service" id="years_of_service"
+                       min="0" max="50"
+                       value="{{ profile.years_of_service if profile else '' }}"
+                       placeholder="Total years served" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Department / Unit <span class="vp-required">*</span></label>
+                <input type="text" class="form-control" name="department" id="department"
+                       value="{{ profile.department if profile else '' }}"
+                       placeholder="e.g. Infantry, Signals, Medical" required>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- ── SPOUSE: INFORMATION ───────────────────────────── -->
+        <div id="spouse-fields" style="display:none;">
+          <div class="vp-profile-section">
+            <div class="vp-profile-section-header">
+              <div class="vp-detail-icon"><i class="fas fa-heart"></i></div>
+              <h5 class="vp-profile-section-title">Military Spouse Information</h5>
+            </div>
+            <div class="vp-divider left"></div>
+
+            <div class="row g-4 mb-2">
+              <div class="col-md-6">
+                <label class="form-label">Spouse's Service Branch</label>
+                <select class="form-select" name="spouse_service_branch">
+                  <option value="">Select Branch</option>
+                  <option value="army"     {% if profile and profile.spouse_service_branch == 'army'     %}selected{% endif %}>Army</option>
+                  <option value="navy"     {% if profile and profile.spouse_service_branch == 'navy'     %}selected{% endif %}>Navy</option>
+                  <option value="airforce" {% if profile and profile.spouse_service_branch == 'airforce' %}selected{% endif %}>Air Force</option>
+                  <option value="other"    {% if profile and profile.spouse_service_branch == 'other'    %}selected{% endif %}>Other</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Spouse's Rank / Rate</label>
+                <input type="text" class="form-control" name="spouse_rank"
+                       value="{{ profile.spouse_rank if profile else '' }}"
+                       placeholder="Spouse's rank or rate">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Spouse's Years of Service</label>
+                <input type="number" class="form-control" name="spouse_years_of_service"
+                       min="0" max="50"
+                       value="{{ profile.spouse_years_of_service if profile else '' }}"
+                       placeholder="Total years served">
+              </div>
+              <div class="col-12">
+                <label class="vp-consent-label">
+                  <input type="checkbox" name="relocation_ready" class="vp-consent-check"
+                         {% if profile and profile.relocation_ready %}checked{% endif %}>
+                  <span>Willing to relocate for job opportunities</span>
+                </label>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Explanation of Employment Gaps</label>
+                <textarea class="form-control" name="employment_gap_explanation" rows="3"
+                          placeholder="Help employers understand frequent moves or breaks...">{{ profile.employment_gap_explanation if profile else '' }}</textarea>
+                <small class="vp-form-hint">Help employers understand frequent moves or breaks</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- ── PROFESSIONAL INFO ─────────────────────────────── -->
+        <div class="vp-profile-section">
+          <div class="vp-profile-section-header">
+            <div class="vp-detail-icon"><i class="fas fa-briefcase"></i></div>
+            <h5 class="vp-profile-section-title">Professional Information</h5>
+          </div>
+          <div class="vp-divider left"></div>
+
+          <div class="row g-4 mb-2">
+            <div class="col-12">
+              <label class="form-label">Professional Summary / Bio</label>
+              <textarea class="form-control" name="bio" rows="4"
+                        placeholder="Your background, strengths, and career goals...">{{ profile.bio if profile else '' }}</textarea>
+              <small class="vp-form-hint">Appears on your public profile — helps employers quickly understand your value.</small>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Key Skills & Competencies</label>
+              <textarea class="form-control" name="skills" rows="3"
+                        placeholder="Leadership, logistics, IT, security, administration...">{{ profile.skills if profile else '' }}</textarea>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Certifications & Training</label>
+              <textarea class="form-control" name="certifications" rows="3"
+                        placeholder="Security clearance, first aid, project management...">{{ profile.certifications if profile else '' }}</textarea>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Discharge Type <small style="color:rgba(255,255,255,0.3);">(if applicable)</small></label>
+              <select class="form-select" name="discharge_type">
+                <option value="">Select (if veteran)</option>
+                <option value="honorable" {% if profile and profile.discharge_type == 'honorable' %}selected{% endif %}>Honorable</option>
+                <option value="general"   {% if profile and profile.discharge_type == 'general'   %}selected{% endif %}>General (Under Honorable)</option>
+                <option value="medical"   {% if profile and profile.discharge_type == 'medical'   %}selected{% endif %}>Medical</option>
+                <option value="other"     {% if profile and profile.discharge_type == 'other'     %}selected{% endif %}>Other</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Notable Deployments / Assignments</label>
+              <textarea class="form-control" name="deployment_history" rows="3"
+                        placeholder="Key deployments, missions, locations...">{{ profile.deployment_history if profile else '' }}</textarea>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- ── RESUME UPLOAD ─────────────────────────────────── -->
+        <div class="vp-profile-section">
+          <div class="vp-profile-section-header">
+            <div class="vp-detail-icon"><i class="fas fa-file-upload"></i></div>
+            <h5 class="vp-profile-section-title">Resume / CV</h5>
+          </div>
+          <div class="vp-divider left"></div>
+
+          <div class="mb-2">
+            <label class="form-label">
+              Upload Resume
+              {% if not profile or not profile.resume_file %}
+              <span class="vp-required">*</span>
+              {% endif %}
+            </label>
+            <input type="file" class="form-control" name="resume_file"
+                   accept=".pdf,.doc,.docx"
+                   {% if not profile or not profile.resume_file %}required{% endif %}>
+            <small class="vp-form-hint">
+              Max 8MB • PDF recommended • Highlight military → civilian transferable skills
+            </small>
+            {% if profile and profile.resume_file %}
+            <div class="vp-file-current mt-2">
+              <i class="fas fa-check-circle me-2" style="color:#4ade80;"></i>
+              <span>Current: {{ profile.resume_file | basename }}</span>
+              {% if profile.resume_last_updated %}
+              <span style="color:rgba(255,255,255,0.3);margin-left:6px;font-size:11px;">
+                (updated {{ profile.resume_last_updated.strftime('%d %b %Y') }})
+              </span>
+              {% endif %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+
+        <!-- ── VERIFICATION DOCS ─────────────────────────────── -->
+        <div class="vp-profile-section">
+          <div class="vp-profile-section-header">
+            <div class="vp-detail-icon"><i class="fas fa-upload"></i></div>
+            <h5 class="vp-profile-section-title">Verification Documents</h5>
+          </div>
+          <div class="vp-divider left"></div>
+
+          <div class="alert alert-info mb-4" style="background:rgba(212,175,55,0.06);border-left:3px solid rgba(212,175,55,0.4);border-radius:8px;padding:14px 18px;">
+            <i class="fas fa-info-circle me-2" style="color:var(--gold);"></i>
+            <span style="color:rgba(255,255,255,0.6);font-size:13px;">
+              Upload clear scans or photos (PDF, JPG, PNG — max 16MB). Required for employer verification.
+            </span>
+          </div>
+
+          <div class="row g-4 mb-2">
+            <div class="col-md-6">
+              <label class="form-label">
+                {% if profile and profile.is_military_spouse %}
+                  Spouse's Discharge / Service Document
+                {% else %}
+                  Discharge Certificate / Service Record <span class="vp-required">*</span>
+                {% endif %}
+              </label>
+              <input type="file" class="form-control" name="discharge_document"
+                     accept=".pdf,.jpg,.jpeg,.png"
+                     {% if not profile or not profile.discharge_document %}required{% endif %}>
+              <small class="vp-form-hint">DD-214, Certificate of Service, or equivalent</small>
+              {% if profile and profile.discharge_document %}
+              <div class="vp-file-current mt-2">
+                <i class="fas fa-check-circle me-2" style="color:#4ade80;"></i>
+                <span>{{ profile.discharge_document | basename }}</span>
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">
+                Military ID / Family ID <span class="vp-required">*</span>
+              </label>
+              <input type="file" class="form-control" name="id_document"
+                     accept=".pdf,.jpg,.jpeg,.png"
+                     {% if not profile or not profile.id_document %}required{% endif %}>
+              <small class="vp-form-hint">Military ID, dependent ID, or retirement ID card</small>
+              {% if profile and profile.id_document %}
+              <div class="vp-file-current mt-2">
+                <i class="fas fa-check-circle me-2" style="color:#4ade80;"></i>
+                <span>{{ profile.id_document | basename }}</span>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+
+        <!-- ── SUBMIT ─────────────────────────────────────────── -->
+        <div class="d-flex flex-column flex-md-row gap-3 justify-content-center mt-5 pt-4"
+             style="border-top:1px solid rgba(212,175,55,0.1);">
+          <button type="submit" class="btn-vp-primary" id="submitBtn">
+            <i class="fas fa-paper-plane"></i>
+            <span>Submit for Verification</span>
+          </button>
+          <a href="{{ url_for('dashboard.veteran') }}" class="btn-vp-ghost">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to Dashboard</span>
+          </a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     ADD ONLY THESE TO premium-upgrade.css — 2 small blocks
+     ═══════════════════════════════════════════════════════════════ -->
+<style>
+
+/* ── Profile section block ── */
+.vp-profile-section {
+  margin-bottom: 40px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.vp-profile-section:last-of-type {
+  border-bottom: none;
+}
+
+.vp-profile-section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.vp-profile-section-title {
+  font-family: var(--font-cond);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+/* ── Uploaded file indicator ── */
+.vp-file-current {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: var(--font-cond);
+  letter-spacing: 0.5px;
+}
+
+/* ── Profile completion bar ── */
+.vp-profile-completion { }
+
+</style>
+
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  const veteranRadio   = document.getElementById('type_veteran');
+  const spouseRadio    = document.getElementById('type_spouse');
+  const veteranSection = document.getElementById('veteran-fields');
+  const spouseSection  = document.getElementById('spouse-fields');
+  const hiddenInput    = document.getElementById('is_military_spouse_hidden');
+
+  function toggleSections() {
+    if (spouseRadio.checked) {
+      spouseSection.style.display  = 'block';
+      veteranSection.style.display = 'none';
+      hiddenInput.value = 'true';
+      document.querySelectorAll('#veteran-fields [required]').forEach(el => el.removeAttribute('required'));
+    } else {
+      spouseSection.style.display  = 'none';
+      veteranSection.style.display = 'block';
+      hiddenInput.value = 'false';
+      ['service_branch','service_number','years_of_service','department','rank'].forEach(id => {
+        document.getElementById(id)?.setAttribute('required', '');
+      });
+    }
+  }
+
+  veteranRadio.addEventListener('change', toggleSections);
+  spouseRadio.addEventListener('change', toggleSections);
+  toggleSections();
+
+  /* File size validation — 16MB */
+  document.querySelectorAll('input[type="file"]').forEach(input => {
+    input.addEventListener('change', function () {
+      if (this.files[0] && this.files[0].size > 16 * 1024 * 1024) {
+        alert('File too large. Maximum size is 16MB.');
+        this.value = '';
+      }
+    });
+  });
+
+  /* Submit loading state */
+  const form      = document.getElementById('profileForm');
+  const submitBtn = document.getElementById('submitBtn');
+
+  form.addEventListener('submit', function () {
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Submitting...</span>';
+    submitBtn.style.opacity = '0.7';
+    submitBtn.style.pointerEvents = 'none';
+  });
+
+});
+</script>
+{% endblock %}
+
+{% endblock %}

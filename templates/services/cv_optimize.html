@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h2 class="fw-bold text-primary">CV Optimization Service</h2>
+    <p class="lead text-muted">
+      Transform your military experience into a powerful, civilian-ready CV that gets noticed by employers.
+    </p>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-5">
+
+          <!-- Service Explanation -->
+          <h5 class="fw-bold mb-3 text-primary">Why This Service Matters</h5>
+          <p class="text-muted">
+            Transitioning from military service to the civilian workforce can be challenging. 
+            Many veterans struggle because their impressive military achievements and skills are written in military language that civilian recruiters and ATS systems don’t understand.
+          </p>
+          <p class="text-muted">
+            Our <strong>CV Optimization Service</strong> bridges that gap by translating your military experience into clear, compelling, and professional language that resonates with civilian employers.
+          </p>
+
+          <hr class="my-4">
+
+          <!-- What You Get -->
+          <h5 class="fw-bold mb-4">What You Will Receive:</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <ul class="list-unstyled">
+                <li class="mb-3">
+                  <span class="text-success fw-bold">✔</span> 
+                  <strong>Military-to-Civilian Translation</strong><br>
+                  <small class="text-muted">We convert ranks, duties, and achievements into civilian-friendly terms</small>
+                </li>
+                <li class="mb-3">
+                  <span class="text-success fw-bold">✔</span> 
+                  <strong>ATS-Optimized Formatting</strong><br>
+                  <small class="text-muted">Your CV will pass Applicant Tracking Systems used by most companies</small>
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <ul class="list-unstyled">
+                <li class="mb-3">
+                  <span class="text-success fw-bold">✔</span> 
+                  <strong>Keyword Optimization</strong><br>
+                  <small class="text-muted">Industry-specific keywords to improve job matching</small>
+                </li>
+                <li class="mb-3">
+                  <span class="text-success fw-bold">✔</span> 
+                  <strong>Professionally Rewritten CV</strong><br>
+                  <small class="text-muted">A polished, high-impact document ready to impress recruiters</small>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <hr class="my-4">
+
+          <!-- Pricing & Importance -->
+          <div class="bg-light p-4 rounded-3 text-center mb-4">
+            <h5 class="fw-bold mb-2">
+              Investment: 
+              <span class="text-primary">
+                ₦{{ "{:,}".format(cv_price|int) }}
+              </span>
+            </h5>
+
+            <p class="mb-0 text-muted small">
+              One-time fee • Delivered within 24–48 hours
+            </p>
+          </div>
+
+          <p class="text-center text-muted small mb-4">
+            This is a small but critical investment in your civilian career success. 
+            A well-optimized CV significantly increases your chances of getting interviews and landing better job opportunities.
+          </p>
+
+          <!-- Action Section -->
+          {% if cv_file %}
+            <form method="POST">
+              <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-semibold">
+                Submit My CV for Optimization
+              </button>
+            </form>
+            <div class="text-center mt-3">
+              <small class="text-muted">
+                You will be redirected to make payment before submission
+              </small>
+            </div>
+          {% else %}
+            <div class="alert alert-warning text-center">
+              <i class="bi bi-exclamation-triangle"></i><br>
+              You have not uploaded a CV yet.
+            </div>
+            <a href="{{ url_for('dashboard.veteran') }}" class="btn btn-outline-primary btn-lg w-100 py-3">
+              Go to Dashboard to Upload CV
+            </a>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

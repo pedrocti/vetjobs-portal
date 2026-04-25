@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Post a Job - Veteran-Employer Job Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Post a New Job</h4>
+                </div>
+                <div class="card-body p-5">
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle me-2"></i>
+
+                        {% if current_user.is_admin %}
+                            <strong>Admin Mode:</strong> Jobs you post will go live immediately without review.
+                        {% else %}
+                            <strong>Job Posting Guidelines:</strong> All job postings are reviewed by our admin team before being published. Please provide accurate and detailed information to help veterans find the right opportunities.
+                        {% endif %}
+                    </div>
+
+                    <form method="POST">
+                        <!-- Job Title and Company -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold text-primary mb-3"><i class="fas fa-briefcase me-2"></i>Job Information</h5>
+                            
+                            <div class="mb-3">
+                                <label for="job_title" class="form-label">Job Title *</label>
+                                <input type="text" class="form-control" id="job_title" name="job_title" 
+                                       placeholder="e.g., Software Engineer, Project Manager, Operations Specialist" 
+                                       value="{{ request.form.get('job_title', '') }}" required>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="company_name" class="form-label">Company Name *</label>
+                                    <input type="text" class="form-control" id="company_name" name="company_name" 
+                                           placeholder="Your company name" value="{{ request.form.get('company_name', '') }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="location" class="form-label">Location *</label>
+                                    <input type="text" class="form-control" id="location" name="location" 
+                                           placeholder="City, State or Remote" value="{{ request.form.get('location', '') }}" required>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="job_type" class="form-label">Job Type *</label>
+                                    <select class="form-select" id="job_type" name="job_type" required>
+                                        <option value="">Select job type</option>
+                                        <option value="full-time" {{ 'selected' if request.form.get('job_type') == 'full-time' else '' }}>Full-time</option>
+                                        <option value="part-time" {{ 'selected' if request.form.get('job_type') == 'part-time' else '' }}>Part-time</option>
+                                        <option value="contract" {{ 'selected' if request.form.get('job_type') == 'contract' else '' }}>Contract</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="salary_range" class="form-label">Salary Range (Optional)</label>
+                                    <input type="text" class="form-control" id="salary_range" name="salary_range" 
+                                           placeholder="e.g., ₦3,000,000 - ₦4,200,000" value="{{ request.form.get('salary_range', '') }}">
+                                    <div class="form-text">Help attract qualified candidates with transparent compensation</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Job Description -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold text-success mb-3"><i class="fas fa-file-alt me-2"></i>Job Description</h5>
+                            
+                            <div class="mb-3">
+                                <label for="job_description" class="form-label">Job Description *</label>
+                                <textarea class="form-control" id="job_description" name="job_description" rows="6" 
+                                          placeholder="Describe the role, responsibilities, and what makes this position attractive to veterans..." required>{{ request.form.get('job_description', '') }}</textarea>
+                                <div class="form-text">Include key responsibilities, team structure, and growth opportunities</div>
+                            </div>
+                        </div>
+
+                        <!-- Requirements -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold text-warning mb-3"><i class="fas fa-list-check me-2"></i>Requirements</h5>
+                            
+                            <div class="mb-3">
+                                <label for="requirements" class="form-label">Job Requirements *</label>
+                                <textarea class="form-control" id="requirements" name="requirements" rows="5" 
+                                          placeholder="List required skills, experience, education, and any military experience that would be valuable..." required>{{ request.form.get('requirements', '') }}</textarea>
+                                <div class="form-text">Be specific about required vs. preferred qualifications</div>
+                            </div>
+                        </div>
+
+                        <!-- Veterans Focus -->
+                        <div class="alert alert-success mb-4">
+                            <i class="fas fa-medal me-2"></i>
+                            <strong>Veteran-Friendly Hiring:</strong> Consider highlighting how military skills translate to this role and any veteran-specific benefits your company offers (e.g., military leave, spouse support, security clearance opportunities).
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                {% if current_user.is_admin %}
+                                    Post Job Now
+                                {% else %}
+                                    Submit Jobpost
+                                {% endif %}
+                            </button>
+                            <a href="{{ url_for('dashboard.employer') }}" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Character count for textareas
+    function addCharacterCounter(textareaId, maxLength) {
+        const textarea = document.getElementById(textareaId);
+        if (!textarea) return;
+        
+        const counter = document.createElement('div');
+        counter.className = 'form-text text-end';
+        counter.style.fontSize = '0.875rem';
+        textarea.parentNode.appendChild(counter);
+        
+        function updateCounter() {
+            const current = textarea.value.length;
+            counter.textContent = `${current} characters`;
+            
+            if (maxLength && current > maxLength * 0.9) {
+                counter.classList.add('text-warning');
+            } else {
+                counter.classList.remove('text-warning');
+            }
+        }
+        
+        textarea.addEventListener('input', updateCounter);
+        updateCounter();
+    }
+    
+    // Add counters to textareas
+    addCharacterCounter('job_description');
+    addCharacterCounter('requirements');
+});
+</script>
+{% endblock %}

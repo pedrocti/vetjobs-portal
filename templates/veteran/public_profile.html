@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Veteran Profile - {{ user.full_name or user.username }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <div class="d-flex align-items-center mb-3">
+            <img src="{{ url_for('static', filename=profile.profile_picture or 'images/vetjoblogo1.webp') }}"
+                 class="rounded-circle me-3" alt="Profile Picture" width="100" height="100">
+            <div>
+                <h2 class="mb-0">{{ user.first_name }} {{ user.last_name }}</h2>
+                <p class="text-muted">{{ user.email }}</p>
+                {% if profile.profile_boosted_until %}
+                    <span class="badge bg-success">
+                        Boosted until {{ profile.profile_boosted_until.strftime('%b %d, %Y') }}
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <hr>
+
+        <h4>About</h4>
+        <p>{{ profile.bio or "No biography provided yet." }}</p>
+
+        <h4 class="mt-4">Skills</h4>
+        <p>{{ profile.skills or "No skills listed." }}</p>
+
+        <h4 class="mt-4">Experience</h4>
+        <p>{{ profile.experience or "No experience information available." }}</p>
+
+        {% if current_user.is_authenticated and current_user.is_employer() %}
+            <div class="mt-4">
+                <a href="{{ url_for('messaging.start_conversation', recipient_id=user.id) }}"
+                   class="btn btn-primary">Message Veteran</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

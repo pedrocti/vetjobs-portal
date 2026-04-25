@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+{% block title %}Employer Subscription Plans | VetConnect{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <h2 class="fw-bold text-center mb-4">Choose Your Employer Subscription Plan</h2>
+    <p class="text-center text-muted mb-5">
+      Unlock more veteran talent, better visibility, and powerful hiring tools designed for Nigerian businesses.
+    </p>
+    <!-- Billing Toggle -->
+    <div class="text-center mb-5">
+      <label class="me-3 fw-semibold">Billing:</label>
+
+      <select id="billingCycle" class="form-select d-inline-block w-auto">
+        <option value="monthly">Monthly</option>
+        <option value="6_months">6 Months (10% OFF)</option>
+        <option value="yearly">Yearly (20% OFF)</option>
+      </select>
+    </div>
+    <!-- Pricing Cards -->
+    <div class="row justify-content-center g-4">
+
+      <!-- Starter Plan -->
+      {% set starter_active = current_subscription and current_subscription.plan_type == 'starter' and current_subscription.is_active() %}
+      <div class="col-lg-4 col-md-6">
+        <div class="card shadow-sm h-100 position-relative {% if starter_active %}border-primary border-2{% else %}border-0{% endif %}">
+          {% if starter_active %}
+          <span class="badge bg-primary position-absolute top-0 start-50 translate-middle px-3 py-2">
+            <i class="fas fa-check-circle me-1"></i>Your Current Plan
+          </span>
+          {% endif %}
+          <div class="card-header text-center {% if starter_active %}bg-primary text-white{% else %}bg-light{% endif %} py-4">
+            <h4 class="fw-bold mb-0">Starter</h4>
+            <div class="display-5 fw-bold mt-3" id="price-starter">
+              ₦{{ plans['starter'].price | int }}
+            </div>
+            <small class="{% if starter_active %}text-white-50{% else %}text-muted{% endif %}">per month</small>
+          </div>
+          <div class="card-body">
+            <ul class="list-unstyled">
+              <li><i class="fas fa-check text-success me-2"></i>Up to 3 Job Postings</li>
+              <li><i class="fas fa-check text-success me-2"></i>Email notifications for applications</li>
+              <li><i class="fas fa-check text-success me-2"></i>Standard support (Email + Chat)</li>
+              <li><i class="fas fa-times text-danger me-2"></i>AI Veteran Matching</li>
+              <li><i class="fas fa-times text-danger me-2"></i>CV/Resume Downloads</li>
+              <li><i class="fas fa-times text-danger me-2"></i>Direct Messaging</li>
+            </ul>
+          </div>
+          <div class="card-footer text-center bg-transparent border-0 py-4">
+            {% if starter_active %}
+              <button class="btn btn-primary w-100" disabled><i class="fas fa-check me-1"></i>Current Plan</button>
+            {% else %}
+              <button class="btn btn-outline-primary w-100" onclick="subscribeToPlan('starter')">
+                Choose Starter
+              </button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Professional Plan (Most Popular) -->
+      {% set pro_active = current_subscription and current_subscription.plan_type == 'professional' and current_subscription.is_active() %}
+      <div class="col-lg-4 col-md-6">
+        <div class="card shadow h-100 position-relative {% if pro_active %}border-warning border-2{% else %}border-warning{% endif %}">
+          {% if pro_active %}
+          <span class="badge bg-warning text-dark position-absolute top-0 start-50 translate-middle px-3 py-2">
+            <i class="fas fa-check-circle me-1"></i>Your Current Plan
+          </span>
+          {% else %}
+          <span class="badge bg-warning text-dark position-absolute top-0 start-50 translate-middle px-3 py-2">Most Popular</span>
+          {% endif %}
+
+          <div class="card-header text-center bg-warning text-dark py-4">
+            <h4 class="fw-bold mb-0">Professional</h4>
+            <div class="display-5 fw-bold mt-3" id="price-professional">
+              ₦{{ plans['professional'].price | int }}
+            </div>
+            <small class="text-dark">per month</small>
+          </div>
+          <div class="card-body">
+            <ul class="list-unstyled">
+              <li><i class="fas fa-check text-success me-2"></i>Unlimited Job Postings</li>
+              <li><i class="fas fa-check text-success me-2"></i>AI Veteran Matching & Search</li>
+              <li><i class="fas fa-check text-success me-2"></i>Unlimited CV/Resume downloads</li>
+              <li><i class="fas fa-check text-success me-2"></i>Direct messaging with veterans</li>
+              <li><i class="fas fa-check text-success me-2"></i>Advanced analytics dashboard</li>
+              <li><i class="fas fa-check text-success me-2"></i>Priority support (Email + WhatsApp)</li>
+            </ul>
+          </div>
+          <div class="card-footer text-center bg-transparent border-0 py-4">
+            {% if pro_active %}
+              <button class="btn btn-warning w-100 text-dark" disabled><i class="fas fa-check me-1"></i>Current Plan</button>
+            {% else %}
+              <button class="btn btn-warning w-100 text-dark" onclick="subscribeToPlan('professional')">
+                Choose Professional
+              </button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Enterprise Plus Plan -->
+      {% set ent_active = current_subscription and current_subscription.plan_type == 'enterprise_plus' and current_subscription.is_active() %}
+      <div class="col-lg-4 col-md-6">
+        <div class="card shadow-sm h-100 position-relative {% if ent_active %}border-success border-2{% else %}border-success{% endif %}">
+          {% if ent_active %}
+          <span class="badge bg-success position-absolute top-0 start-50 translate-middle px-3 py-2">
+            <i class="fas fa-check-circle me-1"></i>Your Current Plan
+          </span>
+          {% endif %}
+          <div class="card-header text-center bg-success text-white py-4">
+            <h4 class="fw-bold mb-0">Enterprise Plus</h4>
+            <div class="display-5 fw-bold mt-3" id="price-enterprise">
+              ₦{{ plans['enterprise_plus'].price | int }}
+            </div>
+            <small class="text-white">per month</small>
+          </div>
+          <div class="card-body">
+            <ul class="list-unstyled">
+              <li><i class="fas fa-check me-2"></i>Everything in Professional</li>
+              <li><i class="fas fa-check me-2"></i>Dedicated Account Manager</li>
+              <li><i class="fas fa-check me-2"></i>Custom branding & white-label options</li>
+              <li><i class="fas fa-check me-2"></i>API access</li>
+              <li><i class="fas fa-check me-2"></i>5 Job Boosts & premium placement</li>
+              <li><i class="fas fa-check me-2"></i>Team accounts & advanced reports</li>
+            </ul>
+          </div>
+          <div class="card-footer text-center bg-transparent border-0 py-4">
+            {% if ent_active %}
+              <button class="btn btn-success w-100" disabled><i class="fas fa-check me-1"></i>Current Plan</button>
+            {% else %}
+              <button class="btn btn-success w-100" onclick="subscribeToPlan('enterprise_plus')">
+                Choose Enterprise Plus
+              </button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Simple Comparison Table -->
+    <div class="table-responsive mt-5">
+      <table class="table table-bordered align-middle text-center">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 35%;">Key Features</th>
+            <th>Starter</th>
+            <th>Professional</th>
+            <th>Enterprise</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Job Postings</td>
+            <td>1 per month</td>
+            <td>Unlimited</td>
+            <td>Unlimited</td>
+          </tr>
+          <tr>
+            <td>CV/Resume Downloads</td>
+            <td>10 per month</td>
+            <td>Unlimited</td>
+            <td>Unlimited</td>
+          </tr>
+          <tr>
+            <td>Direct Messaging (Email + WhatsApp)</td>
+            <td>Limited</td>
+            <td>Full Access</td>
+            <td>Full Access</td>
+          </tr>
+          <tr>
+            <td>Interview Analytics</td>
+            <td>Basic</td>
+            <td>Advanced</td>
+            <td>Advanced + Reports</td>
+          </tr>
+          <tr>
+            <td>Support</td>
+            <td>Email + Chat</td>
+            <td>Priority WhatsApp</td>
+            <td>Dedicated Manager</td>
+          </tr>
+          <tr>
+            <td>Job Boost / Visibility</td>
+            <td>—</td>
+            <td>2 per month</td>
+            <td>Unlimited</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="text-center mt-5">
+      <p class="text-muted">
+        All plans are billed monthly and can be cancelled anytime from your dashboard.<br>
+        Annual billing available with 15% discount (contact support).
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+function subscribeToPlan(plan) {
+  const billing = document.getElementById("billingCycle").value;
+
+  if (!confirm(`Proceed with ${plan} plan (${billing.replace('_', ' ')})?`)) {
+    return;
+  }
+
+  fetch(`/payments/employer/subscription/initialize`, {  // ✅ FIXED URL
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      plan_type: plan,
+      billing_cycle: billing
+    })
+  })
+  .then(async res => {
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok || !data) {
+      throw new Error(data?.message || "Server error");
+    }
+
+    return data;
+  })
+  .then(data => {
+    if (data.success && data.authorization_url) {
+      window.location.href = data.authorization_url;
+    } else {
+      alert(data.message || "Payment failed");
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Something went wrong. Check console.");
+  });
+}
+</script>  
+<script>
+const basePrices = {
+  starter: {{ plans['starter'].price | int }},
+  professional: {{ plans['professional'].price | int }},
+  enterprise_plus: {{ plans['enterprise_plus'].price | int }}
+};
+
+const durationMap = {
+  monthly: 1,
+  "6_months": 6,
+  yearly: 12
+};
+
+const discountMap = {
+  monthly: 0,
+  "6_months": 0.10,
+  yearly: 0.20
+};
+
+function formatPrice(num) {
+  return "₦" + num.toLocaleString();
+}
+
+function updatePrices() {
+  const billing = document.getElementById("billingCycle").value;
+  const months = durationMap[billing];
+  const discount = discountMap[billing];
+
+  let starterP = basePrices.starter * months * (1 - discount);
+  document.getElementById("price-starter").innerText = formatPrice(Math.round(starterP));
+
+  let prof = basePrices.professional * months * (1 - discount);
+  document.getElementById("price-professional").innerText = formatPrice(Math.round(prof));
+
+  let ent = basePrices.enterprise_plus * months * (1 - discount);
+  document.getElementById("price-enterprise").innerText = formatPrice(Math.round(ent));
+}
+
+document.getElementById("billingCycle").addEventListener("change", updatePrices);
+
+// Run once on load
+updatePrices();
+</script>
+{% endblock %}

@@ -1,0 +1,273 @@
+{% extends "admin/base.html" %}
+{% block title %}Veteran Management — Admin Panel{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid p-0">
+
+  <!-- ── HEADER ──────────────────────────────────────────── -->
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+      <p class="section-label mb-1">Veteran Management</p>
+      <h1 style="font-family:var(--font-display);font-size:clamp(24px,4vw,36px);font-weight:700;color:#ffffff;margin:0;line-height:1.2;">
+        Manage <em style="color:var(--gold);font-style:italic;">Veterans</em>
+      </h1>
+      <p style="color:rgba(255,255,255,0.4);font-size:13px;margin-top:4px;">
+        Accounts, verification, and platform access
+      </p>
+    </div>
+    <span class="vp-sidebar-badge" style="padding:6px 16px;font-size:11px;">
+      <i class="fas fa-medal me-1"></i>{{ stats.total }} Veterans
+    </span>
+  </div>
+
+  <!-- ── STAT CARDS ──────────────────────────────────────── -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number">{{ stats.total }}</div>
+          <div class="vp-dash-stat-label">Total Veterans</div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(96,165,250,0.1);color:#60a5fa;">
+          <i class="fas fa-users"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number">{{ stats.active }}</div>
+          <div class="vp-dash-stat-label">Active Accounts</div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(74,222,128,0.1);color:#4ade80;">
+          <i class="fas fa-check-circle"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number">{{ stats.verified }}</div>
+          <div class="vp-dash-stat-label">Verified</div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(212,175,55,0.1);color:var(--gold);">
+          <i class="fas fa-medal"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number">{{ stats.pending }}</div>
+          <div class="vp-dash-stat-label">Pending Verification</div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24;">
+          <i class="fas fa-clock"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FILTERS ──────────────────────────────────────────── -->
+  <div class="vp-dash-card mb-4">
+    <div class="vp-dash-card-header">
+      <span><i class="fas fa-filter me-2"></i>Filter Veterans</span>
+    </div>
+    <div class="vp-dash-card-body">
+      <form method="GET" action="{{ url_for('admin.veteran_management') }}">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Search</label>
+            <input type="text" class="form-control" name="search"
+                   placeholder="Name, email, or username..."
+                   value="{{ current_filters.search }}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Account Status</label>
+            <select class="form-select" name="status">
+              <option value="">All Statuses</option>
+              <option value="active"   {{ 'selected' if current_filters.status == 'active' }}>Active</option>
+              <option value="inactive" {{ 'selected' if current_filters.status == 'inactive' }}>Inactive</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Verification</label>
+            <select class="form-select" name="verification">
+              <option value="">All</option>
+              <option value="verified" {{ 'selected' if current_filters.verification == 'verified' }}>Verified</option>
+              <option value="pending"  {{ 'selected' if current_filters.verification == 'pending' }}>Pending</option>
+              <option value="rejected" {{ 'selected' if current_filters.verification == 'rejected' }}>Rejected</option>
+            </select>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="fas fa-search me-1"></i>Filter
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── VETERANS TABLE ──────────────────────────────────── -->
+  <div class="vp-dash-card">
+    <div class="vp-dash-card-header">
+      <span>
+        <i class="fas fa-users me-2"></i>Veteran Accounts
+        {% if current_filters.search or current_filters.status or current_filters.verification %}
+        <span style="background:rgba(212,175,55,0.15);color:var(--gold);border:1px solid rgba(212,175,55,0.3);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:2px;margin-left:8px;">Filtered</span>
+        {% endif %}
+      </span>
+    </div>
+    <div class="vp-dash-card-body" style="padding:0;">
+
+      {% if veterans %}
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>Veteran</th>
+              <th>Contact</th>
+              <th>Joined</th>
+              <th>Verification</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user, profile in veterans %}
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div class="vp-user-avatar" style="width:38px;height:38px;font-size:14px;flex-shrink:0;">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div>
+                    <div style="font-family:var(--font-cond);font-size:14px;font-weight:700;color:#ffffff;">{{ user.full_name }}</div>
+                    <div style="font-size:12px;color:rgba(255,255,255,0.35);">@{{ user.username }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div style="font-size:13px;color:rgba(255,255,255,0.7);">{{ user.email }}</div>
+                {% if profile and profile.phone %}
+                <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:2px;">{{ profile.phone }}</div>
+                {% endif %}
+              </td>
+              <td>
+                <div style="font-family:var(--font-cond);font-size:12px;color:rgba(255,255,255,0.6);">{{ user.created_at.strftime('%b %d, %Y') }}</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.3);">{{ user.created_at.strftime('%I:%M %p') }}</div>
+              </td>
+              <td>
+                {% if profile %}
+                  {% if profile.is_verified %}
+                  <span style="background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:2px;white-space:nowrap;">
+                    <i class="fas fa-check-circle me-1"></i>Verified
+                  </span>
+                  {% elif profile.verification_status == 'pending' %}
+                  <span style="background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.25);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:2px;white-space:nowrap;">
+                    <i class="fas fa-clock me-1"></i>Pending
+                  </span>
+                  {% else %}
+                  <span style="background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.25);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:2px;white-space:nowrap;">
+                    <i class="fas fa-times-circle me-1"></i>{{ profile.verification_status.title() }}
+                  </span>
+                  {% endif %}
+                {% else %}
+                <span style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.1);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:2px;white-space:nowrap;">
+                  <i class="fas fa-user-plus me-1"></i>Incomplete
+                </span>
+                {% endif %}
+              </td>
+              <td>
+                {% if user.is_active %}
+                <span style="background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:2px;white-space:nowrap;">
+                  <i class="fas fa-check me-1"></i>Active
+                </span>
+                {% else %}
+                <span style="background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.25);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:2px;white-space:nowrap;">
+                  <i class="fas fa-ban me-1"></i>Suspended
+                </span>
+                {% endif %}
+              </td>
+              <td>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  {% if profile %}
+                  <a href="{{ url_for('admin.review_profile', profile_id=profile.id) }}"
+                     class="btn btn-outline-info btn-sm" title="View Profile">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  {% endif %}
+                  <button type="button"
+                          class="btn btn-sm {{ 'btn-outline-warning' if user.is_active else 'btn-outline-success' }}"
+                          onclick="toggleUserStatus({{ user.id }}, '{{ user.full_name }}', {{ user.is_active|lower }})"
+                          title="{{ 'Suspend' if user.is_active else 'Activate' }}">
+                    <i class="fas fa-{{ 'ban' if user.is_active else 'check' }}"></i>
+                  </button>
+                  <button type="button"
+                          class="btn btn-outline-danger btn-sm"
+                          onclick="deleteUser({{ user.id }}, '{{ user.full_name }}')"
+                          title="Delete">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% else %}
+      <div class="vp-empty-state py-5">
+        <i class="fas fa-user-slash fa-3x mb-3" style="color:rgba(255,255,255,0.12);"></i>
+        <p class="section-label mb-2">No Veterans Found</p>
+        {% if current_filters.search or current_filters.status or current_filters.verification %}
+        <p style="color:rgba(255,255,255,0.35);font-size:13px;margin-bottom:16px;">No veterans match your current filters.</p>
+        <a href="{{ url_for('admin.veteran_management') }}" class="btn btn-outline-secondary btn-sm">
+          <i class="fas fa-times me-1"></i>Clear Filters
+        </a>
+        {% else %}
+        <p style="color:rgba(255,255,255,0.35);font-size:13px;">No veterans have registered yet.</p>
+        {% endif %}
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Hidden forms for JS actions -->
+<form id="statusForm" method="POST" style="display:none;">
+  <input type="hidden" name="admin_reason" id="statusReason">
+</form>
+<form id="deleteForm" method="POST" style="display:none;">
+  <input type="hidden" name="admin_reason" id="deleteReason">
+</form>
+
+<script>
+function toggleUserStatus(userId, userName, isActive) {
+  const action = isActive ? 'suspend' : 'activate';
+  const reason = prompt('Why are you ' + action + 'ing ' + userName + '?\n\nPlease provide a reason:');
+  if (reason === null || reason.trim() === '') return;
+  if (confirm('Are you sure you want to ' + action + ' ' + userName + '?\n\nReason: ' + reason)) {
+    const form = document.getElementById('statusForm');
+    form.action = '/admin/user/' + userId + '/toggle-status';
+    document.getElementById('statusReason').value = reason;
+    form.submit();
+  }
+}
+
+function deleteUser(userId, userName) {
+  const reason = prompt('Why are you deleting ' + userName + '\'s account?\n\nThis is PERMANENT.\n\nReason:');
+  if (reason === null || reason.trim() === '') return;
+  if (confirm('PERMANENTLY delete ' + userName + '? This cannot be undone.\n\nReason: ' + reason)) {
+    const form = document.getElementById('deleteForm');
+    form.action = '/admin/user/' + userId + '/delete';
+    document.getElementById('deleteReason').value = reason;
+    form.submit();
+  }
+}
+</script>
+{% endblock %}

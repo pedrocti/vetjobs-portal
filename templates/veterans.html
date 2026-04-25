@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block title %}For Veterans - Veteran-Employer Job Portal{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h1 class="display-4 fw-bold mb-4">Your Service. Your Skills. Your Future.</h1>
+                <p class="lead mb-4">Transition from military service to civilian career success with employers who value your experience and dedication.</p>
+                {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg">
+                    <i class="fas fa-user-plus me-2"></i>Start Your Journey
+                </a>
+                {% else %}
+                <a href="{{ url_for('dashboard.index') }}" class="btn btn-light btn-lg">
+                    <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                </a>
+                {% endif %}
+            </div>
+            <div class="col-lg-6">
+                <div class="text-center">
+                    <i class="fas fa-medal display-1 text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Benefits Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="fw-bold mb-3">Why Veterans Choose Our Platform</h2>
+                <p class="lead text-muted">We understand your unique value and connect you with employers who appreciate military experience.</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-bullseye text-white"></i>
+                        </div>
+                        <h5 class="fw-bold">Targeted Opportunities</h5>
+                        <p class="text-muted">Every job posting is from companies specifically seeking veterans and valuing military experience.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-success bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-graduation-cap text-white"></i>
+                        </div>
+                        <h5 class="fw-bold">Career Resources</h5>
+                        <p class="text-muted">Access resume tools, interview preparation, and career guidance tailored for veterans.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-info bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-users text-white"></i>
+                        </div>
+                        <h5 class="fw-bold">Community Support</h5>
+                        <p class="text-muted">Connect with other veterans and join a supportive community throughout your career journey.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="fw-bold mb-3">How It Works</h2>
+                <p class="lead text-muted">Three simple steps to connect with your next career opportunity.</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <span class="fs-3 fw-bold">1</span>
+                    </div>
+                    <h5 class="fw-bold mb-3">Create Your Profile</h5>
+                    <p class="text-muted">Showcase your military experience, skills, and career objectives. Highlight your leadership experience and technical competencies.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <span class="fs-3 fw-bold">2</span>
+                    </div>
+                    <h5 class="fw-bold mb-3">Find & Apply</h5>
+                    <p class="text-muted">Search veteran-friendly job opportunities, receive personalized recommendations, and apply with confidence.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <span class="fs-3 fw-bold">3</span>
+                    </div>
+                    <h5 class="fw-bold mb-3">Start Your Career</h5>
+                    <p class="text-muted">Interview with employers who understand your value and begin your successful civilian career journey.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Resources Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="fw-bold mb-3">Career Resources</h2>
+                <p class="lead text-muted">Tools and resources to help you succeed in your civilian career transition.</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h6 class="fw-bold">Resume Builder</h6>
+                        <p class="text-muted small">Translate military experience into civilian-friendly language.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h6 class="fw-bold">Interview Prep</h6>
+                        <p class="text-muted small">Practice common interview questions and scenarios.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <h6 class="fw-bold">Networking</h6>
+                        <p class="text-muted small">Connect with other veterans and industry professionals.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h6 class="fw-bold">Career Coaching</h6>
+                        <p class="text-muted small">One-on-one guidance for career planning and growth.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Success Stories -->
+<section class="bg-dark text-white py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="fw-bold mb-3">Success Stories</h2>
+                <p class="lead mb-0">Real veterans sharing their career transition success.</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card bg-transparent border-light">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-user-circle fa-3x text-light"></i>
+                        </div>
+                        <blockquote class="blockquote">
+                            <p class="mb-3">"VetJobs Portal helped me find a company that truly values my military leadership experience. I'm now thriving in my new career!"</p>
+                        </blockquote>
+                        <div class="text-warning mb-2">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <footer class="blockquote-footer text-light">
+                            <strong>Sarah M.</strong> - Army Veteran, IT Manager
+                        </footer>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card bg-transparent border-light">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-user-circle fa-3x text-light"></i>
+                        </div>
+                        <blockquote class="blockquote">
+                            <p class="mb-3">"The platform made my transition seamless. I found a role that perfectly matches my skills and military background."</p>
+                        </blockquote>
+                        <div class="text-warning mb-2">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <footer class="blockquote-footer text-light">
+                            <strong>Michael R.</strong> - Navy Veteran, Project Manager
+                        </footer>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card bg-transparent border-light">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-user-circle fa-3x text-light"></i>
+                        </div>
+                        <blockquote class="blockquote">
+                            <p class="mb-3">"Not only did I find a great job, but I also connected with a community of veterans who understand my journey."</p>
+                        </blockquote>
+                        <div class="text-warning mb-2">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <footer class="blockquote-footer text-light">
+                            <strong>James T.</strong> - Air Force Veteran, Operations Lead
+                        </footer>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="fw-bold mb-3">Ready to Start Your Civilian Career?</h2>
+                <p class="lead text-muted mb-4">Join thousands of veterans who have successfully transitioned to meaningful civilian careers.</p>
+                {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-user-plus me-2"></i>Create Your Profile
+                </a>
+                {% else %}
+                <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-tachometer-alt me-2"></i>Access Your Dashboard
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

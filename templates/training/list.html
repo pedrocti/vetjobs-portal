@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+{% block title %}Training & Transition Programs | VetJobPortal{% endblock %}
+{% block content %}
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HERO
+     Reuses: services-hero, hero-bg, hero-overlay, hero-top-accent,
+             hero-eyebrow, hero-gold-bar, section-title, section-subtitle
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="services-hero text-white text-center">
+
+  <div class="hero-bg"
+       style="background-image: url('{{ url_for('static', filename='images/speaker.webp') }}');
+              background-position: center 40%;">
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-top-accent"></div>
+
+  <div class="container position-relative" style="z-index:2;">
+    <p class="hero-eyebrow">Grow Your Skills</p>
+    <div class="hero-gold-bar mx-auto"></div>
+    <h1 class="section-title mx-auto" style="font-size:clamp(30px,5vw,54px);max-width:720px;">
+      Veteran Training &<br>
+      <em style="color:var(--gold);font-style:italic;">Transition Programs</em>
+    </h1>
+    <p class="section-subtitle mx-auto mt-3" style="max-width:580px;">
+      Structured programs, industry certifications, and employer-backed pathways
+      designed to accelerate your transition from uniform to career.
+    </p>
+  </div>
+
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PROGRAMS GRID
+     Reuses: section-dark, section-gold-top, section-label,
+             section-title, vp-divider, vp-empty-state
+     New: vp-program-img-card
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="section-dark section-gold-top">
+  <div class="container">
+
+    <div class="text-center mb-5">
+      <p class="section-label">Available Programs</p>
+      <h2 class="section-title">Browse Programs</h2>
+      <div class="vp-divider"></div>
+    </div>
+
+    {% if programs %}
+    <div class="row g-4">
+      {% for program in programs %}
+      <div class="col-md-6 col-lg-4">
+        <div class="vp-program-img-card h-100">
+
+          <!-- Image -->
+          <div class="vp-program-img-wrapper">
+            <img src="{{ url_for('static', filename=program.image) if program.image else url_for('static', filename='images/vetjoblogo1.webp') }}"
+                 alt="{{ program.title }}">
+            {% if program.program_type %}
+            <span class="vp-program-type-badge">{{ program.program_type }}</span>
+            {% endif %}
+          </div>
+
+          <!-- Body -->
+          <div class="vp-program-img-body">
+
+            {% if program.provider %}
+            <p class="vp-program-provider">{{ program.provider }}</p>
+            {% endif %}
+
+            <h5 class="vp-program-img-title">{{ program.title }}</h5>
+
+            <p class="vp-program-img-desc">
+              {{ program.description[:130] if program.description else 'No description available.' }}
+              {% if program.description and program.description|length > 130 %}...{% endif %}
+            </p>
+
+            <!-- Meta row -->
+            <div class="vp-program-meta">
+              {% if program.duration %}
+              <span><i class="fas fa-clock"></i> {{ program.duration }}</span>
+              {% endif %}
+              {% if program.price %}
+              <span><i class="fas fa-tag"></i> ₦{{ program.price }}</span>
+              {% endif %}
+              {% if program.location %}
+              <span><i class="fas fa-map-marker-alt"></i> {{ program.location }}</span>
+              {% endif %}
+            </div>
+
+            <!-- Actions -->
+            <div class="vp-program-img-footer">
+              <a href="{{ url_for('training.view_program', program_id=program.id) }}"
+                 class="btn-vp-primary w-100 justify-content-center">
+                <i class="fas fa-arrow-right"></i>
+                <span>View Program</span>
+              </a>
+
+              {% if current_user.is_authenticated and current_user.user_type == 'admin' %}
+              <div class="vp-admin-actions mt-2">
+                <a href="{{ url_for('admin.edit_program', program_id=program.id) }}"
+                   class="vp-admin-btn vp-admin-edit">
+                  <i class="fas fa-edit"></i> Edit
+                </a>
+                <form action="{{ url_for('admin.delete_program', program_id=program.id) }}"
+                      method="POST" style="display:inline;">
+                  <button class="vp-admin-btn vp-admin-delete"
+                          onclick="return confirm('Delete this program?')">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                </form>
+              </div>
+              {% endif %}
+
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="vp-empty-state py-5">
+      <i class="fas fa-graduation-cap fa-3x mb-4" style="color:rgba(212,175,55,0.3);"></i>
+      <p class="section-label mb-2">Coming Soon</p>
+      <p style="color:rgba(255,255,255,0.4);font-size:14px;max-width:400px;text-align:center;">
+        Training programs are being added. Check back soon or contact us to
+        enquire about upcoming programs.
+      </p>
+      <div class="mt-4">
+        <a href="{{ url_for('main.contact') }}" class="btn-vp-ghost">
+          <span>Contact Us</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PARTNERSHIP CTA
+     Reuses: vp-cta-section, vp-cta-bg-lines, vp-cta-glow,
+             section-label, vp-cta-title, vp-divider,
+             vp-cta-subtitle, btn-vp-primary, btn-vp-ghost
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="vp-cta-section">
+
+  <div class="vp-cta-bg-lines">
+    <span></span><span></span><span></span><span></span>
+  </div>
+  <div class="vp-cta-glow"></div>
+
+  <div class="container position-relative text-center" style="z-index:2;">
+
+    <p class="section-label">Collaborate With Us</p>
+    <h2 class="vp-cta-title">
+      Partner With<br><em>VetJobPortal</em>
+    </h2>
+    <div class="vp-divider"></div>
+
+    <p class="vp-cta-subtitle" style="max-width:620px;">
+      Are you a training provider or institution supporting veterans' professional growth?
+      We collaborate with trusted organisations to deliver high-quality transition and
+      career training programs for veterans across Nigeria.
+    </p>
+
+    <div class="d-flex flex-wrap gap-3 justify-content-center">
+      <a href="{{ url_for('main.contact') }}" class="btn-vp-primary">
+        <i class="fas fa-handshake"></i>
+        <span>Contact Partnerships Team</span>
+      </a>
+      <a href="mailto:partnerships@vetjobsportal.com" class="btn-vp-ghost">
+        <span>Email Us Directly</span>
+        <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     ADD ONLY THESE TO premium-upgrade.css
+     ═══════════════════════════════════════════════════════════════ -->
+<style>
+
+/* ── Program image card ── */
+.vp-program-img-card {
+  background: rgba(15, 32, 64, 0.5);
+  border: 1px solid rgba(212, 175, 55, 0.12);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.vp-program-img-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(212, 175, 55, 0.35);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+/* Image wrapper */
+.vp-program-img-wrapper {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.vp-program-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.5s ease;
+}
+
+.vp-program-img-card:hover .vp-program-img-wrapper img {
+  transform: scale(1.05);
+}
+
+/* Type badge */
+.vp-program-type-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: rgba(212, 175, 55, 0.9);
+  color: #0a1628;
+  font-family: var(--font-cond);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 2px;
+}
+
+/* Card body */
+.vp-program-img-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.vp-program-provider {
+  font-family: var(--font-cond);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.vp-program-img-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.3;
+  margin-bottom: 10px;
+}
+
+.vp-program-img-desc {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.7;
+  margin-bottom: 16px;
+  flex: 1;
+}
+
+/* Meta row */
+.vp-program-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.vp-program-meta span {
+  font-family: var(--font-cond);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.vp-program-meta span i {
+  color: rgba(212, 175, 55, 0.5);
+}
+
+/* Card footer */
+.vp-program-img-footer {
+  margin-top: auto;
+}
+
+/* Admin action buttons */
+.vp-admin-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.vp-admin-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-family: var(--font-cond);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.vp-admin-edit {
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  color: #fbbf24;
+}
+
+.vp-admin-edit:hover {
+  background: rgba(251, 191, 36, 0.25);
+  color: #fbbf24;
+}
+
+.vp-admin-delete {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  width: 100%;
+}
+
+.vp-admin-delete:hover {
+  background: rgba(239, 68, 68, 0.25);
+  color: #f87171;
+}
+
+</style>
+
+{% endblock %}

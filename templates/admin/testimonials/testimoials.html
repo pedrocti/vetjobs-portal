@@ -1,0 +1,38 @@
+<div class="container py-5">
+
+    <h2 class="text-center mb-4 text-light">
+        What Our Community Says
+    </h2>
+
+    <div class="row g-4">
+
+        {% for t in testimonials %}
+        <div class="col-md-4">
+
+            <!-- DARK TESTIMONIAL CARD (REPLACES BOOTSTRAP CARD) -->
+            <div class="vp-dash-card h-100 p-3 text-center">
+
+                {% if t.image %}
+                <img src="{{ url_for('static', filename='uploads/testimonials/' + t.image) }}"
+                     class="rounded-circle mx-auto d-block mb-3"
+                     width="80" height="80"
+                     style="border: 2px solid rgba(255,255,255,0.08);">
+                {% endif %}
+
+                <h5 class="mb-1 text-light">{{ t.name }}</h5>
+
+                <p class="text-muted small mb-3">
+                    {{ t.role }} - {{ t.user_type|capitalize }}
+                </p>
+
+                <p class="text-light mb-0" style="opacity:0.85;">
+                    "{{ t.message }}"
+                </p>
+
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+</div>

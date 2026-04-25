@@ -1,0 +1,446 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Email Settings - Admin Dashboard{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold">
+                        <i class="fas fa-envelope me-2"></i>Email Settings
+                    </h2>
+                    <p class="text-muted mb-0">Configure SMTP and email delivery settings</p>
+                </div>
+                <div>
+                    <form method="POST" action="{{ url_for('admin.test_email_settings') }}" style="display: inline;">
+                        <button type="submit" class="btn btn-outline-primary">
+                            <i class="fas fa-paper-plane me-2"></i>Send Test Email
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- SMTP Configuration -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-server me-2"></i>SMTP Configuration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin.update_email_settings') }}" id="emailSettingsForm">
+                        <div class="row">
+                            <!-- SMTP Basic Settings -->
+                            <div class="col-md-6">
+                                <h6 class="fw-bold text-primary mb-3">
+                                    <i class="fas fa-cog me-2"></i>SMTP Server Settings
+                                </h6>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" 
+                                               type="checkbox" 
+                                               id="smtp_enabled" 
+                                               name="smtp_enabled"
+                                               {{ 'checked' if settings.smtp_enabled and settings.smtp_enabled.value == 'true' else '' }}>
+                                        <label class="form-check-label fw-bold" for="smtp_enabled">
+                                            Enable SMTP Email Delivery
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        Enable SMTP to send emails through your mail server
+                                    </small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="smtp_host" class="form-label">
+                                        SMTP Host <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="smtp_host" 
+                                           name="smtp_host" 
+                                           value="{{ settings.smtp_host.value if settings.smtp_host else '' }}"
+                                           placeholder="smtp.gmail.com">
+                                    <small class="form-text text-muted">
+                                        SMTP server hostname (e.g., smtp.gmail.com, smtp.office365.com)
+                                    </small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="smtp_port" class="form-label">
+                                        SMTP Port <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" 
+                                           class="form-control" 
+                                           id="smtp_port" 
+                                           name="smtp_port" 
+                                           value="{{ settings.smtp_port.value if settings.smtp_port else '587' }}"
+                                           min="1" 
+                                           max="65535">
+                                    <small class="form-text text-muted">
+                                        SMTP server port (587 for TLS, 465 for SSL, 25 for unsecured)
+                                    </small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" 
+                                               type="checkbox" 
+                                               id="smtp_use_tls" 
+                                               name="smtp_use_tls"
+                                               {{ 'checked' if not settings.smtp_use_tls or settings.smtp_use_tls.value == 'true' else '' }}>
+                                        <label class="form-check-label" for="smtp_use_tls">
+                                            Use TLS Encryption
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        Enable TLS encryption for secure email transmission (recommended)
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <!-- SMTP Authentication -->
+                            <div class="col-md-6">
+                                <h6 class="fw-bold text-warning mb-3">
+                                    <i class="fas fa-key me-2"></i>Authentication
+                                </h6>
+                                
+                                <div class="mb-3">
+                                    <label for="smtp_username" class="form-label">
+                                        SMTP Username <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="smtp_username" 
+                                           name="smtp_username" 
+                                           value="{{ settings.smtp_username.value if settings.smtp_username else '' }}"
+                                           placeholder="your-email@gmail.com">
+                                    <small class="form-text text-muted">
+                                        SMTP username (usually your email address)
+                                    </small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="smtp_password" class="form-label">
+                                        SMTP Password <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="password" 
+                                           class="form-control" 
+                                           id="smtp_password" 
+                                           name="smtp_password" 
+                                           value="{{ settings.smtp_password.value if settings.smtp_password else '' }}"
+                                           placeholder="Enter your password or app password">
+                                    <small class="form-text text-muted">
+                                        SMTP password (for Gmail, use App Password instead of regular password)
+                                    </small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="test_email" class="form-label">
+                                        Test Email Address
+                                    </label>
+                                    <input type="email" 
+                                           class="form-control" 
+                                           id="test_email" 
+                                           name="test_email" 
+                                           value="{{ settings.test_email.value if settings.test_email else '' }}"
+                                           placeholder="admin@example.com">
+                                    <small class="form-text text-muted">
+                                        Email address to send test emails to
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Email Appearance Settings -->
+                        <hr class="my-4">
+                        <div class="row">
+                            <div class="col-12">
+                                <h6 class="fw-bold text-success mb-3">
+                                    <i class="fas fa-paint-brush me-2"></i>Email Appearance
+                                </h6>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="from_email" class="form-label">
+                                        From Email Address <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="email" 
+                                           class="form-control" 
+                                           id="from_email" 
+                                           name="from_email" 
+                                           value="{{ settings.from_email.value if settings.from_email else 'noreply@veteranportal.com' }}"
+                                           placeholder="noreply@veteranportal.com">
+                                    <small class="form-text text-muted">
+                                        Email address that appears as the sender
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="from_name" class="form-label">
+                                        From Name
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="from_name" 
+                                           name="from_name" 
+                                           value="{{ settings.from_name.value if settings.from_name else 'Veteran-Employer Job Portal' }}"
+                                           placeholder="Veteran-Employer Job Portal">
+                                    <small class="form-text text-muted">
+                                        Display name that appears as the sender
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Save Button -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-save me-2"></i>Save Email Settings
+                                        </button>
+                                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary btn-lg ms-2">
+                                            Cancel
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Email Settings Info & Help -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Email Configuration Help
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <strong><i class="fas fa-lightbulb me-2"></i>Quick Setup Guide:</strong>
+                        <ol class="mb-0 mt-2">
+                            <li>Enable SMTP email delivery</li>
+                            <li>Configure your mail server settings</li>
+                            <li>Enter authentication credentials</li>
+                            <li>Set from email and name</li>
+                            <li>Save and test configuration</li>
+                        </ol>
+                    </div>
+                    
+                    <h6 class="fw-bold mt-4">Common SMTP Providers:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-dark table-hover align-middle mb-0 admin-dark-table">
+                            <thead>
+                                <tr>
+                                    <th>Provider</th>
+                                    <th>Host</th>
+                                    <th>Port</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Gmail</strong></td>
+                                    <td>smtp.gmail.com</td>
+                                    <td>587</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Outlook</strong></td>
+                                    <td>smtp-mail.outlook.com</td>
+                                    <td>587</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Yahoo</strong></td>
+                                    <td>smtp.mail.yahoo.com</td>
+                                    <td>587</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Custom</strong></td>
+                                    <td>mail.yourdomain.com</td>
+                                    <td>587</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <strong><i class="fas fa-exclamation-triangle me-2"></i>Security Note:</strong>
+                        <p class="mb-0 small">For Gmail, use App Passwords instead of your regular password. Enable 2-factor authentication and generate an App Password in your Google Account settings.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Current Settings Summary -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-check-circle me-2"></i>Current Configuration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-6">SMTP Status:</dt>
+                                <dd class="col-sm-6">
+                                    {% if settings.smtp_enabled and settings.smtp_enabled.value == 'true' %}
+                                        <span class="badge bg-success">Enabled</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Disabled</span>
+                                    {% endif %}
+                                </dd>
+                                
+                                <dt class="col-sm-6">SMTP Host:</dt>
+                                <dd class="col-sm-6">
+                                    <code>{{ settings.smtp_host.value if settings.smtp_host and settings.smtp_host.value else 'Not configured' }}</code>
+                                </dd>
+                                
+                                <dt class="col-sm-6">SMTP Port:</dt>
+                                <dd class="col-sm-6">
+                                    <code>{{ settings.smtp_port.value if settings.smtp_port else '587' }}</code>
+                                </dd>
+                                
+                                <dt class="col-sm-6">TLS Encryption:</dt>
+                                <dd class="col-sm-6">
+                                    {% if not settings.smtp_use_tls or settings.smtp_use_tls.value == 'true' %}
+                                        <span class="badge bg-success">Enabled</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Disabled</span>
+                                    {% endif %}
+                                </dd>
+                                
+                                <dt class="col-sm-6">From Email:</dt>
+                                <dd class="col-sm-6">
+                                    <code>{{ settings.from_email.value if settings.from_email else 'noreply@veteranportal.com' }}</code>
+                                </dd>
+                                
+                                <dt class="col-sm-6">Last Updated:</dt>
+                                <dd class="col-sm-6">
+                                    <small class="text-muted">
+                                        {% if settings.smtp_enabled and settings.smtp_enabled.updated_at %}
+                                            {{ settings.smtp_enabled.updated_at.strftime('%Y-%m-%d %H:%M') }}
+                                        {% else %}
+                                            Never
+                                        {% endif %}
+                                    </small>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form validation and UX improvements
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('emailSettingsForm');
+    const smtpEnabled = document.getElementById('smtp_enabled');
+    const smtpFields = ['smtp_host', 'smtp_port', 'smtp_username', 'smtp_password'];
+    
+    function toggleSMTPFields() {
+        const isEnabled = smtpEnabled.checked;
+        smtpFields.forEach(fieldName => {
+            const field = document.getElementById(fieldName);
+            if (field) {
+                field.disabled = !isEnabled;
+                if (isEnabled) {
+                    field.parentElement.classList.remove('opacity-50');
+                } else {
+                    field.parentElement.classList.add('opacity-50');
+                }
+            }
+        });
+    }
+    
+    // Initial state
+    toggleSMTPFields();
+    
+    // Toggle on change
+    smtpEnabled.addEventListener('change', toggleSMTPFields);
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        const submitButton = form.querySelector('button[type="submit"]');
+        
+        if (smtpEnabled.checked) {
+            const requiredFields = ['smtp_host', 'smtp_username', 'smtp_password'];
+            let isValid = true;
+            
+            requiredFields.forEach(fieldName => {
+                const field = document.getElementById(fieldName);
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Please fill in all required SMTP fields when SMTP is enabled.');
+                return;
+            }
+        }
+        
+        // Show loading state after validation passes
+        if (submitButton) {
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+            submitButton.disabled = true;
+        }
+    });
+});
+</script>
+
+<style>
+.opacity-50 {
+    opacity: 0.5;
+}
+
+
+.admin-dark-table {
+    background-color: transparent !important;
+    color: #e9ecef;
+}
+
+.admin-dark-table thead {
+    background-color: rgba(0, 0, 0, 0.35) !important;
+}
+
+.admin-dark-table tbody tr {
+    background-color: transparent !important;
+}
+
+.admin-dark-table td,
+.admin-dark-table th {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #e9ecef !important;
+}
+
+.admin-dark-table code {
+    color: #9ecbff;
+    background: rgba(255,255,255,0.05);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+</style>
+{% endblock %}

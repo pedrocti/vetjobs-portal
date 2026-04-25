@@ -1,0 +1,134 @@
+{% extends "admin/base.html" %}
+
+{% block admin_content %}
+<div class="container py-5">
+  <div class="card shadow-sm p-4">
+    <h3 class="mb-4 text-primary">Add New Training Program</h3>
+
+    <form method="POST" enctype="multipart/form-data">
+
+      <!-- Basic Info -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Program Title</label>
+          <input type="text" name="title" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Provider</label>
+          <input type="text" name="provider" class="form-control">
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Description</label>
+        <textarea name="description" class="form-control" rows="4" required></textarea>
+      </div>
+
+      <!-- Dates & Location -->
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Location</label>
+          <input type="text" name="location" class="form-control">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Start Date</label>
+          <input type="date" name="start_date" class="form-control">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">End Date</label>
+          <input type="date" name="end_date" class="form-control">
+        </div>
+      </div>
+
+      <!-- Program Details -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Program Type</label>
+          <select name="program_type" class="form-select">
+            <option value="">Select type</option>
+            <option>Onsite</option>
+            <option>Online</option>
+            <option>Hybrid</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Certification</label>
+          <select name="certification" class="form-select">
+            <option value="">Select</option>
+            <option>Yes</option>
+            <option>No</option>
+            <option>Optional</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Duration</label>
+          <input type="text" name="duration" class="form-control" placeholder="e.g. 3 Months">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Price (₦)</label>
+          <input type="number" name="price" step="0.01" class="form-control" placeholder="0.00">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">External Link</label>
+          <input type="url" name="link" class="form-control" placeholder="https://example.com">
+        </div>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Contact Phone</label>
+          <input type="text" name="contact_phone" class="form-control">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Contact Email</label>
+          <input type="email" name="contact_email" class="form-control">
+        </div>
+      </div>
+
+      <!-- WhatsApp + Sharable Link -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">WhatsApp Link</label>
+          <input type="url" name="whatsapp_link" class="form-control" placeholder="https://wa.me/234...">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Sharable Link</label>
+          <input type="url" name="sharable_link" class="form-control">
+        </div>
+      </div>
+
+      <!-- Social Links -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Social Media Links</label>
+        <div class="row g-2">
+          <div class="col-md-4"><input type="url" name="facebook_link" class="form-control" placeholder="Facebook URL"></div>
+          <div class="col-md-4"><input type="url" name="instagram_link" class="form-control" placeholder="Instagram URL"></div>
+          <div class="col-md-4"><input type="url" name="linkedin_link" class="form-control" placeholder="LinkedIn URL"></div>
+          <div class="col-md-4"><input type="url" name="twitter_link" class="form-control mt-2" placeholder="Twitter/X URL"></div>
+          <div class="col-md-4"><input type="url" name="tiktok_link" class="form-control mt-2" placeholder="TikTok URL"></div>
+        </div>
+      </div>
+
+      <!-- How to Apply -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold">How to Apply</label>
+        <textarea name="how_to_apply" class="form-control" rows="3"></textarea>
+      </div>
+
+      <!-- Image Upload -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Program Flyer / Image</label>
+        <input type="file" name="image" class="form-control" accept="image/*">
+      </div>
+
+      <button type="submit" class="btn btn-primary px-4">
+        <i class="fas fa-save me-2"></i> Submit Program
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

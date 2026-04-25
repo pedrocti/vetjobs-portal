@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+
+{% block title %}Payment History - Veteran-Employer Job Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="fw-bold">
+                        <i class="fas fa-history me-2"></i>Payment History
+                    </h1>
+                    <p class="text-muted mb-0">View all your payment transactions and receipts</p>
+                </div>
+                <div>
+                    <a href="#" class="btn btn-outline-primary">
+                        <i class="fas fa-download me-2"></i>Export History
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment History -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-credit-card me-2"></i>Transaction History
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            {% if payments %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Reference</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                        <tr>
+                            <td>
+                                <code class="text-primary">{{ payment.reference }}</code>
+                            </td>
+                            <td>
+                                <div>
+                                    <strong>{{ payment.description }}</strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        {% if payment.payment_type == 'verification' %}
+                                        <i class="fas fa-shield-alt me-1"></i>Account Verification
+                                        {% elif payment.payment_type == 'boost' %}
+                                        <i class="fas fa-rocket me-1"></i>Profile Boost
+                                        {% elif payment.payment_type == 'subscription' %}
+                                        <i class="fas fa-crown me-1"></i>Subscription
+                                        {% else %}
+                                        <i class="fas fa-credit-card me-1"></i>{{ payment.payment_type.title() }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="fw-bold">{{ payment.formatted_amount }}</span>
+                                <br>
+                                <small class="text-muted">{{ payment.currency }}</small>
+                            </td>
+                            <td>
+                                {% if payment.status == 'success' %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check me-1"></i>Successful
+                                </span>
+                                {% elif payment.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-clock me-1"></i>Pending
+                                </span>
+                                {% elif payment.status == 'failed' %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-times me-1"></i>Failed
+                                </span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ payment.status.title() }}</span>
+                                {% endif %}
+                                
+                                {% if payment.payment_method %}
+                                <br>
+                                <small class="text-muted">{{ payment.payment_method.title() }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="fw-bold">{{ payment.created_at.strftime('%b %d, %Y') }}</span>
+                                <br>
+                                <small class="text-muted">{{ payment.created_at.strftime('%I:%M %p') }}</small>
+                                {% if payment.paid_at and payment.paid_at != payment.created_at %}
+                                <br>
+                                <small class="text-success">Paid: {{ payment.paid_at.strftime('%I:%M %p') }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    {% if payment.is_successful() %}
+                                    <button type="button" class="btn btn-outline-primary btn-sm" 
+                                            onclick="viewReceipt('{{ payment.reference }}')">
+                                        <i class="fas fa-receipt"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                                            onclick="downloadReceipt('{{ payment.reference }}')">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    {% elif payment.status == 'pending' %}
+                                    <button type="button" class="btn btn-outline-warning btn-sm"
+                                            onclick="checkPaymentStatus('{{ payment.reference }}')">
+                                        <i class="fas fa-sync"></i>
+                                    </button>
+                                    {% elif payment.status == 'failed' %}
+                                    <button type="button" class="btn btn-outline-danger btn-sm"
+                                            onclick="retryPayment('{{ payment.reference }}')">
+                                        <i class="fas fa-redo"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-receipt fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">No Payment History</h5>
+                <p class="text-muted mb-4">You haven't made any payments yet.</p>
+                
+                {% if current_user.is_veteran() %}
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <a href="{{ url_for('payments.veteran_verification_payment') }}" class="btn btn-primary me-2">
+                            <i class="fas fa-shield-alt me-2"></i>Get Verified
+                        </a>
+                        <a href="{{ url_for('payments.veteran_boost_payment') }}" class="btn btn-outline-warning">
+                            <i class="fas fa-rocket me-2"></i>Boost Profile
+                        </a>
+                    </div>
+                </div>
+                {% elif current_user.is_employer() %}
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <a href="{{ url_for('payments.employer_subscription_plans') }}" class="btn btn-primary">
+                            <i class="fas fa-crown me-2"></i>View Subscription Plans
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Payment Summary -->
+    {% if payments %}
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="text-success">Total Paid</h5>
+                    <h3 class="fw-bold">
+                        ₦{{ "{:,.2f}".format(payments | selectattr('status', 'equalto', 'success') | sum(attribute='amount') | float) }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="text-primary">Total Transactions</h5>
+                    <h3 class="fw-bold">{{ payments | length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="text-warning">Successful</h5>
+                    <h3 class="fw-bold">{{ payments | selectattr('status', 'equalto', 'success') | list | length }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Receipt Modal -->
+<div class="modal fade" id="receiptModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-receipt me-2"></i>Payment Receipt
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="receiptContent">
+                <!-- Receipt content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="printReceipt()">
+                    <i class="fas fa-print me-2"></i>Print
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function viewReceipt(reference) {
+    // Show receipt in modal
+    document.getElementById('receiptContent').innerHTML = `
+        <div class="text-center mb-4">
+            <h4>Payment Receipt</h4>
+            <p class="text-muted">Reference: ${reference}</p>
+        </div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            Receipt details will be loaded here. This is a demo implementation.
+        </div>
+    `;
+    
+    const modal = new bootstrap.Modal(document.getElementById('receiptModal'));
+    modal.show();
+}
+
+function downloadReceipt(reference) {
+    // Download receipt PDF
+    alert('Receipt download will be implemented. Reference: ' + reference);
+}
+
+function checkPaymentStatus(reference) {
+    // Check payment status
+    alert('Checking payment status for: ' + reference);
+    // Implement status check logic
+}
+
+function retryPayment(reference) {
+    // Retry failed payment
+    if (confirm('Do you want to retry this payment?')) {
+        alert('Payment retry will be implemented. Reference: ' + reference);
+        // Implement retry logic
+    }
+}
+
+function printReceipt() {
+    // Print receipt
+    const content = document.getElementById('receiptContent').innerHTML;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+            <head>
+                <title>Payment Receipt</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    .text-center { text-align: center; }
+                    .alert { background-color: #d1ecf1; padding: 10px; border-radius: 5px; }
+                </style>
+            </head>
+            <body>
+                ${content}
+            </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+</script>
+{% endblock %}

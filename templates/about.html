@@ -1,0 +1,471 @@
+{% extends "base.html" %}
+{% block title %}About Us - VetJobs Portal{% endblock %}
+{% block content %}
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HERO
+     Reuses: services-hero, hero-bg, hero-overlay, hero-eyebrow,
+             hero-gold-bar, section-label, btn-vp-primary, btn-vp-ghost
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="services-hero text-white text-center">
+
+  <div class="hero-bg"
+       style="background-image: url('{{ url_for('static', filename='images/skills-translate-illustration.webp') }}');
+              background-position: center 35%;">
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-top-accent"></div>
+
+  <div class="container position-relative" style="z-index:2;">
+    <p class="hero-eyebrow">Who We Are</p>
+    <div class="hero-gold-bar mx-auto"></div>
+    <h1 class="section-title" style="font-size:clamp(36px,6vw,64px);">VetJobs Portal</h1>
+    <p class="section-subtitle mx-auto mt-3" style="max-width:680px;">
+      From the battlefield to the boardroom we don't just place veterans. We elevate them.
+      Because your service didn't end when you took off the uniform. It evolved.
+    </p>
+  </div>
+
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     ORIGIN STORY
+     Reuses: section-dark, section-gold-top, section-label,
+             section-title, section-subtitle, image-frame, vp-divider
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="section-dark section-gold-top">
+  <div class="container">
+    <div class="row align-items-center g-5">
+
+      <div class="col-lg-6">
+        <p class="section-label">Our Origin</p>
+        <h2 class="section-title text-start">The Story Behind<br><em style="color:var(--gold);font-style:italic;">VetJobs Portal</em></h2>
+        <div class="vp-divider left"></div>
+
+        <p class="section-subtitle text-start mb-4">
+          After years of watching talented veterans return home only to face long job searches,
+          underemployment, or roles that didn't match their capabilities it became clear
+          something was missing.
+        </p>
+
+        <p style="font-size:15px;color:rgba(255,255,255,0.6);line-height:1.85;margin-bottom:20px;">
+          Skills proven in high-pressure environments discipline, leadership, problem-solving
+          under uncertainty were often invisible on paper or misunderstood in interviews.
+          Employment gaps that didn't reflect ability. Civilian roles that felt foreign.
+          Employers who genuinely wanted to hire veterans but didn't understand military roles in 
+          resume.
+        </p>
+
+        <p style="font-size:15px;color:rgba(255,255,255,0.6);line-height:1.85;margin-bottom:28px;">
+          VetJobPortal was created to close that gap not as another job board, but as a
+          purposeful bridge that helps veterans clearly show their value and helps employers
+          confidently bring that talent onboard.
+        </p>
+
+        <div class="vp-story-quote">
+          <i class="fas fa-quote-left" style="color:var(--gold);font-size:20px;margin-bottom:12px;display:block;"></i>
+          <p style="font-family:var(--font-display);font-size:20px;font-style:italic;color:#ffffff;margin:0;line-height:1.6;">
+            Service doesn't end. It simply changes uniforms.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="image-frame rounded overflow-hidden" style="height:460px;">
+          <img src="{{ url_for('static', filename='images/7aki9.webp') }}"
+               alt="Veterans transitioning to civilian careers"
+               class="img-fluid w-100 h-100"
+               style="object-fit:cover;object-position:center;">
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MISSION
+     Reuses: mission-section, mission-container, mission-label,
+             mission-title, mission-divider, mission-statement,
+             mission-founding, mission-pillars, pillar, pillar-icon,
+             pillar-title, pillar-text, mission-closing, mission-closing-text
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="mission-section">
+  <div class="mission-container">
+
+    <p class="mission-label">Our Purpose</p>
+    <h2 class="mission-title">Our Mission</h2>
+    <div class="mission-divider"></div>
+
+    <blockquote class="mission-statement">
+      To help veterans, military spouses, and employers build stronger futures by bridging
+      the gap between proven military experience and civilian opportunity across Nigeria and Africa.
+    </blockquote>
+
+    <div class="mission-pillars">
+      <div class="pillar">
+        <div class="pillar-icon">🎯</div>
+        <h3 class="pillar-title">Clear Skill Translation</h3>
+        <p class="pillar-text">
+          We convert military experience — MOS, ratings, field skills — into language civilian
+          hiring managers recognize and value. Your strengths become impossible to overlook.
+        </p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon">🤝</div>
+        <h3 class="pillar-title">Trusted Employer Matches</h3>
+        <p class="pillar-text">
+          We partner with organizations that genuinely value military discipline. No filler
+          postings. No generic matches. Only roles where your experience is truly appreciated.
+        </p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon">🚀</div>
+        <h3 class="pillar-title">Ongoing Support & Growth</h3>
+        <p class="pillar-text">
+          Transition doesn't end at the first job. We offer mentorship, alumni connections,
+          and career guidance — because elevation is a long-term mission, not a one-time event.
+        </p>
+      </div>
+    </div>
+
+    <div class="mission-closing">
+      <p class="mission-closing-text">
+        "Every veteran placed is a mission accomplished."
+      </p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CORE VALUES
+     Reuses: section-surface, section-label, section-title,
+             vp-divider, sector-card, sector-icon
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="section-surface">
+  <div class="container">
+
+    <div class="text-center mb-5">
+      <p class="section-label">What Drives Us</p>
+      <h2 class="section-title">Core Values That Guide Us</h2>
+      <div class="vp-divider"></div>
+    </div>
+
+    <div class="row g-4">
+
+      <div class="col-lg-3 col-md-6">
+        <div class="sector-card h-100 text-center">
+          <div class="sector-icon mx-auto">
+            <i class="fas fa-medal"></i>
+          </div>
+          <h5 class="pillar-title">Honor</h5>
+          <p class="pillar-text">
+            Every veteran's service carries a weight of sacrifice and commitment. We honor that
+            by treating each person with the dignity and respect they have earned.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="sector-card h-100 text-center">
+          <div class="sector-icon mx-auto">
+            <i class="fas fa-hands-helping"></i>
+          </div>
+          <h5 class="pillar-title">Service</h5>
+          <p class="pillar-text">
+            Those who served deserve support that puts their needs first. Every part of our
+            platform exists to make the transition smoother and more meaningful.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="sector-card h-100 text-center">
+          <div class="sector-icon mx-auto">
+            <i class="fas fa-balance-scale"></i>
+          </div>
+          <h5 class="pillar-title">Integrity</h5>
+          <p class="pillar-text">
+            Trust is everything in transition. Transparent matching, honest postings, real
+            opportunities — veterans and employers always know exactly where they stand.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="sector-card h-100 text-center">
+          <div class="sector-icon mx-auto">
+            <i class="fas fa-users"></i>
+          </div>
+          <h5 class="pillar-title">Community</h5>
+          <p class="pillar-text">
+            No one succeeds alone. We build lasting connections — alumni networks, mentorship
+            circles, and lifelong support so every veteran knows they belong to something bigger.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     STATS
+     Reuses: stats-section, stat-number, stat-label, stat-divider
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="stats-section">
+  <div class="container">
+
+    <div class="text-center mb-5">
+      <p class="section-label">The Opportunity</p>
+      <h2 class="section-title">Real Impact, Real Numbers</h2>
+      <div class="vp-divider"></div>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-center align-items-center gap-0">
+
+      <div class="stat-item">
+        <span class="stat-number">3,000+</span>
+        <span class="stat-label">Service Members Retire Annually</span>
+      </div>
+
+      <div class="stat-divider d-none d-md-block" style="height:60px;"></div>
+
+      <div class="stat-item">
+        <span class="stat-number">999+</span>
+        <span class="stat-label">Veterans Registered on Platform</span>
+      </div>
+
+      <div class="stat-divider d-none d-md-block" style="height:60px;"></div>
+
+      <div class="stat-item">
+        <span class="stat-number">Nigeria</span>
+        <span class="stat-label">First Dedicated Veteran Job Portal</span>
+      </div>
+
+      <div class="stat-divider d-none d-md-block" style="height:60px;"></div>
+
+      <div class="stat-item">
+        <span class="stat-number">Africa</span>
+        <span class="stat-label">Expanding Continent-Wide</span>
+      </div>
+
+    </div>
+
+    <p class="text-center mt-5" style="font-family:var(--font-display);font-size:18px;font-style:italic;color:rgba(255,255,255,0.5);max-width:600px;margin-left:auto;margin-right:auto;">
+      These aren't just numbers, they're stories of grit, leadership, and second chapters.
+      VetJobPortal exists to make every transition count.
+    </p>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     THE GAP IN THE MARKET
+     Zero new CSS — fully reuses existing classes
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="section-dark section-gold-top">
+  <div class="container">
+
+    <div class="text-center mb-5">
+      <p class="section-label">The Problem</p>
+      <h2 class="section-title">A Gap Nobody<br>
+        <em style="color:var(--gold);font-style:italic;">Was Solving</em>
+      </h2>
+      <div class="vp-divider"></div>
+      <p class="section-subtitle mx-auto" style="max-width:640px;">
+        Every year, thousands of Nigerian military veterans leave service with
+        world class discipline, leadership, and technical skills.
+        Most of them cannot find work that matches what they are worth.
+        That is not a veteran problem. That is a systems problem.
+      </p>
+    </div>
+
+    <!-- Stat Cards Row -->
+    <div class="row g-4 mb-5">
+
+      <div class="col-md-4">
+        <div class="sector-card h-100 text-center">
+          <div class="sector-icon mx-auto">
+            <i class="fas fa-user-minus"></i>
+          </div>
+          <h5 class="pillar-title">3,000+</h5>
+          <p class="pillar-text">
+            Nigerian military personnel retire or are discharged every year
+            entering a civilian job market with no structured transition support.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="sector-card h-100 text-center">
+          <div class="sector-icon mx-auto">
+            <i class="fas fa-ban"></i>
+          </div>
+          <h5 class="pillar-title">Zero</h5>
+          <p class="pillar-text">
+            Before VetJobPortal, there was no dedicated structure
+            built specifically for Nigerian or African military veterans employment.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="sector-card h-100 text-center">
+          <div class="sector-icon mx-auto">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <h5 class="pillar-title">Invisible</h5>
+          <p class="pillar-text">
+            Military CVs are written in a language civilian employers
+            don't understand. Skills go unseen. Careers stall.
+            Experience gets wasted.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- The Gap Statement -->
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="vp-story-quote">
+          <i class="fas fa-quote-left"
+             style="color:var(--gold);font-size:24px;margin-bottom:16px;display:block;"></i>
+
+          <div class="row g-5 align-items-center">
+
+            <div class="col-lg-6">
+              <h3 class="section-title text-start" style="font-size:clamp(20px,3vw,30px);">
+                The System Was<br>
+                <em style="color:var(--gold);font-style:italic;">Never Built For Them</em>
+              </h3>
+              <p style="font-size:15px;color:rgba(255,255,255,0.65);line-height:1.85;margin-bottom:16px;">
+                Generic job boards were built for generic candidates.
+                Veterans are not generic. They operate in high-stakes environments,
+                lead teams under pressure, and execute with precision
+                qualities that most civilian employers desperately need
+                but rarely seen on a standard CV.
+              </p>
+              <p style="font-size:15px;color:rgba(255,255,255,0.65);line-height:1.85;margin-bottom:0;">
+                The result is a painful mismatch employers struggling
+                to find reliable, disciplined talent while thousands of
+                battle-tested professionals sit underemployed or unemployed,
+                their potential completely invisible to the market.
+              </p>
+            </div>
+
+            <div class="col-lg-6">
+              <ul class="vp-employer-bullets">
+                <li>
+                  <span class="vp-bullet-icon"><i class="fas fa-times"></i></span>
+                  <span>No platform to translate military roles into civilian job titles</span>
+                </li>
+                <li>
+                  <span class="vp-bullet-icon"><i class="fas fa-times"></i></span>
+                  <span>No employer database actively seeking veteran talent in Nigeria</span>
+                </li>
+                <li>
+                  <span class="vp-bullet-icon"><i class="fas fa-times"></i></span>
+                  <span>No mentorship or transition support after discharge</span>
+                </li>
+                <li>
+                  <span class="vp-bullet-icon"><i class="fas fa-times"></i></span>
+                  <span>No community connecting veterans to each other or to opportunity</span>
+                </li>
+                <li>
+                  <span class="vp-bullet-icon"><i class="fas fa-check"></i></span>
+                  <span style="color:rgba(255,255,255,0.8);">
+                    <strong style="color:var(--gold);">VetJobPortal</strong> was built
+                    to fix every single one of these gaps starting in Nigeria,
+                    scaling across Africa.
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     FINAL CTA
+     Reuses: vp-cta-section, vp-cta-title, vp-cta-subtitle,
+             vp-cta-bg-lines, vp-cta-glow, section-label,
+             vp-divider, btn-vp-primary, btn-vp-ghost
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="vp-cta-section">
+
+  <div class="vp-cta-bg-lines">
+    <span></span><span></span><span></span><span></span>
+  </div>
+  <div class="vp-cta-glow"></div>
+
+  <div class="container position-relative text-center" style="z-index:2;">
+
+    <p class="section-label">Join The Mission</p>
+    <h2 class="vp-cta-title">
+      Your Next Mission<br><em>Starts Here</em>
+    </h2>
+    <div class="vp-divider"></div>
+
+    <p class="vp-cta-subtitle">
+      Whether you're ready to hire grit or ready to bring it 
+      VetJobPortal is built for you.
+    </p>
+
+    {% if not current_user.is_authenticated %}
+      <div class="d-flex flex-wrap gap-3 justify-content-center">
+        <a href="{{ url_for('auth.register') }}" class="btn-vp-primary">
+          <i class="fas fa-user-shield"></i>
+          <span>Join as Veteran</span>
+        </a>
+        <a href="{{ url_for('main.employers') }}" class="btn-vp-ghost">
+          <span>Hire Veterans</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+      <p class="vp-cta-login-prompt mt-4">
+        Already have an account?
+        <a href="{{ url_for('auth.login') }}">Sign in here</a>
+      </p>
+    {% else %}
+      <a href="{{ url_for('dashboard.index') }}" class="btn-vp-primary btn-vp-primary-lg">
+        <i class="fas fa-tachometer-alt"></i>
+        <span>Go to Dashboard</span>
+      </a>
+    {% endif %}
+
+  </div>
+
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     NEW CSS — Add only these to premium-upgrade.css
+     ═══════════════════════════════════════════════════════════════ -->
+<style>
+
+/* Founder quote block */
+.vp-story-quote {
+  background: rgba(212, 175, 55, 0.06);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 24px 28px;
+  margin-top: 8px;
+}
+
+</style>
+
+{% endblock %}

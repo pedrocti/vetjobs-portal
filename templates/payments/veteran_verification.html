@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Veteran Verification Payment - Veteran-Employer Job Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h1 class="fw-bold text-primary">
+                    <i class="fas fa-shield-alt me-2"></i>Veteran Verification
+                </h1>
+                <p class="text-muted">Complete your verification to access all veteran benefits</p>
+            </div>
+
+            <!-- Verification Benefits -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-star me-2"></i>Verified Veteran Benefits
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Verified badge on your profile
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Priority in employer searches
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Access to exclusive job opportunities
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Enhanced profile visibility
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Direct employer contact features
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Profile boost eligibility
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Card -->
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-credit-card me-2"></i>Verification Payment
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h4 class="text-primary mb-1">One-time Verification Fee</h4>
+                            <p class="text-muted mb-0">
+                                Secure payment processed by Flutterwave. Your verification will be completed within 24 hours after successful payment.
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="display-4 fw-bold text-success">₦{{ "{:,.0f}".format(verification_fee) }}</div>
+                            <small class="text-muted">One-time payment</small>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <!-- Payment Button -->
+                    <div class="text-center">
+                        <button type="button" id="payNowBtn" class="btn btn-success btn-lg px-5">
+                            <i class="fas fa-lock me-2"></i>Pay ₦{{ "{:,.0f}".format(verification_fee) }} Securely
+                        </button>
+                        
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-shield-alt me-1"></i>
+                                Secured by Flutterwave SSL encryption
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Security Info -->
+            <div class="row mt-4">
+                <div class="col-md-4 text-center">
+                    <i class="fas fa-shield-alt fa-2x text-primary mb-2"></i>
+                    <h6>Secure Payment</h6>
+                    <small class="text-muted">Protected by Flutterwave's enterprise security</small>
+                </div>
+                <div class="col-md-4 text-center">
+                    <i class="fas fa-clock fa-2x text-primary mb-2"></i>
+                    <h6>Quick Verification</h6>
+                    <small class="text-muted">Verification completed within 24 hours</small>
+                </div>
+                <div class="col-md-4 text-center">
+                    <i class="fas fa-star fa-2x text-primary mb-2"></i>
+                    <h6>Lifetime Benefits</h6>
+                    <small class="text-muted">One-time payment for permanent verification</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const payButton = document.getElementById('payNowBtn');
+    
+    payButton.addEventListener('click', function() {
+        // Disable button and show loading
+        payButton.disabled = true;
+        payButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Initializing Payment...';
+        
+        // Initialize payment with Flutterwave
+        fetch('{{ url_for("payments.initialize_verification_payment") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Redirect to Flutterwave payment page
+                window.location.href = data.authorization_url;
+            } else {
+                alert('Payment initialization failed: ' + data.message);
+                payButton.disabled = false;
+                payButton.innerHTML = '<i class="fas fa-lock me-2"></i>Pay ₦{{ "{:,.0f}".format(verification_fee) }} Securely';
+            }
+        })
+        .catch(error => {
+            console.error('Payment error:', error);
+            alert('An error occurred. Please try again.');
+            payButton.disabled = false;
+            payButton.innerHTML = '<i class="fas fa-lock me-2"></i>Pay ₦{{ "{:,.0f}".format(verification_fee) }} Securely';
+        });
+    });
+});
+
+function getCsrfToken() {
+    // Get CSRF token from meta tag or form
+    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+    return csrfMeta ? csrfMeta.getAttribute('content') : '';
+}
+</script>
+{% endblock %}

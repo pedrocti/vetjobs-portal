@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+
+# Environment
+.env
+
+# Uploads (user files)
+static/uploads/
+
+# Replit / local junk
+.pythonlibs/
+.cache/
+.local/
+.upm/
+
+# Virtual environment
+venv/
+
+# Logs
+*.log

@@ -1,0 +1,14 @@
+11:    User, VeteranProfile, EmployerProfile, Partner, TrainingPartner,
+1790:from models import TrainingPartner
+1792:@admin_bp.route('/training_partners', methods=['GET'])
+1794:def admin_training_partners():
+1800:    partners = TrainingPartner.query.order_by(TrainingPartner.created_at.desc()).all()
+1804:@admin_bp.route('/training_partners/<int:partner_id>', methods=['GET'])
+1812:    partner = TrainingPartner.query.get_or_404(partner_id)
+1816:@admin_bp.route('/training_partners/approve/<int:partner_id>', methods=['POST'])
+1824:    partner = TrainingPartner.query.get_or_404(partner_id)
+1828:    return redirect(url_for('admin.admin_training_partners'))
+1831:@admin_bp.route('/training_partners/delete/<int:partner_id>', methods=['POST'])
+1839:    partner = TrainingPartner.query.get_or_404(partner_id)
+1843:    return redirect(url_for('admin.admin_training_partners'))
+1877:    partner = TrainingPartner.query.get(sub.partner_id)

@@ -1,0 +1,274 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Admin Dashboard - Veteran-Employer Job Portal{% endblock %}
+
+{% block admin_content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="fw-bold mb-1">Admin Dashboard</h1>
+                    <p class="text-muted mb-0">System overview and management tools.</p>
+                </div>
+                <div>
+                    <span class="badge bg-danger fs-6">
+                        <i class="fas fa-user-shield me-1"></i>Administrator
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Platform Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">0</h4>
+                            <p class="mb-0">Total Users</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">0</h4>
+                            <p class="mb-0">Job Postings</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-briefcase fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">0</h4>
+                            <p class="mb-0">Applications</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-file-alt fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">100%</h4>
+                            <p class="mb-0">System Health</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-heartbeat fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Management Tools -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Management Tools</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <a href="{{ url_for('admin.verification_management') }}" class="btn btn-outline-danger w-100 p-3">
+                                <i class="fas fa-user-check fa-2x mb-2 d-block"></i>
+                                <strong>Veteran Verification</strong>
+                                <small class="d-block text-muted">Review and verify veteran profiles</small>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{{ url_for('admin.job_moderation') }}" class="btn btn-outline-success w-100 p-3">
+                                <i class="fas fa-briefcase fa-2x mb-2 d-block"></i>
+                                <strong>Job Moderation</strong>
+                                <small class="d-block text-muted">Review and approve job postings</small>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-info w-100 p-3">
+                                <i class="fas fa-tachometer-alt fa-2x mb-2 d-block"></i>
+                                <strong>Analytics Dashboard</strong>
+                                <small class="d-block text-muted">View comprehensive platform analytics</small>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="#" class="btn btn-outline-primary w-100 p-3">
+                                <i class="fas fa-users fa-2x mb-2 d-block"></i>
+                                <strong>User Management</strong>
+                                <small class="d-block text-muted">Manage veterans and employers</small>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="#" class="btn btn-outline-info w-100 p-3">
+                                <i class="fas fa-chart-bar fa-2x mb-2 d-block"></i>
+                                <strong>Analytics</strong>
+                                <small class="d-block text-muted">Platform usage and metrics</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Recent Activity</h5>
+                    <small class="text-muted">Coming Soon</small>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-4">
+                        <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">No recent activity</h6>
+                        <p class="text-muted mb-0">System activity will be displayed here as users interact with the platform.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Alerts -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>System Alerts</h5>
+                    <span class="badge bg-success">All Clear</span>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-4">
+                        <i class="fas fa-shield-alt fa-3x text-success mb-3"></i>
+                        <h6 class="text-success">No system alerts</h6>
+                        <p class="text-muted mb-0">All systems are operating normally.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Stats -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-tachometer-alt me-2"></i>Platform Overview</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <h5 class="text-primary mb-0">0</h5>
+                            <small class="text-muted">Veterans</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h5 class="text-success mb-0">0</h5>
+                            <small class="text-muted">Employers</small>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="text-info mb-0">0</h5>
+                            <small class="text-muted">Active Jobs</small>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="text-warning mb-0">0</h5>
+                            <small class="text-muted">Placements</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Platform Health -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-heartbeat me-2"></i>System Health</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small>Database</small>
+                            <small class="text-success">Online</small>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small>Server Load</small>
+                            <small class="text-success">Low</small>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" style="width: 25%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-0">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small>Storage</small>
+                            <small class="text-info">15%</small>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-info" style="width: 15%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Tools -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-tools me-2"></i>Admin Tools</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-database me-2"></i>Backup Database
+                        </a>
+                        <a href="#" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-envelope me-2"></i>Send Newsletter
+                        </a>
+                        <a href="#" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-download me-2"></i>Export Data
+                        </a>
+                        <a href="#" class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-broom me-2"></i>Cleanup Tasks
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-life-ring me-2"></i>Support</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-book me-2"></i>Admin Documentation
+                        </a>
+                        <a href="{{ url_for('main.contact') }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-envelope me-2"></i>Technical Support
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

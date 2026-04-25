@@ -1,0 +1,166 @@
+{% extends "admin/base.html" %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-primary mb-0">
+      CV Optimization Requests
+    </h2>
+  </div>
+
+  {% if requests %}
+
+  <!-- Main Card (dark-safe wrapper) -->
+  <div class="vp-dash-card">
+    <div class="vp-dash-card-header">
+      <h5 class="mb-0">
+        <i class="fas fa-file-alt me-2"></i>
+        CV Requests
+      </h5>
+    </div>
+
+    <div class="vp-dash-card-body p-0">
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 table-dark-admin">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>CV</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for req in requests %}
+            <tr>
+
+              <!-- User -->
+              <td class="fw-semibold text-light">
+                {{ req.user.full_name }}
+              </td>
+
+              <!-- CV -->
+              <td>
+                {% if req.user and req.user.veteran_profile %}
+                  <a href="{{ url_for('admin.view_document',
+                                       profile_id=req.user.veteran_profile.id,
+                                       document_type='resume') }}"
+                     target="_blank"
+                     class="btn btn-sm btn-outline-info">
+                    <i class="fas fa-file-alt me-1"></i> View
+                  </a>
+                {% else %}
+                  <span class="text-danger">No profile</span>
+                {% endif %}
+              </td>
+
+              <!-- Status -->
+              <td>
+                {% if req.status == 'pending' %}
+                  <span class="badge bg-warning text-dark">Pending</span>
+                {% elif req.status == 'processing' %}
+                  <span class="badge bg-info text-dark">Processing</span>
+                {% elif req.status == 'completed' %}
+                  <span class="badge bg-success">Completed</span>
+                {% else %}
+                  <span class="badge bg-secondary">{{ req.status }}</span>
+                {% endif %}
+              </td>
+
+              <!-- Date -->
+              <td class="text-muted">
+                {{ req.created_at.strftime('%Y-%m-%d') }}
+              </td>
+
+              <!-- Actions -->
+              <td class="text-center">
+                <div class="d-flex justify-content-center gap-2">
+
+                  <form action="{{ url_for('admin.mark_cv_completed', request_id=req.id) }}"
+                        method="POST">
+                    <button type="submit" class="btn btn-sm btn-success">
+                      <i class="fas fa-check"></i>
+                    </button>
+                  </form>
+
+                  <form action="{{ url_for('admin.delete_cv_request', request_id=req.id) }}"
+                        method="POST"
+                        onsubmit="return confirm('Delete this request?');">
+                    <button type="submit" class="btn btn-sm btn-danger">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </form>
+
+                </div>
+              </td>
+
+            </tr>
+            {% endfor %}
+          </tbody>
+
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  {% else %}
+
+  <!-- Empty State (dark consistent) -->
+  <div class="vp-dash-card text-center py-5">
+    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+    <h5 class="text-muted">No CV optimization requests found</h5>
+  </div>
+
+  {% endif %}
+
+</div>
+
+<!-- Small CSS FIX (only visual polish, no logic impact) -->
+<style>
+.table-dark-admin {
+  background: transparent;
+  color: #e5e7eb;
+}
+
+.table-dark-admin thead {
+  background: rgba(255,255,255,0.04);
+  color: #9ca3af;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.table-dark-admin tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.table-dark-admin tbody tr:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+.table-dark-admin td {
+  border-color: rgba(255,255,255,0.05);
+}
+
+.vp-dash-card {
+  background: linear-gradient(180deg, #0b1220 0%, #0a0f1a 100%);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+}
+
+.vp-dash-card-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  color: #e5e7eb;
+}
+
+.vp-dash-card-body {
+  padding: 0;
+}
+</style>
+
+{% endblock %}

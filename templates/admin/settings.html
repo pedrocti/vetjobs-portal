@@ -1,0 +1,31 @@
+{% extends "admin/base.html" %}
+{% block title %}Platform Settings - Admin{% endblock %}
+
+{% block admin_content %}
+<div class="container py-4">
+  <h3 class="mb-4"><i class="fas fa-cog me-2"></i>Platform Settings</h3>
+
+  <form method="POST" class="card p-4 bg-dark border-secondary">
+    <div class="mb-3">
+      <label class="form-label text-white">Platform Name</label>
+      <input type="text" name="platform_name" class="form-control" value="{{ settings.platform_name }}">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label text-white">Veteran Label (display name)</label>
+      <input type="text" name="veteran_label" class="form-control" value="{{ settings.veteran_label }}">
+      <div class="form-text">Example: Specialist, Candidate, Veteran</div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label text-white">Employer Label (display name)</label>
+      <input type="text" name="employer_label" class="form-control" value="{{ settings.employer_label }}">
+      <div class="form-text">Example: Employer, Partner, Company</div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+      <i class="fas fa-save me-2"></i>Save Changes
+    </button>
+  </form>
+</div>
+{% endblock %}

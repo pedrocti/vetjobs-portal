@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{% block title %}Search Analytics - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="fas fa-chart-line me-2 text-primary"></i>Search Analytics</h2>
+            <p class="text-muted mb-0">Insights into search behavior and platform usage</p>
+        </div>
+        
+        <!-- Time Range Selector -->
+        <div class="btn-group" role="group">
+            <a href="{{ url_for('admin.search_analytics', days=7) }}" 
+               class="btn btn-outline-primary {% if selected_days == 7 %}active{% endif %}">7 Days</a>
+            <a href="{{ url_for('admin.search_analytics', days=30) }}" 
+               class="btn btn-outline-primary {% if selected_days == 30 %}active{% endif %}">30 Days</a>
+            <a href="{{ url_for('admin.search_analytics', days=90) }}" 
+               class="btn btn-outline-primary {% if selected_days == 90 %}active{% endif %}">90 Days</a>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ total_veteran_searches }}</h4>
+                            <p class="mb-0">Veteran Searches</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ total_job_searches }}</h4>
+                            <p class="mb-0">Job Searches</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-briefcase fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ unique_searchers }}</h4>
+                            <p class="mb-0">Active Searchers</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-user-friends fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ total_veteran_searches + total_job_searches }}</h4>
+                            <p class="mb-0">Total Searches</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-search fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Activity Chart -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-area me-2"></i>Search Activity Over Time
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="searchActivityChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Popular Search Terms -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-fire me-2 text-danger"></i>Popular Search Terms
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <h6 class="text-muted">Veteran Searches</h6>
+                            {% if popular_veteran_terms %}
+                            <div class="mb-3">
+                                {% for term, count in popular_veteran_terms %}
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge bg-primary">{{ term or 'No search terms' }}</span>
+                                    <small class="text-muted">{{ count }} searches</small>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted">No veteran search data available</p>
+                            {% endif %}
+                            
+                            <h6 class="text-muted">Job Searches</h6>
+                            {% if popular_job_terms %}
+                            <div>
+                                {% for term, count in popular_job_terms %}
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge bg-success">{{ term or 'No search terms' }}</span>
+                                    <small class="text-muted">{{ count }} searches</small>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted">No job search data available</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popular Skills -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tools me-2 text-warning"></i>Most In-Demand Skills
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if popular_skills %}
+                    <div class="skills-cloud">
+                        {% for skill in popular_skills %}
+                        <span class="badge bg-light text-dark me-2 mb-2 fs-6">{{ skill.title() }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No skills data available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Geographic Hotspots -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-map-marker-alt me-2 text-info"></i>Geographic Hotspots
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if popular_locations %}
+                    <div class="list-group list-group-flush">
+                        {% for location in popular_locations[:10] %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                            <span>
+                                <i class="fas fa-map-pin me-2 text-muted"></i>
+                                {{ location }}
+                            </span>
+                            <span class="badge bg-info rounded-pill">Active</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No location data available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Industry Distribution -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-industry me-2 text-secondary"></i>Active Industries
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if industry_stats %}
+                    <div class="list-group list-group-flush">
+                        {% for industry, job_count in industry_stats %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                            <span>
+                                <i class="fas fa-building me-2 text-muted"></i>
+                                {{ industry }}
+                            </span>
+                            <span class="badge bg-secondary rounded-pill">{{ job_count }} jobs</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No industry data available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Insights & Recommendations -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-lightbulb me-2 text-warning"></i>Platform Insights
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center p-3 border rounded">
+                                <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                                <h6>Search Engagement</h6>
+                                <p class="text-muted small">
+                                    {% if total_veteran_searches + total_job_searches > 0 %}
+                                    Platform is actively used for connecting veterans and employers
+                                    {% else %}
+                                    Encourage more users to utilize search features
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-3 border rounded">
+                                <i class="fas fa-chart-line fa-2x text-success mb-2"></i>
+                                <h6>Growth Opportunities</h6>
+                                <p class="text-muted small">
+                                    {% if popular_skills|length > 10 %}
+                                    Strong skill diversity indicates healthy platform growth
+                                    {% else %}
+                                    Consider promoting skill completion in profiles
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-3 border rounded">
+                                <i class="fas fa-map-marked-alt fa-2x text-info mb-2"></i>
+                                <h6>Geographic Reach</h6>
+                                <p class="text-muted small">
+                                    {% if popular_locations|length > 5 %}
+                                    Good geographic distribution across multiple locations
+                                    {% else %}
+                                    Focus on expanding to new geographic markets
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search Activity Chart
+    const ctx = document.getElementById('searchActivityChart').getContext('2d');
+    const dailyStats = {{ daily_search_stats | tojson }};
+    
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dailyStats.map(stat => {
+                const date = new Date(stat.date);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            }),
+            datasets: [{
+                label: 'Veteran Searches',
+                data: dailyStats.map(stat => stat.veteran_searches),
+                borderColor: 'rgb(54, 162, 235)',
+                backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Job Searches',
+                data: dailyStats.map(stat => stat.job_searches),
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Daily Search Activity (Last {{ selected_days }} Days)'
+                },
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                },
+                y: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Searches'
+                    },
+                    beginAtZero: true
+                }
+            },
+            elements: {
+                point: {
+                    radius: 4,
+                    hoverRadius: 6
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

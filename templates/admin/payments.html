@@ -1,0 +1,260 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Payment Tracking - Admin Panel{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="fw-bold mb-1">Payment Tracking</h1>
+                    <p class="text-muted mb-0">Monitor platform monetization and payment processing</p>
+                </div>
+                <div>
+                    <span class="badge bg-warning text-dark fs-6">
+                        <i class="fas fa-flask me-1"></i>Beta Feature
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h3 class="mb-0">₦{{ "%.2f"|format(stats.total_revenue|float) }}</h3>
+                    <p class="mb-0">Total Revenue</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h3 class="mb-0">₦{{ "%.2f"|format(stats.monthly_revenue|float) }}</h3>
+                    <p class="mb-0">This Month</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h3 class="mb-0">{{ stats.total_transactions }}</h3>
+                    <p class="mb-0">Total Transactions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body text-center">
+                    <h3 class="mb-0">{{ stats.pending_payments }}</h3>
+                    <p class="mb-0">Pending Payments</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monetization Info -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h6 class="alert-heading">
+                    <i class="fas fa-info-circle me-2"></i>Future Monetization Features
+                </h6>
+                <p class="mb-0">
+                    Current monetization features include:
+                    <strong>Verification Fees</strong> (₦{{ "%.0f"|format(stats.current_verification_fee|float) }}), 
+                    <strong>Profile Boosts</strong> (₦{{ "%.0f"|format(stats.current_boost_fee|float) }}), 
+                    <strong>Basic Subscription</strong> (₦{{ "%.0f"|format(stats.current_basic_plan|float) }}/month), and 
+                    <strong>Premium Subscription</strong> (₦{{ "%.0f"|format(stats.current_premium_plan|float) }}/month).
+                    Payment data is displayed from actual transactions.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Transactions -->
+    <div class="vp-dash-card">
+        <div class="vp-dash-card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-credit-card me-2"></i>Recent Transactions
+                </h5>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-download me-1"></i>Export
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-filter me-1"></i>Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="vp-dash-card-body" style="padding:0;">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle" style="background: transparent;">
+
+                    <!-- 🔥 FIXED HEADER (no white background) -->
+                    <thead>
+                        <tr style="background: rgba(255,255,255,0.03);">
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Service Type</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for payment in payments %}
+                        <tr style="border-color: rgba(255,255,255,0.05);">
+                            <td>
+                                <code class="text-primary">#{{ "%04d"|format(payment.id) }}</code>
+                            </td>
+
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2" 
+                                         style="width: 32px; height: 32px; font-size: 12px;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    {{ payment.user }}
+                                </div>
+                            </td>
+
+                            <td>
+                                <div>
+                                    <span class="fw-bold">{{ payment.type }}</span><br>
+                                    <small class="text-muted">
+                                        {% if payment.type == 'Verification Fee' %}
+                                        <i class="fas fa-user-check me-1"></i>Account verification
+                                        {% elif payment.type == 'Premium Job Posting' %}
+                                        <i class="fas fa-star me-1"></i>Featured job posting
+                                        {% elif payment.type == 'Profile Boost' %}
+                                        <i class="fas fa-rocket me-1"></i>Profile visibility boost
+                                        {% else %}
+                                        <i class="fas fa-credit-card me-1"></i>Platform service
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </td>
+
+                            <td>
+                                {% if payment.formatted_amount %}
+                                    <span class="fw-bold text-success">{{ payment.formatted_amount }}</span>
+                                {% else %}
+                                    <span class="fw-bold text-success">₦{{ "{:,.2f}"|format(payment.amount) }}</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if payment.status == 'Completed' %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check me-1"></i>Completed
+                                </span>
+                                {% elif payment.status == 'Pending' %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-clock me-1"></i>Pending
+                                </span>
+                                {% elif payment.status == 'Failed' %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-times me-1"></i>Failed
+                                </span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ payment.status }}</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <span class="small">{{ payment.date.strftime('%B %d, %Y') }}</span><br>
+                                <span class="text-muted small">{{ payment.date.strftime('%I:%M %p') }}</span>
+                            </td>
+
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    {% if payment.status == 'Pending' %}
+                                    <button type="button" class="btn btn-outline-success btn-sm">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    {% endif %}
+                                    <button type="button" class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Plans Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i>Planned Revenue Streams
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-primary">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-user-check fa-2x text-primary mb-2"></i>
+                                    <h5>Verification Fees</h5>
+                                    <h4 class="text-primary">₦{{ "%.0f"|format(stats.current_verification_fee|float) }}</h4>
+                                    <p class="small text-muted">One-time veteran verification</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-success">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-star fa-2x text-success mb-2"></i>
+                                    <h5>Basic Plan</h5>
+                                    <h4 class="text-success">₦{{ "%.0f"|format(stats.current_basic_plan|float) }}/mo</h4>
+                                    <p class="small text-muted">Monthly employer subscription plan</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-info">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-rocket fa-2x text-info mb-2"></i>
+                                    <h5>Profile Boosts</h5>
+                                    <h4 class="text-info">₦{{ "%.0f"|format(stats.current_boost_fee|float) }}</h4>
+                                    <p class="small text-muted">Increase profile visibility for 7 days</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-warning">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-crown fa-2x text-warning mb-2"></i>
+                                    <h5>Premium Plan</h5>
+                                    <h4 class="text-warning">₦{{ "%.0f"|format(stats.current_premium_plan|float) }}/mo</h4>
+                                    <p class="small text-muted">Advanced employer features</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

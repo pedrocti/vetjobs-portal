@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Review Job: {{ job_post.job_title }} - Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-briefcase me-2"></i>Job Review: {{ job_post.job_title }}
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Current Status -->
+                    <div class="alert alert-{{ 'success' if job_post.status == 'approved' else 'danger' if job_post.status == 'rejected' else 'secondary' if job_post.status == 'flagged' else 'warning' }} mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-{{ 'check-circle' if job_post.status == 'approved' else 'times-circle' if job_post.status == 'rejected' else 'flag' if job_post.status == 'flagged' else 'clock' }} fa-2x me-3"></i>
+                            <div>
+                                <h5 class="mb-1">Status: {{ job_post.status.title() }}</h5>
+                                {% if job_post.admin_notes %}
+                                <p class="mb-0"><strong>Admin Notes:</strong> {{ job_post.admin_notes }}</p>
+                                {% endif %}
+                                {% if job_post.moderated_by_admin %}
+                                <p class="mb-0"><small>Moderated by: {{ job_post.moderated_by_admin.full_name }} on {{ job_post.moderated_at.strftime('%m/%d/%Y at %I:%M %p') if job_post.moderated_at else 'N/A' }}</small></p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Information -->
+                    <div class="mb-4">
+                        <h5 class="fw-bold text-primary mb-3"><i class="fas fa-info-circle me-2"></i>Job Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Job Title:</label>
+                                <p class="mb-0">{{ job_post.job_title }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Company:</label>
+                                <p class="mb-0">{{ job_post.company_name }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Location:</label>
+                                <p class="mb-0">{{ job_post.location }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Job Type:</label>
+                                <p class="mb-0">{{ job_post.get_job_type_display() }}</p>
+                            </div>
+                            {% if job_post.salary_range %}
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold">Salary Range:</label>
+                                <p class="mb-0">{{ job_post.salary_range }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Employer Information -->
+                    <div class="mb-4">
+                        <h5 class="fw-bold text-success mb-3"><i class="fas fa-building me-2"></i>Employer Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Employer Name:</label>
+                                <p class="mb-0">{{ job_post.employer.full_name }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Email:</label>
+                                <p class="mb-0">{{ job_post.employer.email }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Member Since:</label>
+                                <p class="mb-0">{{ job_post.employer.created_at.strftime('%B %d, %Y') }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Total Job Posts:</label>
+                                <p class="mb-0">{{ job_post.employer.job_posts|length }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Description -->
+                    <div class="mb-4">
+                        <h5 class="fw-bold text-info mb-3"><i class="fas fa-file-alt me-2"></i>Job Description</h5>
+                        <div class="bg-light p-3 rounded">
+                            <p class="mb-0">{{ job_post.job_description|replace('\n', '<br>')|safe }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Requirements -->
+                    <div class="mb-4">
+                        <h5 class="fw-bold text-warning mb-3"><i class="fas fa-list-check me-2"></i>Job Requirements</h5>
+                        <div class="bg-light p-3 rounded">
+                            <p class="mb-0">{{ job_post.requirements|replace('\n', '<br>')|safe }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Action Forms -->
+                    {% if job_post.status == 'pending' or job_post.status == 'flagged' %}
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-success">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="mb-0"><i class="fas fa-check me-2"></i>Approve Job</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form method="POST" action="{{ url_for('admin.approve_job', job_id=job_post.id) }}">
+                                        <div class="mb-3">
+                                            <label for="approve_notes" class="form-label">Admin Notes (Optional)</label>
+                                            <textarea class="form-control" id="approve_notes" name="admin_notes" rows="2" 
+                                                      placeholder="Add any notes about the approval..."></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-success w-100" onclick="return confirm('Are you sure you want to approve this job?')">
+                                            <i class="fas fa-check me-2"></i>Approve
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-danger">
+                                <div class="card-header bg-danger text-white">
+                                    <h6 class="mb-0"><i class="fas fa-times me-2"></i>Reject Job</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form method="POST" action="{{ url_for('admin.reject_job', job_id=job_post.id) }}">
+                                        <div class="mb-3">
+                                            <label for="reject_notes" class="form-label">Reason for Rejection *</label>
+                                            <textarea class="form-control" id="reject_notes" name="admin_notes" rows="2" 
+                                                      placeholder="Explain why this job is being rejected..." required></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to reject this job?')">
+                                            <i class="fas fa-times me-2"></i>Reject
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-secondary">
+                                <div class="card-header bg-secondary text-white">
+                                    <h6 class="mb-0"><i class="fas fa-flag me-2"></i>Flag Job</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form method="POST" action="{{ url_for('admin.flag_job', job_id=job_post.id) }}">
+                                        <div class="mb-3">
+                                            <label for="flag_notes" class="form-label">Reason for Flagging *</label>
+                                            <textarea class="form-control" id="flag_notes" name="admin_notes" rows="2" 
+                                                      placeholder="Explain why this job needs attention..." required></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-secondary w-100" onclick="return confirm('Are you sure you want to flag this job?')">
+                                            <i class="fas fa-flag me-2"></i>Flag
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Job Summary -->
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Job Summary</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-briefcase fa-2x"></i>
+                        </div>
+                        <h5 class="fw-bold mb-1">{{ job_post.job_title }}</h5>
+                        <p class="text-muted mb-0">{{ job_post.company_name }}</p>
+                    </div>
+                    
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-calendar text-muted me-2"></i>
+                            <small>Submitted: {{ job_post.created_at.strftime('%B %d, %Y') }}</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-clock text-muted me-2"></i>
+                            <small>Last Updated: {{ job_post.updated_at.strftime('%B %d, %Y') }}</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-eye text-muted me-2"></i>
+                            <small>Status: {{ job_post.status.title() }}</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-{{ 'toggle-on' if job_post.is_active else 'toggle-off' }} text-muted me-2"></i>
+                            <small>{{ 'Active' if job_post.is_active else 'Inactive' }}</small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card shadow">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('admin.job_moderation') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Moderation
+                        </a>
+                        <a href="{{ url_for('dashboard.admin') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+{% block title %}Job Moderation - Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="fw-bold mb-1">Job Moderation</h1>
+                    <p class="text-muted mb-0">Review and moderate employer job postings</p>
+                </div>
+                <div>
+                    <span class="badge bg-danger fs-6">
+                        <i class="fas fa-user-shield me-1"></i>Administrator
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ pending_jobs|length }}</h4>
+                            <p class="mb-0">Pending Review</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ approved_jobs|length }}</h4>
+                            <p class="mb-0">Approved</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ rejected_jobs|length }}</h4>
+                            <p class="mb-0">Rejected</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-times-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-secondary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ flagged_jobs|length }}</h4>
+                            <p class="mb-0">Flagged</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-flag fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Jobs -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock me-2"></i>Pending Jobs ({{ pending_jobs|length }})
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if pending_jobs %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Job Title</th>
+                                    <th>Company</th>
+                                    <th>Employer</th>
+                                    <th>Location</th>
+                                    <th>Type</th>
+                                    <th>Submitted</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for job in pending_jobs %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <h6 class="mb-1">{{ job.job_title }}</h6>
+                                            {% if job.salary_range %}
+                                            <small class="text-muted">{{ job.salary_range }}</small>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>{{ job.company_name }}</td>
+                                    <td>
+                                        <div>
+                                            <h6 class="mb-1">{{ job.employer.full_name }}</h6>
+                                            <small class="text-muted">{{ job.employer.email }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-map-marker-alt me-1 text-muted"></i>
+                                        {{ job.location }}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ job.get_job_type_display() }}</span>
+                                    </td>
+                                    <td>
+                                        <small>{{ job.created_at.strftime('%m/%d/%Y') }}</small>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('admin.review_job', job_id=job.id) }}" 
+                                           class="btn btn-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>Review
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">No pending jobs to review</h6>
+                        <p class="text-muted mb-0">All job postings have been processed.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Approved Jobs -->
+    {% if approved_jobs %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-check-circle me-2"></i>Approved Jobs ({{ approved_jobs|length }})
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Job Title</th>
+                                    <th>Company</th>
+                                    <th>Status</th>
+                                    <th>Approved By</th>
+                                    <th>Approved Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for job in approved_jobs[:10] %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <h6 class="mb-1">{{ job.job_title }}</h6>
+                                            <small class="text-muted">{{ job.company_name }}</small>
+                                        </div>
+                                    </td>
+                                    <td>{{ job.company_name }}</td>
+                                    <td>
+                                        <span class="badge bg-success">Active</span>
+                                        {% if not job.is_active %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if job.moderated_by_admin %}
+                                            {{ job.moderated_by_admin.full_name }}
+                                        {% else %}
+                                            System
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if job.moderated_at %}
+                                            <small>{{ job.moderated_at.strftime('%m/%d/%Y') }}</small>
+                                        {% else %}
+                                            <small>N/A</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('admin.review_job', job_id=job.id) }}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% if approved_jobs|length > 10 %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">
+                                        <small>Showing latest 10 approved jobs</small>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Rejected and Flagged Jobs -->
+    {% if rejected_jobs or flagged_jobs %}
+    <div class="row">
+        {% if rejected_jobs %}
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-times-circle me-2"></i>Recently Rejected ({{ rejected_jobs|length }})
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Job Title</th>
+                                    <th>Company</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for job in rejected_jobs[:5] %}
+                                <tr>
+                                    <td>{{ job.job_title|truncate(30) }}</td>
+                                    <td>{{ job.company_name|truncate(20) }}</td>
+                                    <td><small>{{ job.moderated_at.strftime('%m/%d') if job.moderated_at else 'N/A' }}</small></td>
+                                    <td>
+                                        <a href="{{ url_for('admin.review_job', job_id=job.id) }}" 
+                                           class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if flagged_jobs %}
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-flag me-2"></i>Flagged Jobs ({{ flagged_jobs|length }})
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Job Title</th>
+                                    <th>Company</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for job in flagged_jobs %}
+                                <tr>
+                                    <td>{{ job.job_title|truncate(30) }}</td>
+                                    <td>{{ job.company_name|truncate(20) }}</td>
+                                    <td><small>{{ job.moderated_at.strftime('%m/%d') if job.moderated_at else 'N/A' }}</small></td>
+                                    <td>
+                                        <a href="{{ url_for('admin.review_job', job_id=job.id) }}" 
+                                           class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

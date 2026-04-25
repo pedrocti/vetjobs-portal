@@ -1,0 +1,1386 @@
+{% extends "base.html" %}
+{% block title %}Employer Dashboard - VetJobs Portal{% endblock %}
+
+{% block content %}
+<div class="emp-dashboard-wrap">
+
+  <!-- SIDEBAR -->
+  <nav class="emp-sidebar d-none d-md-flex">
+    <div class="emp-sidebar-brand">
+      <div class="emp-sidebar-avatar">
+        {{ (current_user.company_name or current_user.first_name)[0] | upper }}
+      </div>
+      <div>
+        <div class="emp-sidebar-name">{{ current_user.company_name or current_user.first_name }}</div>
+        <span class="emp-sidebar-badge">
+          <i class="fas fa-building me-1"></i>Employer
+        </span>
+      </div>
+    </div>
+
+    <div class="emp-sidebar-divider"></div>
+
+    <ul class="emp-sidebar-nav">
+      <li>
+        <a href="{{ url_for('dashboard.employer') }}" class="emp-nav-link active">
+          <i class="fas fa-home"></i><span>Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a href="{% if can_post_job %}{{ url_for('employer.post_job') }}{% else %}{{ url_for('payments.employer_subscription_plans') }}{% endif %}"
+           class="emp-nav-link {% if not can_post_job %}emp-nav-locked{% endif %}">
+          <i class="fas fa-plus"></i><span>Post Job</span>
+          {% if not can_post_job %}<i class="fas fa-lock emp-lock-icon"></i>{% endif %}
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('employer.manage_jobs') }}" class="emp-nav-link">
+          <i class="fas fa-briefcase"></i><span>Manage Jobs</span>
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('applications.manage_applications') }}" class="emp-nav-link">
+          <i class="fas fa-file-alt"></i><span>Applications</span>
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('search.search_veterans') }}" class="emp-nav-link">
+          <i class="fas fa-users"></i><span>Find Veterans</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="emp-sidebar-divider"></div>
+
+    <ul class="emp-sidebar-nav">
+      <li>
+        <a href="{{ url_for('payments.init_payment') }}" class="emp-nav-link">
+          <i class="fas fa-credit-card"></i><span>Payments</span>
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('messaging.inbox') }}" class="emp-nav-link">
+          <i class="fas fa-envelope"></i><span>Messages</span>
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('dashboard.profile') }}" class="emp-nav-link">
+          <i class="fas fa-user-cog"></i><span>Profile</span>
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('main.contact') }}" class="emp-nav-link">
+          <i class="fas fa-life-ring"></i><span>Support</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="emp-sidebar-divider"></div>
+
+    <ul class="emp-sidebar-nav">
+      <li>
+        <a href="{{ url_for('auth.logout') }}" class="emp-nav-link emp-nav-logout">
+          <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+        </a>
+      </li>
+    </ul>
+
+    <!-- Plan badge in sidebar -->
+    <div class="emp-sidebar-plan">
+      {% if subscription and subscription.is_active() and subscription.plan_type != 'free' %}
+        <i class="fas fa-gem" style="color: var(--gold);"></i>
+        <span>{{ subscription.plan_type | replace('_', ' ') | title }}</span>
+      {% else %}
+        <i class="fas fa-seedling" style="color: rgba(255,255,255,0.4);"></i>
+        <span>Free Plan</span>
+      {% endif %}
+      <a href="{{ url_for('payments.employer_subscription_plans') }}" class="emp-sidebar-upgrade">
+        {% if subscription and subscription.is_active() and subscription.plan_type != 'free' %}Manage{% else %}Upgrade{% endif %}
+      </a>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="emp-main">
+
+    <!-- Welcome Header -->
+    <div class="emp-page-header">
+      <div>
+        <h1 class="emp-page-title">Welcome back, {{ current_user.company_name or current_user.first_name }}!</h1>
+        <p class="emp-page-sub">Manage your job postings and connect with veteran talent.</p>
+      </div>
+      <div class="emp-header-actions">
+        {% if not subscription or subscription.plan_type == 'free' %}
+          <a href="{{ url_for('payments.employer_subscription_plans') }}" class="emp-upgrade-btn">
+            <i class="fas fa-crown"></i> Upgrade Account
+          </a>
+        {% else %}
+          <a href="{{ url_for('payments.employer_subscription_plans') }}" class="emp-manage-btn">
+            <i class="fas fa-gem"></i> Manage Plan
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Status Alerts -->
+    {% if current_user.employer_status == 'pending' %}
+    <div class="emp-alert emp-alert-warning">
+      <i class="fas fa-clock"></i>
+      <div><strong>Account Pending Approval</strong><br>Your employer account is under review. You'll be notified once approved.</div>
+    </div>
+    {% elif current_user.employer_status == 'rejected' %}
+    <div class="emp-alert emp-alert-danger">
+      <i class="fas fa-times-circle"></i>
+      <div><strong>Account Rejected</strong><br>Please contact support for more information.</div>
+    </div>
+    {% elif current_user.employer_status == 'active' and not subscription %}
+    <div class="emp-alert emp-alert-info">
+      <i class="fas fa-credit-card"></i>
+      <div>
+        <strong>Select a Subscription Plan</strong><br>
+        Your account is approved! Choose a plan to start posting jobs.
+        <a href="{{ url_for('payments.employer_subscription_plans') }}" class="emp-alert-cta">Choose Plan</a>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Stat Cards -->
+    <div class="emp-stats-row">
+      <div class="emp-stat-card" style="--stat-color: #3b82f6;">
+        <div class="emp-stat-icon"><i class="fas fa-briefcase"></i></div>
+        <div class="emp-stat-body">
+          <span class="emp-stat-num">{{ stats.active_jobs }}</span>
+          <span class="emp-stat-label">Active Jobs</span>
+        </div>
+      </div>
+      <div class="emp-stat-card" style="--stat-color: #10b981;">
+        <div class="emp-stat-icon"><i class="fas fa-file-alt"></i></div>
+        <div class="emp-stat-body">
+          <span class="emp-stat-num">{{ stats.total_applications }}</span>
+          <span class="emp-stat-label">Applications</span>
+        </div>
+      </div>
+      <div class="emp-stat-card" style="--stat-color: #6366f1;">
+        <div class="emp-stat-icon"><i class="fas fa-handshake"></i></div>
+        <div class="emp-stat-body">
+          <span class="emp-stat-num">{{ stats.interviews }}</span>
+          <span class="emp-stat-label">Interviews</span>
+        </div>
+      </div>
+      <div class="emp-stat-card" style="--stat-color: var(--gold);">
+        <div class="emp-stat-icon"><i class="fas fa-users"></i></div>
+        <div class="emp-stat-body">
+          <span class="emp-stat-num">{{ stats.total_veterans or 'N/A' }}</span>
+          <span class="emp-stat-label">Veterans Reached</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-column layout -->
+    <div class="emp-content-grid">
+
+      <!-- LEFT COLUMN -->
+      <div class="emp-col-main">
+
+        <!-- Quick Actions -->
+        <div class="emp-card mb-4">
+          <div class="emp-card-header">
+            <i class="fas fa-rocket" style="color: var(--gold);"></i> Quick Actions
+          </div>
+          <div class="emp-card-body">
+            <div class="emp-actions-grid">
+              <a href="{% if can_post_job %}{{ url_for('employer.post_job') }}{% else %}{{ url_for('payments.employer_subscription_plans') }}{% endif %}"
+                 class="emp-action-btn {% if not can_post_job %}emp-action-locked{% endif %}">
+                <i class="fas fa-plus"></i>
+                <strong>Post New Job</strong>
+                <span>{% if can_post_job %}Create a new listing{% else %}Upgrade to post{% endif %}</span>
+              </a>
+              <a href="{{ url_for('employer.manage_jobs') }}" class="emp-action-btn">
+                <i class="fas fa-briefcase"></i>
+                <strong>Manage Jobs</strong>
+                <span>View & edit postings</span>
+              </a>
+              <a href="{{ url_for('applications.manage_applications') }}" class="emp-action-btn">
+                <i class="fas fa-users"></i>
+                <strong>Review Applications</strong>
+                <span>From veterans</span>
+              </a>
+              <a href="{{ url_for('search.search_veterans') }}" class="emp-action-btn">
+                <i class="fas fa-search"></i>
+                <strong>Find Veterans</strong>
+                <span>Talent search</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Job Postings -->
+        <div class="emp-card mb-4">
+          <div class="emp-card-header">
+            <span><i class="fas fa-briefcase" style="color: var(--gold);"></i> Recent Job Postings</span>
+            {% if recent_jobs %}
+            <a href="{{ url_for('employer.manage_jobs') }}" class="emp-card-header-link">View All</a>
+            {% endif %}
+          </div>
+          <div class="emp-card-body">
+            {% if recent_jobs and recent_jobs|length > 0 %}
+              <ul class="emp-list">
+                {% for job in recent_jobs %}
+                <li class="emp-list-item">
+                  <div>
+                    <div class="emp-list-title">{{ job.title }}</div>
+                    <div class="emp-list-sub">Posted {{ job.created_at.strftime('%b %d, %Y') }}</div>
+                  </div>
+                  <a href="{{ url_for('employer.view_job', job_id=job.id) }}" class="emp-pill-btn">View</a>
+                </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <div class="emp-empty-state">
+                <div class="emp-empty-icon"><i class="fas fa-briefcase"></i></div>
+                <h6>No job postings yet</h6>
+                <p>Post your first job to start attracting veteran talent.</p>
+                {% if can_post_job %}
+                <a href="{{ url_for('employer.post_job') }}" class="emp-cta-btn">
+                  <i class="fas fa-plus me-1"></i>Post First Job
+                </a>
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Recent Applications -->
+        <div class="emp-card mb-4">
+          <div class="emp-card-header">
+            <span><i class="fas fa-file-alt" style="color: var(--gold);"></i> Recent Applications</span>
+            <a href="{{ url_for('applications.manage_applications') }}" class="emp-card-header-link">View All</a>
+          </div>
+          <div class="emp-card-body">
+            {% if recent_applications and recent_applications|length > 0 %}
+              <ul class="emp-list">
+                {% for application, job, veteran in recent_applications %}
+                <li class="emp-list-item">
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="emp-applicant-avatar">
+                      {{ veteran.first_name[0] | upper }}
+                    </div>
+                    <div>
+                      <div class="emp-list-title">{{ veteran.first_name }} {{ veteran.last_name }}</div>
+                      <div class="emp-list-sub">{{ job.title }} · {{ application.created_at.strftime('%b %d, %Y') }}</div>
+                    </div>
+                  </div>
+                  <span class="emp-status-badge {{ application.get_status_badge_class() }}">
+                    {{ application.get_status_display() }}
+                  </span>
+                </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <div class="emp-empty-state">
+                <div class="emp-empty-icon"><i class="fas fa-inbox"></i></div>
+                <h6>No applications yet</h6>
+                <p>Post jobs to start receiving applications from veterans.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- AI Suggested Veterans -->
+        <div class="emp-card">
+          <div class="emp-card-header">
+            <span>
+              <i class="fas fa-robot" style="color: var(--gold);"></i> AI Suggested Veterans
+              {% if can_use_ai %}
+              <span class="emp-ai-badge">AI Matching</span>
+              {% endif %}
+            </span>
+            {% if can_use_ai %}
+            <a href="{{ url_for('search.search_veterans') }}" class="emp-card-header-link">Browse All</a>
+            {% endif %}
+          </div>
+          <div class="emp-card-body">
+
+            {% if not can_use_ai %}
+            <div class="emp-empty-state">
+              <div class="emp-empty-icon"><i class="fas fa-robot"></i></div>
+              <h6>AI Matching is a Pro Feature</h6>
+              <p>Upgrade to <strong>Professional</strong> or <strong>Enterprise Plus</strong> to get AI-powered veteran suggestions matched to your job postings.</p>
+              <a href="{{ url_for('payments.employer_subscription_plans') }}" class="emp-cta-btn emp-cta-gold">
+                <i class="fas fa-crown me-1"></i>Unlock AI Matching
+              </a>
+            </div>
+
+            {% elif not recent_jobs %}
+            <div class="emp-empty-state">
+              <div class="emp-empty-icon"><i class="fas fa-briefcase"></i></div>
+              <h6>Post a Job to Get Suggestions</h6>
+              <p>Once you post your first job, our AI will match it against veteran profiles and show the best candidates here.</p>
+              <a href="{{ url_for('employer.post_job') }}" class="emp-cta-btn">
+                <i class="fas fa-plus me-1"></i>Post a Job
+              </a>
+            </div>
+
+            {% elif suggested_veterans %}
+            <p class="emp-ai-note">
+              <i class="fas fa-info-circle me-1"></i>
+              Matched against: <strong>{{ recent_jobs[0].title }}</strong> — Boosted profiles appear first.
+            </p>
+            <div class="emp-veterans-grid">
+              {% for suggestion in suggested_veterans %}
+              {% set vet_user = suggestion.user %}
+              {% set vet_profile = suggestion.profile %}
+              {% set score = suggestion.match_score %}
+              {% set is_boosted = suggestion.is_boosted %}
+              <div class="emp-vet-card {% if is_boosted %}emp-vet-boosted{% endif %}">
+                {% if is_boosted %}
+                <div class="emp-vet-boost-bar">
+                  <i class="fas fa-rocket me-1"></i>Boosted Profile
+                  <span class="ms-auto">Top Match</span>
+                </div>
+                {% endif %}
+                <div class="emp-vet-card-body">
+                  <div class="emp-vet-header">
+                    <div class="emp-vet-avatar">{{ vet_user.full_name[0] | upper }}</div>
+                    <div>
+                      <div class="emp-vet-name">
+                        {{ vet_user.full_name }}
+                        {% if vet_profile.is_verified %}
+                        <i class="fas fa-shield-alt" style="color: #10b981; font-size: 12px;" title="Verified"></i>
+                        {% endif %}
+                      </div>
+                      <div class="emp-vet-branch">{{ vet_profile.military_branch or 'Veteran' }}</div>
+                    </div>
+                  </div>
+
+                  <div class="emp-vet-score-wrap">
+                    <div class="emp-vet-score-labels">
+                      <span>Match Score</span>
+                      <span class="emp-vet-score-num {% if score >= 70 %}score-high{% elif score >= 40 %}score-mid{% else %}score-low{% endif %}">
+                        {{ score }}%
+                      </span>
+                    </div>
+                    <div class="emp-vet-score-bar">
+                      <div class="emp-vet-score-fill {% if score >= 70 %}fill-high{% elif score >= 40 %}fill-mid{% else %}fill-low{% endif %}"
+                           style="width: {{ score }}%;"></div>
+                    </div>
+                  </div>
+
+                  {% if suggestion.matching_skills %}
+                  <div class="emp-vet-skills">
+                    {% for skill in suggestion.matching_skills[:3] %}
+                    <span class="emp-skill-tag"><i class="fas fa-check me-1"></i>{{ skill }}</span>
+                    {% endfor %}
+                    {% if suggestion.matching_skills|length > 3 %}
+                    <span class="emp-skill-tag emp-skill-more">+{{ suggestion.matching_skills|length - 3 }}</span>
+                    {% endif %}
+                  </div>
+                  {% endif %}
+
+                  {% if vet_profile.location or vet_user.location %}
+                  <div class="emp-vet-location">
+                    <i class="fas fa-map-marker-alt me-1"></i>{{ vet_profile.location or vet_user.location }}
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="emp-vet-card-footer">
+                  <a href="{{ url_for('veteran.public_profile', user_id=vet_user.id) }}" class="emp-vet-view-btn">
+                    <i class="fas fa-eye me-1"></i>View Profile
+                  </a>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+            {% else %}
+            <div class="emp-empty-state">
+              <div class="emp-empty-icon"><i class="fas fa-search-minus"></i></div>
+              <h6>No Matches Found Yet</h6>
+              <p>Try adding more specific skills and requirements to your job postings.</p>
+              <a href="{{ url_for('employer.manage_jobs') }}" class="emp-cta-btn">
+                <i class="fas fa-edit me-1"></i>Update Requirements
+              </a>
+            </div>
+            {% endif %}
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="emp-col-side">
+
+        <!-- Subscription Card -->
+        <div class="emp-card emp-plan-card mb-4 {% if subscription and subscription.is_active() and subscription.plan_type != 'free' %}emp-plan-active{% endif %}">
+          <div class="emp-card-header">
+            <span><i class="fas fa-gem" style="color: var(--gold);"></i> Your Plan</span>
+            {% if subscription and subscription.is_active() %}
+            <span class="emp-badge-active">Active</span>
+            {% else %}
+            <span class="emp-badge-inactive">Inactive</span>
+            {% endif %}
+          </div>
+          <div class="emp-card-body">
+            {% if subscription %}
+              <div class="emp-plan-name">
+                {% if subscription.plan_type == 'enterprise_plus' %}
+                  <i class="fas fa-crown" style="color: var(--gold);"></i> Enterprise Plus
+                {% elif subscription.plan_type == 'professional' %}
+                  <i class="fas fa-star" style="color: #3b82f6;"></i> Professional
+                {% elif subscription.plan_type == 'starter' %}
+                  <i class="fas fa-rocket" style="color: #10b981;"></i> Starter
+                {% else %}
+                  <i class="fas fa-seedling" style="color: rgba(255,255,255,0.4);"></i> Free Plan
+                {% endif %}
+              </div>
+              {% if subscription.is_active() %}
+              <p class="emp-plan-expires">
+                <i class="fas fa-calendar me-1"></i>
+                Expires {{ subscription.expires_at.strftime('%b %d, %Y') }}
+                · {{ subscription.days_until_expiry() }} days left
+              </p>
+              {% else %}
+              <p class="emp-plan-expired">
+                <i class="fas fa-exclamation-circle me-1"></i>Plan expired — upgrade to continue.
+              </p>
+              {% endif %}
+
+              <ul class="emp-plan-features">
+                <li class="{% if can_post_job %}feat-on{% else %}feat-off{% endif %}">
+                  <i class="fas fa-{% if can_post_job %}check{% else %}times{% endif %}"></i>
+                  Job Postings {% if subscription.max_job_posts == -1 %}(Unlimited){% else %}(up to {{ subscription.max_job_posts }}){% endif %}
+                </li>
+                <li class="{% if can_contact %}feat-on{% else %}feat-off{% endif %}">
+                  <i class="fas fa-{% if can_contact %}check{% else %}times{% endif %}"></i>
+                  Contact Candidates
+                </li>
+                <li class="{% if can_access_cv %}feat-on{% else %}feat-off{% endif %}">
+                  <i class="fas fa-{% if can_access_cv %}check{% else %}times{% endif %}"></i>
+                  CV / Resume Access
+                </li>
+                <li class="{% if can_use_analytics %}feat-on{% else %}feat-off{% endif %}">
+                  <i class="fas fa-{% if can_use_analytics %}check{% else %}times{% endif %}"></i>
+                  Analytics Dashboard
+                </li>
+                <li class="{% if can_use_ai %}feat-on{% else %}feat-off{% endif %}">
+                  <i class="fas fa-{% if can_use_ai %}check{% else %}times{% endif %}"></i>
+                  AI Talent Suggestions
+                </li>
+                {% if job_boosts > 0 %}
+                <li class="feat-boost">
+                  <i class="fas fa-bolt"></i>
+                  {{ job_boosts }} Job Boost{{ 's' if job_boosts != 1 else '' }}
+                </li>
+                {% endif %}
+              </ul>
+            {% else %}
+              <p class="emp-plan-none">No active plan found.</p>
+            {% endif %}
+
+            <a href="{{ url_for('payments.employer_subscription_plans') }}"
+               class="emp-plan-cta {% if subscription and subscription.plan_type != 'free' and subscription.is_active() %}emp-plan-cta-manage{% else %}emp-plan-cta-upgrade{% endif %}">
+              <i class="fas fa-{% if subscription and subscription.plan_type != 'free' and subscription.is_active() %}cog{% else %}arrow-up{% endif %} me-1"></i>
+              {% if subscription and subscription.plan_type != 'free' and subscription.is_active() %}Manage Plan{% else %}Upgrade Now{% endif %}
+            </a>
+          </div>
+        </div>
+
+        <!-- Company Profile -->
+        <div class="emp-card mb-4">
+          <div class="emp-card-header">
+            <i class="fas fa-building" style="color: var(--gold);"></i> Company Profile
+          </div>
+          <div class="emp-card-body">
+            <p class="emp-side-note">Keep your company profile updated to attract better veteran candidates.</p>
+            <a href="{{ url_for('dashboard.profile') }}" class="emp-pill-btn w-100 text-center">
+              <i class="fas fa-edit me-1"></i>Update Profile
+            </a>
+          </div>
+        </div>
+
+        <!-- Support -->
+        <div class="emp-card">
+          <div class="emp-card-header">
+            <i class="fas fa-life-ring" style="color: var(--gold);"></i> Support
+          </div>
+          <div class="emp-card-body">
+            <p class="emp-side-note">Need help finding veteran talent or managing your account?</p>
+            <a href="{{ url_for('main.contact') }}" class="emp-pill-btn w-100 text-center">
+              <i class="fas fa-envelope me-1"></i>Contact Support
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<style>
+  /* ===================================
+     EMPLOYER DASHBOARD
+  =================================== */
+  .emp-dashboard-wrap {
+      display: flex;
+      min-height: 100vh;
+      background: #080f1e;
+      padding-top: var(--navbar-height);
+  }
+
+  /* ── SIDEBAR ──────────────────────────────────────────── */
+  .emp-sidebar {
+      width: 240px;
+      min-height: 100vh;
+      background: rgba(10,22,40,0.98);
+      border-right: 1px solid rgba(212,175,55,0.1);
+      flex-direction: column;
+      padding: 28px 16px;
+      position: sticky;
+      top: var(--navbar-height);
+      height: calc(100vh - var(--navbar-height));
+      overflow-y: auto;
+      flex-shrink: 0;
+      gap: 0;
+  }
+
+  .emp-sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 4px 24px;
+  }
+
+  .emp-sidebar-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--gold-dim);
+      border: 1px solid rgba(212,175,55,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-cond);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gold);
+      flex-shrink: 0;
+  }
+
+  .emp-sidebar-name {
+      font-family: var(--font-cond);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--vp-white);
+      letter-spacing: 0.5px;
+      line-height: 1.2;
+  }
+
+  .emp-sidebar-badge {
+      font-family: var(--font-cond);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--gold);
+      background: var(--gold-dim);
+      border: 1px solid rgba(212,175,55,0.2);
+      border-radius: 3px;
+      padding: 2px 8px;
+  }
+
+  .emp-sidebar-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+      margin: 12px 0;
+  }
+
+  .emp-sidebar-nav {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+  }
+
+  .emp-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: rgba(255,255,255,0.65);
+      text-decoration: none;
+      transition: all 0.2s ease;
+      position: relative;
+  }
+
+  .emp-nav-link:hover,
+  .emp-nav-link.active {
+      background: rgba(212,175,55,0.08);
+      color: var(--vp-white);
+      border: 1px solid rgba(212,175,55,0.15);
+  }
+
+  .emp-nav-link.active {
+      color: var(--gold);
+  }
+
+  .emp-nav-link i:first-child {
+      width: 16px;
+      text-align: center;
+      font-size: 13px;
+      flex-shrink: 0;
+  }
+
+  .emp-nav-locked { opacity: 0.5; }
+  .emp-lock-icon {
+      margin-left: auto;
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+  }
+
+  .emp-nav-logout { color: rgba(239,68,68,0.7); }
+  .emp-nav-logout:hover { color: #ef4444; background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.2); }
+
+  .emp-sidebar-plan {
+      margin-top: auto;
+      padding: 14px 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(212,175,55,0.12);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-cond);
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.5px;
+      margin-top: 16px;
+  }
+
+  .emp-sidebar-upgrade {
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gold);
+      text-decoration: none;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+  }
+
+  /* ── MAIN AREA ────────────────────────────────────────── */
+  .emp-main {
+      flex: 1;
+      padding: 32px 28px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+  }
+
+  @media (max-width: 767px) {
+      .emp-main { padding: 20px 16px; }
+      .emp-dashboard-wrap { flex-direction: column; }
+  }
+
+  /* Page header */
+  .emp-page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+  }
+
+  .emp-page-title {
+      font-family: var(--font-display);
+      font-size: clamp(22px, 3vw, 32px);
+      font-weight: 700;
+      color: var(--vp-white);
+      margin: 0 0 4px;
+  }
+
+  .emp-page-sub {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      margin: 0;
+  }
+
+  .emp-upgrade-btn,
+  .emp-manage-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      font-family: var(--font-cond);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.25s ease;
+  }
+
+  .emp-upgrade-btn {
+      background: var(--gold);
+      color: var(--navy);
+      border: 2px solid var(--gold);
+  }
+
+  .emp-upgrade-btn:hover {
+      background: var(--gold-light);
+      color: var(--navy);
+      transform: translateY(-1px);
+  }
+
+  .emp-manage-btn {
+      background: transparent;
+      color: var(--vp-white);
+      border: 2px solid rgba(255,255,255,0.2);
+  }
+
+  .emp-manage-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+  }
+
+  /* Alerts */
+  .emp-alert {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 20px;
+      border-radius: 10px;
+      margin-bottom: 24px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.6;
+  }
+
+  .emp-alert i { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+  .emp-alert-warning { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.25); color: #fbbf24; }
+  .emp-alert-danger  { background: rgba(239,68,68,0.08);  border: 1px solid rgba(239,68,68,0.25);  color: #ef4444; }
+  .emp-alert-info    { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.25); color: #93c5fd; }
+
+  .emp-alert-cta {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 6px 14px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      color: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 13px;
+      transition: background 0.2s ease;
+  }
+
+  .emp-alert-cta:hover { background: rgba(255,255,255,0.18); }
+
+  /* Stat cards */
+  .emp-stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+  }
+
+  @media (max-width: 900px) { .emp-stats-row { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .emp-stats-row { grid-template-columns: 1fr 1fr; gap: 10px; } }
+
+  .emp-stat-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 20px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+  }
+
+  .emp-stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--stat-color);
+      opacity: 0.6;
+  }
+
+  .emp-stat-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255,255,255,0.12);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+
+  .emp-stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--stat-color) 12%, transparent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--stat-color);
+      flex-shrink: 0;
+  }
+
+  .emp-stat-body { display: flex; flex-direction: column; gap: 2px; }
+
+  .emp-stat-num {
+      font-family: var(--font-cond);
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--vp-white);
+      line-height: 1;
+  }
+
+  .emp-stat-label {
+      font-family: var(--font-body);
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.3px;
+  }
+
+  /* Two-column layout */
+  .emp-content-grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+      align-items: start;
+  }
+
+  @media (max-width: 1024px) {
+      .emp-content-grid { grid-template-columns: 1fr; }
+      .emp-col-side { order: -1; }
+  }
+
+  /* Cards */
+  .emp-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.3s ease;
+  }
+
+  .emp-card:hover { border-color: rgba(212,175,55,0.15); }
+
+  .emp-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-family: var(--font-cond);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.8);
+  }
+
+  .emp-card-header-link {
+      font-size: 11px;
+      color: var(--gold);
+      text-decoration: none;
+      letter-spacing: 1px;
+      font-weight: 700;
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+  }
+
+  .emp-card-header-link:hover { opacity: 1; }
+
+  .emp-card-body { padding: 20px; }
+
+  /* Actions grid */
+  .emp-actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+  }
+
+  .emp-action-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 20px 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      text-align: center;
+      text-decoration: none;
+      color: var(--vp-white);
+      transition: all 0.25s ease;
+  }
+
+  .emp-action-btn i { font-size: 22px; color: var(--gold); }
+  .emp-action-btn strong { font-family: var(--font-cond); font-size: 13px; letter-spacing: 0.5px; }
+  .emp-action-btn span { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+  .emp-action-btn:hover {
+      background: rgba(212,175,55,0.08);
+      border-color: rgba(212,175,55,0.25);
+      transform: translateY(-2px);
+      color: var(--vp-white);
+  }
+
+  .emp-action-locked { opacity: 0.4; pointer-events: none; }
+
+  /* List items */
+  .emp-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+  }
+
+  .emp-list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .emp-list-item:last-child { border-bottom: none; }
+
+  .emp-list-title {
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--vp-white);
+  }
+
+  .emp-list-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 2px;
+  }
+
+  .emp-applicant-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--gold-dim);
+      border: 1px solid rgba(212,175,55,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-cond);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold);
+      flex-shrink: 0;
+  }
+
+  /* Buttons */
+  .emp-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 14px;
+      font-family: var(--font-cond);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--gold);
+      border: 1px solid rgba(212,175,55,0.3);
+      border-radius: 4px;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+  }
+
+  .emp-pill-btn:hover {
+      background: var(--gold-dim);
+      color: var(--gold);
+  }
+
+  .emp-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      font-family: var(--font-cond);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--vp-white);
+      transition: all 0.25s ease;
+  }
+
+  .emp-cta-btn:hover { background: rgba(255,255,255,0.1); color: var(--vp-white); }
+
+  .emp-cta-gold {
+      background: var(--gold-dim);
+      border-color: rgba(212,175,55,0.3);
+      color: var(--gold);
+  }
+
+  .emp-cta-gold:hover { background: rgba(212,175,55,0.2); color: var(--gold); }
+
+  /* Status badge */
+  .emp-status-badge {
+      font-family: var(--font-cond);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+      white-space: nowrap;
+  }
+
+  /* Empty states */
+  .emp-empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+  }
+
+  .emp-empty-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: rgba(255,255,255,0.25);
+      margin-bottom: 4px;
+  }
+
+  .emp-empty-state h6 {
+      font-family: var(--font-cond);
+      font-size: 15px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.5px;
+      margin: 0;
+  }
+
+  .emp-empty-state p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+      max-width: 320px;
+      margin: 0;
+      line-height: 1.6;
+  }
+
+  /* AI section */
+  .emp-ai-badge {
+      font-family: var(--font-cond);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      background: var(--gold-dim);
+      border: 1px solid rgba(212,175,55,0.3);
+      border-radius: 3px;
+      color: var(--gold);
+      margin-left: 8px;
+  }
+
+  .emp-ai-note {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      margin: 0 0 16px;
+      line-height: 1.6;
+  }
+
+  .emp-veterans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+  }
+
+  .emp-vet-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+  }
+
+  .emp-vet-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(212,175,55,0.2);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.4);
+  }
+
+  .emp-vet-boosted { border-color: rgba(212,175,55,0.3); }
+
+  .emp-vet-boost-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(212,175,55,0.1);
+      border-bottom: 1px solid rgba(212,175,55,0.2);
+      font-family: var(--font-cond);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--gold);
+  }
+
+  .emp-vet-card-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+
+  .emp-vet-header { display: flex; align-items: center; gap: 10px; }
+
+  .emp-vet-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(59,130,246,0.12);
+      border: 1px solid rgba(59,130,246,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-cond);
+      font-size: 15px;
+      font-weight: 700;
+      color: #3b82f6;
+      flex-shrink: 0;
+  }
+
+  .emp-vet-name {
+      font-family: var(--font-cond);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--vp-white);
+      letter-spacing: 0.3px;
+  }
+
+  .emp-vet-branch { font-size: 12px; color: rgba(255,255,255,0.45); }
+
+  .emp-vet-score-wrap { display: flex; flex-direction: column; gap: 6px; }
+
+  .emp-vet-score-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+  }
+
+  .emp-vet-score-num { font-weight: 700; }
+  .score-high { color: #10b981; }
+  .score-mid  { color: #fbbf24; }
+  .score-low  { color: rgba(255,255,255,0.4); }
+
+  .emp-vet-score-bar {
+      height: 5px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 3px;
+      overflow: hidden;
+  }
+
+  .emp-vet-score-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 1s ease;
+  }
+
+  .fill-high { background: #10b981; }
+  .fill-mid  { background: #fbbf24; }
+  .fill-low  { background: rgba(255,255,255,0.2); }
+
+  .emp-vet-skills { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .emp-skill-tag {
+      font-family: var(--font-cond);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 3px 8px;
+      background: rgba(16,185,129,0.08);
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: 3px;
+      color: #10b981;
+  }
+
+  .emp-skill-more {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.4);
+  }
+
+  .emp-vet-location { font-size: 12px; color: rgba(255,255,255,0.4); }
+
+  .emp-vet-card-footer { padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.06); }
+
+  .emp-vet-view-btn {
+      display: block;
+      text-align: center;
+      padding: 8px;
+      font-family: var(--font-cond);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--gold);
+      border: 1px solid rgba(212,175,55,0.25);
+      border-radius: 6px;
+      transition: all 0.2s ease;
+  }
+
+  .emp-vet-view-btn:hover {
+      background: var(--gold-dim);
+      color: var(--gold);
+  }
+
+  /* Plan card */
+  .emp-plan-card.emp-plan-active {
+      border-color: rgba(212,175,55,0.3);
+      box-shadow: 0 0 30px rgba(212,175,55,0.06);
+  }
+
+  .emp-plan-name {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--vp-white);
+      margin-bottom: 8px;
+  }
+
+  .emp-plan-expires {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 16px;
+  }
+
+  .emp-plan-expired {
+      font-size: 12px;
+      color: #ef4444;
+      margin-bottom: 16px;
+  }
+
+  .emp-plan-none {
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 16px;
+  }
+
+  .emp-plan-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+  }
+
+  .emp-plan-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+  }
+
+  .feat-on i  { color: #10b981; }
+  .feat-off i { color: rgba(255,255,255,0.2); }
+  .feat-off   { opacity: 0.5; }
+  .feat-boost i { color: var(--gold); }
+  .feat-boost   { color: var(--gold); }
+
+  .emp-badge-active {
+      font-family: var(--font-cond);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      background: rgba(16,185,129,0.12);
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: 3px;
+      color: #10b981;
+  }
+
+  .emp-badge-inactive {
+      font-family: var(--font-cond);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 3px;
+      color: rgba(255,255,255,0.4);
+  }
+
+  .emp-plan-cta {
+      display: block;
+      text-align: center;
+      padding: 11px;
+      font-family: var(--font-cond);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.25s ease;
+  }
+
+  .emp-plan-cta-upgrade {
+      background: var(--gold);
+      color: var(--navy);
+      border: 2px solid var(--gold);
+  }
+
+  .emp-plan-cta-upgrade:hover {
+      background: var(--gold-light);
+      color: var(--navy);
+  }
+
+  .emp-plan-cta-manage {
+      background: transparent;
+      color: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .emp-plan-cta-manage:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+  }
+
+  .emp-side-note {
+      font-size: 13px;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.6;
+      margin: 0 0 14px;
+  }
+  
+</style>
+{% endblock %}

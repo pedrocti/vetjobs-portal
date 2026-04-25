@@ -1,0 +1,117 @@
+/* ==============================
+   THEME.CSS
+   - Global colors, gradients, dark mode, premium design system
+   ============================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@700;800&display=swap');
+
+:root {
+    /* Bootstrap gradient helpers */
+    --primary-gradient: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+    --success-gradient: linear-gradient(135deg, var(--bs-success), var(--bs-teal));
+
+    /* Layout */
+    --hero-height: 60vh;
+    --navbar-height: 70px;
+
+    /* ── Premium Gold/Navy Design System ── */
+    --gold:           #D4AF37;
+    --gold-light:     #f0d060;
+    --gold-dim:       rgba(212, 175, 55, 0.15);
+    --gold-border:    rgba(212, 175, 55, 0.25);
+    --navy:           #0a1628;
+    --navy-mid:       #0f2040;
+    --navy-surface:   rgba(10, 22, 40, 0.85);
+
+    /* Typography */
+    --font-display:   'Cormorant Garamond', Georgia, serif;
+    --font-body:      'Barlow', sans-serif;
+    --font-cond:      'Barlow Condensed', sans-serif;
+
+    /* Text */
+    --text-white:     #ffffff;
+    --text-muted-vp:  rgba(255, 255, 255, 0.6);
+    --text-soft:      rgba(255, 255, 255, 0.75);
+
+    /* Dark theme palette */
+    --color-bg-dark:      #0a0e1a;
+    --color-surface-dark: rgba(255, 255, 255, 0.05);
+    --color-text-light:   #e9ecef;
+    --color-border-dark:  rgba(255, 255, 255, 0.1);
+}
+
+/* ── Global font application ─────────────────────────────── */
+body {
+    font-family: var(--font-body);
+    padding-top: var(--navbar-height);
+}
+
+/* ── Dark theme overrides ────────────────────────────────── */
+[data-bs-theme="dark"] {
+    --bs-body-bg:    var(--color-bg-dark);
+    --bs-body-color: var(--color-text-light);
+}
+
+[data-bs-theme="dark"] body,
+[data-bs-theme="dark"] .admin-content {
+    background-color: var(--color-bg-dark) !important;
+    color: var(--color-text-light);
+}
+
+[data-bs-theme="dark"] .card,
+[data-bs-theme="dark"] .table,
+[data-bs-theme="dark"] .dashboard-card {
+    background-color: var(--color-surface-dark) !important;
+    color: var(--color-text-light) !important;
+    border-color: var(--color-border-dark);
+}
+
+[data-bs-theme="dark"] .table thead th {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: #f8f9fa !important;
+}
+
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--color-text-light);
+    border-color: var(--color-border-dark);
+}
+
+[data-bs-theme="dark"] .form-control::placeholder {
+    color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .bg-light {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-bs-theme="dark"] .text-muted {
+    color: #adb5bd !important;
+}
+
+[data-bs-theme="dark"] .table thead th {
+    color: #e9ecef !important;
+    background-color: #212529 !important;
+    font-weight: 600;
+}
+
+/* ── Section alternating backgrounds ─────────────────────── */
+section {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+}
+section:nth-child(even) { background-color: rgba(255, 255, 255, 0.03); }
+section:nth-child(odd)  { background-color: transparent; }
+
+/* ── Global text gradient utility ────────────────────────── */
+.text-gradient {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.text-gold {
+    color: var(--gold) !important;
+}

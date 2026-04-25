@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% block title %}Job Board - Veteran-Employer Job Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">Job Board</h1>
+            <p class="text-muted mb-0">Discover veteran-friendly opportunities from verified employers</p>
+        </div>
+        {% if current_user.is_authenticated and current_user.is_employer() %}
+            <a href="{{ url_for('jobs.job_board') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Post a Job
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('jobs.job_board') }}">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="search" class="form-label">Search Jobs</label>
+                        <input type="text" class="form-control" id="search" name="search"
+                               placeholder="Job title, company, or keyword..."
+                               value="{{ current_filters.search }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="location" class="form-label">Location</label>
+                        <select class="form-select" id="location" name="location">
+                            <option value="">All Locations</option>
+                            {% for location in locations %}
+                            <option value="{{ location }}" {{ 'selected' if current_filters.location == location else '' }}>
+                                {{ location }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="job_type" class="form-label">Job Type</label>
+                        <select class="form-select" id="job_type" name="job_type">
+                            <option value="">All Types</option>
+                            <option value="full-time" {{ 'selected' if current_filters.job_type == 'full-time' else '' }}>Full-time</option>
+                            <option value="part-time" {{ 'selected' if current_filters.job_type == 'part-time' else '' }}>Part-time</option>
+                            <option value="contract" {{ 'selected' if current_filters.job_type == 'contract' else '' }}>Contract</option>
+                            <option value="remote" {{ 'selected' if current_filters.job_type == 'remote' else '' }}>Remote</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i>Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Job Listings -->
+    {% if jobs.items %}
+    <div class="row">
+        {% for job in jobs.items %}
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100 shadow-sm hover-card">
+                <div class="card-body">
+
+                    <!-- Employer Logo and Info -->
+                    <div class="d-flex align-items-center mb-3">
+                        {% if job.company_logo %}
+                            <img src="{{ url_for('static', filename=job.company_logo) }}"
+                                 alt="Company Logo"
+                                 class="rounded-circle border me-3"
+                                 style="width:55px; height:55px; object-fit:cover;">
+
+                        {% elif job.employer and job.employer.employer_profile and job.employer.employer_profile.company_logo %}
+                            <img src="{{ url_for('static', filename='uploads/' + job.employer.employer_profile.company_logo) }}"
+                                 alt="{{ job.company_name }} Logo"
+                                 class="rounded-circle border me-3"
+                                 style="width:55px; height:55px; object-fit:cover;">
+
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/vetjoblogo1.webp') }}"
+                                 alt="Default Logo"
+                                 class="rounded-circle border me-3"
+                                 style="width:55px; height:55px; object-fit:cover;">
+                        {% endif %}
+
+                        
+                        <!-- Featured / Promoted Badges -->
+                        <div class="mb-2">
+                            {% if job.is_featured %}
+                                <span class="badge bg-warning text-dark me-1">Featured</span>
+                            {% endif %}
+                            {% if job.promote_on_social %}
+                                <span class="badge bg-info text-white me-1">Promoted</span>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <h5 class="card-title mb-0">{{ job.job_title }}</h5>
+                            <h6 class="text-primary">{{ job.company_name }}</h6>
+                        </div>
+                    </div>
+
+                    <!-- Job Meta -->
+                    <p class="text-muted small mb-2">
+                        <i class="fas fa-map-marker-alt me-1"></i>{{ job.location or "Location not specified" }}
+                        {% if job.salary_range %}
+                            &nbsp;&nbsp;|&nbsp;&nbsp;
+                            <i class="fas fa-money-bill me-1"></i>{{ job.salary_range }}
+                        {% endif %}
+                    </p>
+
+                    <p class="card-text text-muted">{{ job.short_description or job.description[:150] ~ '...' }}</p>
+
+                    <!-- Footer -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>Posted {{ job.created_at.strftime('%b %d, %Y') }}
+                        </small>
+                        <div class="btn-group" role="group">
+                            <a href="{{ url_for('jobs.job_details', job_id=job.id) }}" class="btn btn-outline-primary btn-sm">
+                                View Details
+                            </a>
+                            {% if current_user.is_authenticated and current_user.is_veteran() %}
+                            <a href="{{ url_for('applications.apply_to_job', job_id=job.id) }}" class="btn btn-success btn-sm">
+                                <i class="fas fa-paper-plane me-1"></i>Apply
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if jobs.pages > 1 %}
+    <nav aria-label="Pagination">
+        <ul class="pagination justify-content-center">
+            {% if jobs.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('jobs.job_board', page=jobs.prev_num, **current_filters) }}">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </a>
+            </li>
+            {% endif %}
+            {% for page_num in jobs.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num != jobs.page %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('jobs.job_board', page=page_num, **current_filters) }}">{{ page_num }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                    {% endif %}
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+            {% if jobs.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('jobs.job_board', page=jobs.next_num, **current_filters) }}">
+                    Next <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- No Jobs Found -->
+    <div class="text-center py-5">
+        <i class="fas fa-search fa-4x text-muted mb-3"></i>
+        <h5 class="text-muted">No Jobs Found</h5>
+        <p class="text-muted mb-4">Try adjusting your search or check back later for new opportunities.</p>
+        <a href="{{ url_for('jobs.job_board') }}" class="btn btn-outline-primary">
+            <i class="fas fa-undo me-2"></i>Clear Filters
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.hover-card:hover {
+    transform: translateY(-3px);
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1) !important;
+}
+</style>
+{% endblock %}

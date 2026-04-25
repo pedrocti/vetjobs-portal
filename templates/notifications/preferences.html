@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}Notification Preferences - Veteran-Employer Job Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="fw-bold">
+                        <i class="fas fa-cog me-2"></i>Notification Preferences
+                    </h1>
+                    <p class="text-muted mb-0">Customize how and when you receive notifications</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('notifications.notification_center') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-bell me-2"></i>View Notifications
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST">
+        <div class="row">
+            <!-- Email Notifications -->
+            <div class="col-lg-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-envelope me-2"></i>Email Notifications
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="email_notifications" name="email_notifications" 
+                                   {% if preferences.email_notifications %}checked{% endif %}>
+                            <label class="form-check-label fw-bold" for="email_notifications">
+                                Enable Email Notifications
+                            </label>
+                            <div class="form-text">Receive notifications via email</div>
+                        </div>
+                        
+                        <div class="ms-3">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="email_job_matches" name="email_job_matches"
+                                       {% if preferences.email_job_matches %}checked{% endif %}>
+                                <label class="form-check-label" for="email_job_matches">
+                                    Job Matches
+                                </label>
+                                <div class="form-text">New jobs that match your profile</div>
+                            </div>
+                            
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="email_applications" name="email_applications"
+                                       {% if preferences.email_applications %}checked{% endif %}>
+                                <label class="form-check-label" for="email_applications">
+                                    Application Updates
+                                </label>
+                                <div class="form-text">Status changes on your applications</div>
+                            </div>
+                            
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="email_payments" name="email_payments"
+                                       {% if preferences.email_payments %}checked{% endif %}>
+                                <label class="form-check-label" for="email_payments">
+                                    Payment & Subscription
+                                </label>
+                                <div class="form-text">Payment confirmations and subscription updates</div>
+                            </div>
+                            
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="email_marketing" name="email_marketing"
+                                       {% if preferences.email_marketing %}checked{% endif %}>
+                                <label class="form-check-label" for="email_marketing">
+                                    Marketing & Promotions
+                                </label>
+                                <div class="form-text">Platform updates and promotional offers</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SMS Notifications -->
+            <div class="col-lg-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-sms me-2"></i>SMS Notifications
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="sms_notifications" name="sms_notifications"
+                                   {% if preferences.sms_notifications %}checked{% endif %}>
+                            <label class="form-check-label fw-bold" for="sms_notifications">
+                                Enable SMS Notifications
+                            </label>
+                            <div class="form-text">Receive notifications via SMS</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="phone_number" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone_number" name="phone_number" 
+                                   value="{{ preferences.phone_number or '' }}" placeholder="+234xxxxxxxxxx">
+                            <div class="form-text">Enter your phone number for SMS notifications</div>
+                        </div>
+                        
+                        <div class="ms-3">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="sms_urgent_only" name="sms_urgent_only"
+                                       {% if preferences.sms_urgent_only %}checked{% endif %}>
+                                <label class="form-check-label" for="sms_urgent_only">
+                                    Urgent Only
+                                </label>
+                                <div class="form-text">Only send SMS for urgent notifications</div>
+                            </div>
+                            
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="sms_payments" name="sms_payments"
+                                       {% if preferences.sms_payments %}checked{% endif %}>
+                                <label class="form-check-label" for="sms_payments">
+                                    Payment Alerts
+                                </label>
+                                <div class="form-text">Payment confirmations and failures</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WhatsApp Notifications -->
+            <div class="col-lg-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fab fa-whatsapp me-2"></i>WhatsApp Notifications
+                            <span class="badge bg-warning text-dark">Coming Soon</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="whatsapp_notifications" name="whatsapp_notifications"
+                                   {% if preferences.whatsapp_notifications %}checked{% endif %} disabled>
+                            <label class="form-check-label fw-bold" for="whatsapp_notifications">
+                                Enable WhatsApp Notifications
+                            </label>
+                            <div class="form-text">Receive notifications via WhatsApp (coming soon)</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="whatsapp_number" class="form-label">WhatsApp Number</label>
+                            <input type="tel" class="form-control" id="whatsapp_number" name="whatsapp_number" 
+                                   value="{{ preferences.whatsapp_number or '' }}" placeholder="+234xxxxxxxxxx" disabled>
+                            <div class="form-text">Enter your WhatsApp number</div>
+                        </div>
+                        
+                        <div class="ms-3">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="whatsapp_job_matches" name="whatsapp_job_matches"
+                                       {% if preferences.whatsapp_job_matches %}checked{% endif %} disabled>
+                                <label class="form-check-label" for="whatsapp_job_matches">
+                                    Job Match Alerts
+                                </label>
+                                <div class="form-text">Get notified about new job matches</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- In-App Preferences -->
+            <div class="col-lg-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-desktop me-2"></i>In-App Preferences
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="push_notifications" name="push_notifications"
+                                   {% if preferences.push_notifications %}checked{% endif %}>
+                            <label class="form-check-label fw-bold" for="push_notifications">
+                                Push Notifications
+                            </label>
+                            <div class="form-text">Show notifications in the notification center</div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="sound_notifications" name="sound_notifications"
+                                   {% if preferences.sound_notifications %}checked{% endif %}>
+                            <label class="form-check-label" for="sound_notifications">
+                                Sound Notifications
+                            </label>
+                            <div class="form-text">Play sound for new notifications</div>
+                        </div>
+                        
+                        <hr>
+                        <h6>Frequency Settings</h6>
+                        
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="daily_digest" name="daily_digest"
+                                   {% if preferences.daily_digest %}checked{% endif %}>
+                            <label class="form-check-label" for="daily_digest">
+                                Daily Digest
+                            </label>
+                            <div class="form-text">Receive a daily summary of notifications</div>
+                        </div>
+                        
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="weekly_summary" name="weekly_summary"
+                                   {% if preferences.weekly_summary %}checked{% endif %}>
+                            <label class="form-check-label" for="weekly_summary">
+                                Weekly Summary
+                            </label>
+                            <div class="form-text">Receive a weekly activity summary</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="fas fa-save me-2"></i>Save Preferences
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+// Enable/disable dependent checkboxes
+document.getElementById('email_notifications').addEventListener('change', function() {
+    const emailInputs = document.querySelectorAll('[id^="email_"]:not(#email_notifications)');
+    emailInputs.forEach(input => {
+        input.disabled = !this.checked;
+        if (!this.checked) input.checked = false;
+    });
+});
+
+document.getElementById('sms_notifications').addEventListener('change', function() {
+    const smsInputs = document.querySelectorAll('[id^="sms_"]:not(#sms_notifications)');
+    smsInputs.forEach(input => {
+        input.disabled = !this.checked;
+        if (!this.checked) input.checked = false;
+    });
+    document.getElementById('phone_number').disabled = !this.checked;
+});
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('email_notifications').dispatchEvent(new Event('change'));
+    document.getElementById('sms_notifications').dispatchEvent(new Event('change'));
+});
+</script>
+{% endblock %}

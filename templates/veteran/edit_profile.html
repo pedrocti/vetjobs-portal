@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Veteran Profile - Veteran-Employer Job Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fas fa-edit me-2"></i>Edit Your Veteran Profile</h4>
+                </div>
+                <div class="card-body p-5">
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Profile Status:</strong> 
+                        {% if profile.verification_status == 'approved' %}
+                            <span class="badge bg-success ms-2">Verified</span>
+                        {% elif profile.verification_status == 'rejected' %}
+                            <span class="badge bg-danger ms-2">Rejected</span>
+                            {% if profile.admin_notes %}
+                            <div class="mt-2">
+                                <strong>Admin Notes:</strong> {{ profile.admin_notes }}
+                            </div>
+                            {% endif %}
+                        {% else %}
+                            <span class="badge bg-warning text-dark ms-2">Under Review</span>
+                        {% endif %}
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data">
+                        <!-- Personal Information -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold text-primary mb-3"><i class="fas fa-user me-2"></i>Personal Information</h5>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="age" class="form-label">Age *</label>
+                                    <input type="number" class="form-control" id="age" name="age" 
+                                           min="18" max="100" value="{{ profile.age }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Military Service Information -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold text-success mb-3"><i class="fas fa-flag me-2"></i>Military Service</h5>
+                            
+                            <div class="mb-3">
+                                <label for="service_branch" class="form-label">Service Branch *</label>
+                                <select class="form-select" id="service_branch" name="service_branch" required>
+                                    <option value="">Select your service branch</option>
+                                    <option value="army" {{ 'selected' if profile.service_branch == 'army' else '' }}>ARMY</option>
+                                    <option value="navy" {{ 'selected' if profile.service_branch == 'navy' else '' }}>NAVY</option>
+                                    <option value="airforce" {{ 'selected' if profile.service_branch == 'airforce' else '' }}>AIR FORCE</option>
+                                </select>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="service_number" class="form-label">Service Number *</label>
+                                    <input type="text" class="form-control" id="service_number" name="service_number" 
+                                           placeholder="Your military service number" value="{{ profile.service_number }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="years_of_service" class="form-label">Years of Service *</label>
+                                    <input type="number" class="form-control" id="years_of_service" name="years_of_service" 
+                                           min="0" max="50" placeholder="Total years served" value="{{ profile.years_of_service }}" required>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="department" class="form-label">Department/Unit *</label>
+                                <input type="text" class="form-control" id="department" name="department" 
+                                       placeholder="Your military department, unit, or specialty" value="{{ profile.department }}" required>
+                                <div class="form-text">Examples: Infantry, Engineering, Medical Corps, Aviation, etc.</div>
+                            </div>
+                        </div>
+
+                        <!-- Document Updates -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold text-warning mb-3"><i class="fas fa-upload me-2"></i>Update Documents (Optional)</h5>
+                            
+                            <div class="alert alert-info mb-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Only upload new documents if you want to replace the existing ones. Leave blank to keep current documents.
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="discharge_document" class="form-label">Discharge Certificate/Service Record</label>
+                                <input type="file" class="form-control" id="discharge_document" name="discharge_document" 
+                                       accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                <div class="form-text">Current file: {{ profile.discharge_document }}</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="id_document" class="form-label">Military ID Card/Photo ID</label>
+                                <input type="file" class="form-control" id="id_document" name="id_document" 
+                                       accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                <div class="form-text">Current file: {{ profile.id_document }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Bio Section -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold text-info mb-3"><i class="fas fa-edit me-2"></i>Professional Bio</h5>
+                            
+                            <div class="mb-3">
+                                <label for="bio" class="form-label">Tell Us About Yourself</label>
+                                <textarea class="form-control" id="bio" name="bio" rows="4" 
+                                          placeholder="Share your military experience, skills, achievements, and career goals.">{{ profile.bio or '' }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-save me-2"></i>Update Profile
+                            </button>
+                            <a href="{{ url_for('dashboard.veteran') }}" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

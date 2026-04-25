@@ -1,0 +1,454 @@
+{% extends "base.html" %}
+{% block title %}For Employers - VetJobs Portal{% endblock %}
+{% block content %}
+<!-- ═══════════════════════════════════════════════════════════════
+     HERO WITH TABS
+     Reuses: services-hero, hero-bg, hero-overlay, hero-top-accent,
+             hero-eyebrow, hero-gold-bar, section-title, section-subtitle
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="services-hero text-white text-center">
+
+  <div class="hero-bg"
+       style="background-image: url('{{ url_for('static', filename='images/speaker.webp') }}');
+              background-position: center 30%;">
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-top-accent"></div>
+
+  <div class="container position-relative" style="z-index:2;">
+
+    <p class="hero-eyebrow">For Employers</p>
+    <div class="hero-gold-bar mx-auto"></div>
+
+    <h1 class="section-title mx-auto" style="font-size:clamp(30px,5vw,56px);max-width:800px;">
+      Partner With Us to Build<br>
+      <em style="color:var(--gold);font-style:italic;">Stronger Teams & Stronger Futures</em>
+    </h1>
+
+    <p class="section-subtitle mx-auto mt-3 mb-5" style="max-width:640px;">
+      Access exceptional veteran talent or amplify your brand through meaningful collaboration.
+      We offer paths that deliver real value — for your organisation and for Africa's workforce.
+    </p>
+
+    <!-- Premium Tab Switcher -->
+    <div class="vp-tab-switcher" id="employerTabs" role="tablist">
+      <button class="vp-tab-btn active"
+              id="employment-tab"
+              data-bs-toggle="pill"
+              data-bs-target="#employment"
+              type="button" role="tab"
+              aria-controls="employment"
+              aria-selected="true">
+        <i class="fas fa-briefcase"></i>
+        <span>Employment Partnerships</span>
+      </button>
+      <button class="vp-tab-btn"
+              id="corporate-tab"
+              data-bs-toggle="pill"
+              data-bs-target="#corporate"
+              type="button" role="tab"
+              aria-controls="corporate"
+              aria-selected="false">
+        <i class="fas fa-handshake"></i>
+        <span>Corporate Partnerships</span>
+      </button>
+    </div>
+
+  </div>
+</section>
+<!-- ═══════════════════════════════════════════════════════════════
+     TAB CONTENT
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="tab-content" id="employerTabsContent">
+
+<!-- ── EMPLOYMENT PARTNERSHIPS TAB ──────────────────────────── -->
+  <div class="tab-pane fade show active" id="employment" role="tabpanel"
+       aria-labelledby="employment-tab" tabindex="0">
+      
+    <!-- Intro -->
+    <section class="section-dark section-gold-top">
+      <div class="container text-center">
+        <p class="section-label">Why Hire Veterans</p>
+        <h2 class="section-title">Hire With Purpose.<br><em style="color:var(--gold);font-style:italic;">Gain Real Advantage.</em></h2>
+        <div class="vp-divider"></div>
+        <p class="section-subtitle mx-auto">
+          Access talent that brings reliability, quick adaptation, and quiet excellence —
+          qualities that directly strengthen your performance, culture, and bottom line
+          across African markets.
+        </p>
+      </div>
+    </section>
+    <!-- Story Block 1 -->
+    <section class="section-surface">
+      <div class="container">
+        <div class="row align-items-center g-5">
+
+          <div class="col-lg-6">
+            <div class="image-frame rounded overflow-hidden" style="height:420px;">
+              <img src="{{ url_for('static', filename='images/teams2.webp') }}"
+                   alt="High-performing team collaborating"
+                   class="img-fluid w-100 h-100"
+                   style="object-fit:cover;">
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <p class="section-label">Retention & Reliability</p>
+            <h3 class="section-title text-start" style="font-size:clamp(24px,3vw,36px);">
+              Teams That Stay<br><em style="color:var(--gold);font-style:italic;">& Deliver</em>
+            </h3>
+            <div class="vp-divider left"></div>
+            <p style="font-size:15px;color:rgba(255,255,255,0.65);line-height:1.85;margin-bottom:16px;">
+              Professionals with military backgrounds embody unwavering loyalty, disciplined
+              follow-through, and a mission-first mindset that translates directly into
+              superior workplace outcomes. They consistently demonstrate exceptional retention
+              rates — staying longer and contributing more stably than average hires.
+            </p>
+            <p style="font-size:15px;color:rgba(255,255,255,0.65);line-height:1.85;margin-bottom:28px;">
+              In high-stakes African business environments where consistency drives competitive
+              advantage, this proven dependability saves significant recruitment and onboarding
+              costs while accelerating team momentum.
+            </p>
+            <ul class="vp-employer-bullets">
+              <li>
+                <span class="vp-bullet-icon"><i class="fas fa-check"></i></span>
+                Lower turnover — veterans stay longer and commit fully
+              </li>
+              <li>
+                <span class="vp-bullet-icon"><i class="fas fa-check"></i></span>
+                Operational continuity — mission-first discipline on day one
+              </li>
+              <li>
+                <span class="vp-bullet-icon"><i class="fas fa-check"></i></span>
+                Culture of accountability that elevates entire teams
+              </li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+    <!-- Story Block 2 -->
+    <section class="section-dark">
+      <div class="container">
+        <div class="row align-items-center g-5 flex-lg-row-reverse">
+
+          <div class="col-lg-6">
+            <div class="image-frame rounded overflow-hidden" style="height:420px;">
+              <img src="{{ url_for('static', filename='images/teams.webp') }}"
+                   alt="Team innovating around a table"
+                   class="img-fluid w-100 h-100"
+                   style="object-fit:cover;">
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <p class="section-label">Adaptability & Innovation</p>
+            <h3 class="section-title text-start" style="font-size:clamp(24px,3vw,36px);">
+              Faster Innovation<br><em style="color:var(--gold);font-style:italic;">& Adaptation</em>
+            </h3>
+            <div class="vp-divider left"></div>
+            <p style="font-size:15px;color:rgba(255,255,255,0.65);line-height:1.85;margin-bottom:16px;">
+              Military-trained professionals excel as rapid learners who thrive under pressure
+              and in dynamic, fast-evolving settings. Their ability to quickly master new
+              technologies, processes, and strategies enables your teams to pivot effectively
+              whether responding to market shifts, implementing digital transformations, or
+              navigating regulatory changes.
+            </p>
+            <p style="font-size:15px;color:rgba(255,255,255,0.65);line-height:1.85;margin-bottom:28px;">
+              This built-in agility provides a measurable competitive edge, allowing
+              organisations to innovate faster and maintain forward momentum through any challenge.
+            </p>
+            <ul class="vp-employer-bullets">
+              <li>
+                <span class="vp-bullet-icon"><i class="fas fa-check"></i></span>
+                Rapid learners — adapt fast, perform faster
+              </li>
+              <li>
+                <span class="vp-bullet-icon"><i class="fas fa-check"></i></span>
+                Composure under pressure — built for high-stakes environments
+              </li>
+              <li>
+                <span class="vp-bullet-icon"><i class="fas fa-check"></i></span>
+                Strategic thinkers trained to solve complex challenges
+              </li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+    <!-- Ecosystem Impact -->
+    <section class="section-surface">
+      <div class="container text-center">
+        <p class="section-label">The Bigger Picture</p>
+        <h2 class="section-title">Together, We Strengthen<br><em style="color:var(--gold);font-style:italic;">Africa's Workforce</em></h2>
+        <div class="vp-divider"></div>
+        <p class="section-subtitle mx-auto" style="max-width:680px;">
+          Every partnership creates a powerful ripple effect — your business gains enduring
+          strength through exceptional talent, skilled professionals secure meaningful
+          opportunities, and our continental employment ecosystem becomes more inclusive,
+          resilient, and equitable.
+        </p>
+      </div>
+    </section>
+    <!-- Employment CTA -->
+    <section class="vp-cta-section">
+      <div class="vp-cta-bg-lines">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <div class="vp-cta-glow"></div>
+      <div class="container position-relative text-center" style="z-index:2;">
+        <p class="section-label">Get Started</p>
+        <h2 class="vp-cta-title">Ready to Add Real Strength<br><em>To Your Team?</em></h2>
+        <div class="vp-divider"></div>
+        <p class="vp-cta-subtitle">
+          Let's talk about how we can help you access talent that performs, stays, and grows with you.
+        </p>
+        {% if not current_user.is_authenticated %}
+          <div class="d-flex flex-wrap gap-3 justify-content-center">
+            <a href="{{ url_for('auth.register') }}" class="btn-vp-primary">
+              <i class="fas fa-briefcase"></i>
+              <span>Start Hiring</span>
+            </a>
+            <a href="{{ url_for('main.contact') }}" class="btn-vp-ghost">
+              <span>Contact Us</span>
+              <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        {% else %}
+          <a href="{{ url_for('dashboard.index') }}" class="btn-vp-primary">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Open Employer Dashboard</span>
+          </a>
+        {% endif %}
+      </div>
+    </section>
+
+
+  </div><!-- /employment tab -->
+
+
+  <!-- ── CORPORATE PARTNERSHIPS TAB ───────────────────────────── -->
+  <div class="tab-pane fade" id="corporate" role="tabpanel"
+       aria-labelledby="corporate-tab" tabindex="0">
+
+
+    <!-- Intro -->
+    <section class="section-dark section-gold-top">
+      <div class="container text-center">
+        <p class="section-label">Corporate Partnerships</p>
+        <h2 class="section-title">Where Collaboration<br><em style="color:var(--gold);font-style:italic;">Meets Impact</em></h2>
+        <div class="vp-divider"></div>
+        <p class="section-subtitle mx-auto">
+          Your brand can power economic mobility for veterans and military spouses without
+          posting a single job. Through custom activations, we turn your values into real
+          impact for the military community — and meaningful engagement for your customers
+          and teams across Africa.
+        </p>
+      </div>
+    </section>
+    <!-- Activation Options -->
+    <section class="section-surface">
+      <div class="container">
+        <div class="row align-items-center g-5">
+
+          <div class="col-lg-6">
+            <div class="image-frame rounded overflow-hidden" style="height:440px;">
+              <img src="{{ url_for('static', filename='images/teams2.webp') }}"
+                   alt="Corporate team supporting community"
+                   class="img-fluid w-100 h-100"
+                   style="object-fit:cover;">
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <p class="section-label">How To Partner</p>
+            <h3 class="section-title text-start" style="font-size:clamp(24px,3vw,36px);">
+              Custom Ways to<br><em style="color:var(--gold);font-style:italic;">Activate Your Purpose</em>
+            </h3>
+            <div class="vp-divider left"></div>
+            <ul class="vp-employer-bullets mb-4">
+              <li>
+                <span class="vp-bullet-icon"><i class="fas fa-check"></i></span>
+                Cause marketing campaigns & point-of-sale round-ups that resonate with socially conscious consumers
+              </li>
+              <li>
+                <span class="vp-bullet-icon"><i class="fas fa-check"></i></span>
+                Product givebacks & employee engagement programs that boost internal morale
+              </li>
+              <li>
+                <span class="vp-bullet-icon"><i class="fas fa-check"></i></span>
+                Event sponsorships & branded activations that position your brand as a committed leader
+              </li>
+              <li>
+                <span class="vp-bullet-icon"><i class="fas fa-check"></i></span>
+                Custom-tailored programs aligned to your strategic goals, budget, and brand narrative
+              </li>
+            </ul>
+            <p style="font-size:14px;color:rgba(255,255,255,0.5);line-height:1.8;">
+              Whether your priority is social impact, brand equity, customer loyalty, or employee
+              satisfaction — our partnerships deliver tangible, long-term value across Nigeria and the continent.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+    <!-- 3 Giving Cards -->
+    <section class="section-dark">
+      <div class="container">
+        <div class="text-center mb-5">
+          <p class="section-label">Partnership Types</p>
+          <h2 class="section-title">Choose Your Impact</h2>
+          <div class="vp-divider"></div>
+        </div>
+        <div class="row g-4">
+
+          <div class="col-md-4">
+            <div class="sector-card h-100 text-center">
+              <div class="sector-icon mx-auto">
+                <i class="fas fa-gift"></i>
+              </div>
+              <h5 class="pillar-title">Corporate Giving</h5>
+              <p class="pillar-text">
+                Direct financial contributions expand our capacity to deliver job search support,
+                career development resources, and transition assistance empowering more veterans
+                and military spouses to thrive.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="sector-card h-100 text-center">
+              <div class="sector-icon mx-auto">
+                <i class="fas fa-users"></i>
+              </div>
+              <h5 class="pillar-title">Employee Giving</h5>
+              <p class="pillar-text">
+                Structured programs that connect your workforce to veteran-focused causes
+                fostering shared purpose, reinforcing core company values, and creating powerful
+                internal engagement that strengthens culture.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="sector-card h-100 text-center">
+              <div class="sector-icon mx-auto">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+              <h5 class="pillar-title">Event Sponsorships</h5>
+              <p class="pillar-text">
+                Premium sponsorship of high-profile events, career fairs, and community
+                initiatives — offering tailored visibility, networking, and brand association
+                with meaningful causes across Nigeria and beyond.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+    <!-- Contact Form -->
+    <section class="section-surface">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+
+            <div class="text-center mb-5">
+              <p class="section-label">Get In Touch</p>
+              <h2 class="section-title">Let's Connect</h2>
+              <div class="vp-divider"></div>
+              <p class="section-subtitle">
+                Tell us about your organisation and how you'd like to partner.
+                We'll be in touch within 48 hours.
+              </p>
+            </div>
+
+            <div class="vp-contact-form-card">
+              <form action="{{ url_for('main.contact') }}" method="post">
+
+                <div class="row g-4">
+                  <div class="col-md-6">
+                    <label class="form-label">First Name <span class="vp-required">*</span></label>
+                    <input type="text" class="form-control" name="first_name" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Last Name <span class="vp-required">*</span></label>
+                    <input type="text" class="form-control" name="last_name" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Email <span class="vp-required">*</span></label>
+                    <input type="email" class="form-control" name="email" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Phone <span class="vp-required">*</span></label>
+                    <input type="tel" class="form-control" name="phone" required>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">Company <span class="vp-required">*</span></label>
+                    <input type="text" class="form-control" name="company" required>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">How did you hear about us? <span class="vp-required">*</span></label>
+                    <select class="form-select" name="source" required>
+                      <option value="">Select...</option>
+                      <option>Facebook</option>
+                      <option>LinkedIn</option>
+                      <option>Instagram</option>
+                      <option>Google</option>
+                      <option>Word of mouth</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">Describe your interest in partnering with us</label>
+                    <textarea class="form-control" name="message" rows="5"
+                              placeholder="Tell us about your organisation and goals..."></textarea>
+                  </div>
+                  <div class="col-12">
+                    <label class="vp-consent-label">
+                      <input type="checkbox" name="consent" required class="vp-consent-check">
+                      <span>
+                        I consent to be contacted by VetJobPortal regarding this inquiry.
+                        Message and data rates may apply. Reply STOP to opt out.
+                      </span>
+                    </label>
+                  </div>
+                  <div class="col-12 text-center pt-2">
+                    <button type="submit" class="btn-vp-primary">
+                      <i class="fas fa-paper-plane"></i>
+                      <span>Submit Inquiry</span>
+                    </button>
+                  </div>
+                </div>
+
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Corporate CTA -->
+    <section class="vp-cta-section">
+      <div class="vp-cta-bg-lines">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <div class="vp-cta-glow"></div>
+      <div class="container position-relative text-center" style="z-index:2;">
+        <p class="section-label">Make An Impact</p>
+        <h2 class="vp-cta-title">Ready to Make an Impact<br><em>Your Way?</em></h2>
+        <div class="vp-divider"></div>
+        <p class="vp-cta-subtitle">
+          Whether through hiring exceptional talent or meaningful corporate collaboration —
+          we're here to help you create value that lasts.
+        </p>
+        <a href="{{ url_for('main.contact') }}" class="btn-vp-primary">
+          <i class="fas fa-envelope"></i>
+          <span>Start the Conversation</span>
+        </a>
+      </div>
+    </section>
+{% endblock %}

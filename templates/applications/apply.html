@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block title %}Apply to Job: {{ job_post.job_title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-paper-plane me-2"></i>Apply for Position
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Job Information -->
+                    <div class="mb-4 p-3 bg-light rounded">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5 class="fw-bold text-primary mb-2">{{ job_post.job_title }}</h5>
+                                <p class="mb-1">
+                                    <i class="fas fa-building me-2 text-muted"></i>{{ job_post.company_name }}
+                                </p>
+                                <p class="mb-1">
+                                    <i class="fas fa-map-marker-alt me-2 text-muted"></i>{{ job_post.location }}
+                                </p>
+                                {% if job_post.salary_range %}
+                                <p class="mb-0">
+                                    <i class="fas fa-money-bill me-2 text-muted"></i>{{ job_post.salary_range }}
+                                </p>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 text-md-end">
+                                <span class="badge bg-info fs-6">{{ job_post.get_job_type_display() }}</span>
+                                <br>
+                                <small class="text-muted">Posted {{ job_post.created_at.strftime('%B %d, %Y') }}</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Application Form -->
+                    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <!-- Cover Letter -->
+                        <div class="mb-4">
+                            <label for="cover_letter" class="form-label fw-bold">
+                                <i class="fas fa-file-alt me-2 text-primary"></i>Cover Letter *
+                            </label>
+                            <textarea 
+                                class="form-control" 
+                                id="cover_letter" 
+                                name="cover_letter" 
+                                rows="8" 
+                                required
+                                placeholder="Dear Hiring Manager,&#10;&#10;I am writing to express my interest in the {{ job_post.job_title }} position at {{ job_post.company_name }}. As a military veteran with [your experience], I am excited about the opportunity to bring my skills in [relevant skills] to your team.&#10;&#10;During my service, I [specific achievements or experiences relevant to the role]. I believe these experiences have prepared me well for this position because [explain the connection].&#10;&#10;I am particularly drawn to this role because [mention something specific about the company or position]. I would welcome the opportunity to discuss how my background and skills can contribute to your team's success.&#10;&#10;Thank you for considering my application. I look forward to hearing from you.&#10;&#10;Respectfully,&#10;{{ current_user.full_name }}"
+                                maxlength="2000"></textarea>
+                            <div class="form-text">
+                                <small>
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Minimum 50 characters. Tell the employer why you're interested in this position and what makes you a great fit.
+                                </small>
+                            </div>
+                            <div class="invalid-feedback">
+                                Please provide a cover letter (minimum 50 characters).
+                            </div>
+                        </div>
+
+                        <!-- Resume Upload -->
+                        <div class="mb-4">
+                          <label for="resume_file" class="form-label fw-bold">
+                            <i class="fas fa-file-upload me-2 text-primary"></i>Resume *
+                          </label>
+
+                          <div class="input-group">
+                            <input 
+                              type="file" 
+                              class="form-control" 
+                              id="resume_file" 
+                              name="resume_file" 
+                              accept=".pdf,.doc,.docx"
+                              required>
+                            <div class="invalid-feedback">
+                              Please upload your resume.
+                            </div>
+                          </div>
+
+                          <div class="form-text">
+                            <small>
+                              <i class="fas fa-info-circle me-1"></i>
+                              Accepted formats: PDF, DOC, DOCX. Maximum size: 16MB.
+                            </small>
+                          </div>
+
+                          <!-- Optional Resume Builder -->
+                          <div class="text-center mt-3">
+                            <p class="text-muted mb-1">Don’t have a resume yet?</p>
+                            <a href="{{ url_for('resources.resume_builder') }}" class="btn btn-outline-info btn-sm mb-3">
+                              <i class="fas fa-file-alt me-2"></i>Generate Resume with Our Builder
+                            </a>
+
+                            <hr class="my-3">
+
+                            <p class="text-muted mb-1">Already have a resume but want it professionally reviewed?</p>
+                            <a href="{{ url_for('payments.init_payment', feature='review') }}" class="btn btn-outline-success btn-sm">
+                              <i class="fas fa-user-check me-2"></i>Submit for Professional Review
+                            </a>
+                          </div>
+                        </div>
+                        <!-- Application Tips -->
+                        <div class="alert alert-info mb-4">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-lightbulb me-2"></i>Application Tips
+                            </h6>
+                            <ul class="mb-0">
+                                <li>Customize your cover letter for this specific position</li>
+                                <li>Highlight relevant military experience and transferable skills</li>
+                                <li>Ensure your resume is up-to-date and professionally formatted</li>
+                                <li>Double-check for spelling and grammar errors</li>
+                            </ul>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-paper-plane me-2"></i>Submit Application
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="{{ url_for('jobs.job_board') }}" class="btn btn-outline-secondary btn-lg w-100">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to Jobs
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Application Process
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item active">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <h6>Submit Application</h6>
+                                <p class="small text-muted">Complete the form and upload your resume</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-secondary"></div>
+                            <div class="timeline-content">
+                                <h6>Employer Review</h6>
+                                <p class="small text-muted">The employer will review your application</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-secondary"></div>
+                            <div class="timeline-content">
+                                <h6>Response</h6>
+                                <p class="small text-muted">You'll be notified of their decision</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Job Details -->
+            <div class="card shadow">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-briefcase me-2"></i>Job Details
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="fw-bold text-muted small">Company</label>
+                        <p class="mb-0">{{ job_post.company_name }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="fw-bold text-muted small">Location</label>
+                        <p class="mb-0">{{ job_post.location }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="fw-bold text-muted small">Employment Type</label>
+                        <p class="mb-0">{{ job_post.get_job_type_display() }}</p>
+                    </div>
+                    {% if job_post.salary_range %}
+                    <div class="mb-0">
+                        <label class="fw-bold text-muted small">Salary Range</label>
+                        <p class="mb-0">{{ job_post.salary_range }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Timeline CSS -->
+<style>
+.timeline {
+    position: relative;
+    padding: 0;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 20px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 13px;
+    top: 30px;
+    height: calc(100% + 10px);
+    width: 2px;
+    background: #dee2e6;
+}
+
+.timeline-item:last-child::before {
+    display: none;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 2px #dee2e6;
+}
+
+.timeline-item.active .timeline-marker {
+    box-shadow: 0 0 0 2px #198754;
+}
+
+.timeline-content h6 {
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+</style>
+
+<!-- Form Validation JavaScript -->
+<script>
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                var coverLetter = document.getElementById('cover_letter');
+                var resumeFile = document.getElementById('resume_file');
+                
+                // Custom validation for cover letter length
+                if (coverLetter.value.length < 50) {
+                    coverLetter.setCustomValidity('Cover letter must be at least 50 characters long.');
+                } else {
+                    coverLetter.setCustomValidity('');
+                }
+                
+                // File type validation
+                if (resumeFile.files.length > 0) {
+                    var fileName = resumeFile.files[0].name.toLowerCase();
+                    var allowedExtensions = ['.pdf', '.doc', '.docx'];
+                    var isValidExtension = allowedExtensions.some(function(ext) {
+                        return fileName.endsWith(ext);
+                    });
+                    
+                    if (!isValidExtension) {
+                        resumeFile.setCustomValidity('Please upload a PDF, DOC, or DOCX file.');
+                    } else {
+                        resumeFile.setCustomValidity('');
+                    }
+                }
+                
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}

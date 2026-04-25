@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ resource.title }}{% endblock %}
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <h2 class="mb-3 text-primary">{{ resource.title }}</h2>
+      <p class="text-muted">{{ resource.category|capitalize }} | {{ resource.created_at.strftime("%b %d, %Y") }}</p>
+
+      {% if resource.image_url %}
+        <img src="{{ resource.image_url }}" class="img-fluid mb-3" alt="{{ resource.title }}">
+      {% endif %}
+
+      <div class="fs-5" style="white-space: pre-line;">{{ resource.description | safe }}</div>
+
+      {% if resource.external_link %}
+        <a href="{{ resource.external_link }}" target="_blank" class="btn btn-outline-primary mt-4">
+          Visit External Resource
+        </a>
+      {% endif %}
+
+      <a href="{{ url_for('resources.by_category', category=resource.category) }}" class="btn btn-outline-secondary mt-4">
+        ← Back to {{ resource.category|capitalize }} Resources
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

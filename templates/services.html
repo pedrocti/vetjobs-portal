@@ -1,0 +1,686 @@
+{% extends "base.html" %}
+{% block title %}Our Services - VetJobs Portal{% endblock %}
+{% block content %}
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HERO
+     Reuses: services-hero, hero-bg, hero-overlay, hero-top-accent,
+             hero-eyebrow, hero-gold-bar, section-title, section-subtitle
+             btn-vp-primary
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="services-hero text-white text-center">
+
+  <div class="hero-bg"
+       style="background-image: url('{{ url_for('static', filename='images/veteran-hero3.webp') }}');
+              background-position: center 40%;">
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-top-accent"></div>
+
+  <div class="container position-relative" style="z-index:2;">
+
+    <p class="hero-eyebrow">What We Offer</p>
+    <div class="hero-gold-bar mx-auto"></div>
+
+    <h1 class="section-title mx-auto" style="font-size:clamp(32px,5vw,60px);max-width:760px;">
+      Transition With Power.<br>
+      <em style="color:var(--gold);font-style:italic;">Build Your Next Mission.</em>
+    </h1>
+
+    <p class="section-subtitle mx-auto mt-3 mb-5" style="max-width:620px;">
+      VetJobPortal transforms your military experience into career-ready success.
+      From guided transition programs to lifelong support  we connect you with
+      the opportunities you deserve.
+    </p>
+
+    <div id="get-started-wrapper">
+      <a id="get-started-btn" class="btn-vp-primary" href="#">
+        <i class="fas fa-rocket"></i>
+        <span>Start Your Journey</span>
+      </a>
+    </div>
+
+    <div id="path-content" class="mt-4"></div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CORE SERVICE PILLARS
+     Reuses: section-dark, section-gold-top, section-label,
+             section-title, vp-divider, sector-card, sector-icon,
+             pillar-title, pillar-text
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="section-dark section-gold-top">
+  <div class="container">
+
+    <div class="text-center mb-5">
+      <p class="section-label">Core Offerings</p>
+      <h2 class="section-title">Our Core Service Pillars</h2>
+      <div class="vp-divider"></div>
+      <p class="section-subtitle mx-auto">
+        Structured support across every stage of transition and career growth.
+      </p>
+    </div>
+
+    <div class="row g-4">
+
+      <div class="col-md-6 col-lg-4">
+        <div class="sector-card h-100 text-center">
+          <div class="sector-icon mx-auto">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h5 class="pillar-title">Veteran Career Transition</h5>
+          <p class="pillar-text">
+            Mentorship, civilian role mapping, and structured job placement pathways
+            built specifically for Nigerian military veterans.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="sector-card h-100 text-center">
+          <div class="sector-icon mx-auto">
+            <i class="fas fa-heart"></i>
+          </div>
+          <h5 class="pillar-title">Military Spouse Employment</h5>
+          <p class="pillar-text">
+            Remote work options, flexible pathways, and location-friendly support
+            designed around the realities of military family life.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="sector-card h-100 text-center">
+          <div class="sector-icon mx-auto">
+            <i class="fas fa-building"></i>
+          </div>
+          <h5 class="pillar-title">Employer Talent Access</h5>
+          <p class="pillar-text">
+            Connect with disciplined, leadership-ready professionals vetted and
+            matched to your organisation's specific needs.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TRAINING & UPSKILLING
+     Reuses: section-surface, image-frame, section-label,
+             section-title, vp-divider, vp-employer-bullets,
+             vp-bullet-icon
+     ═══════════════════════════════════════════════════════════════ -->
+<!-- Skills Translation -->
+<section class="vp-skills-section py-5">
+  <div class="container">
+
+    <div class="row align-items-center gy-5">
+
+      <!-- Left: Content -->
+      <div class="col-md-6">
+
+        <div class="vp-skills-eyebrow">
+          <span class="vp-skills-line"></span>
+          <span>Career Transformation</span>
+        </div>
+
+        <h2 class="vp-skills-heading">
+          Translate Military Skills<br>
+          <span class="vp-skills-heading-gold">Into Civilian Careers</span>
+        </h2>
+
+        <p class="vp-skills-subtext">
+          We map your military roles to civilian job titles, highlight transferable skills,
+          and package your profile so hiring managers immediately see your value.
+        </p>
+
+        <!-- Feature Cards -->
+        <div class="vp-skills-features">
+
+          <div class="vp-skill-card">
+            <div class="vp-skill-icon">
+              <i class="fas fa-random"></i>
+            </div>
+            <div>
+              <strong>Role-to-Role Skill Mapping</strong>
+              <p>Your MOS/NOS translated into titles employers recognise instantly.</p>
+            </div>
+          </div>
+
+          <div class="vp-skill-card">
+            <div class="vp-skill-icon">
+              <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div>
+              <strong>Short Training & Certifications</strong>
+              <p>Targeted upskilling programs to close any civilian credential gaps.</p>
+            </div>
+          </div>
+
+          <div class="vp-skill-card">
+            <div class="vp-skill-icon">
+              <i class="fas fa-file-alt"></i>
+            </div>
+            <div>
+              <strong>Employer-Ready Resume Formatting</strong>
+              <p>CVs structured around what Nigerian hiring managers actually look for.</p>
+            </div>
+          </div>
+
+          <div class="vp-skill-card">
+            <div class="vp-skill-icon">
+              <i class="fas fa-road"></i>
+            </div>
+            <div>
+              <strong>Career Transformation Pathways</strong>
+              <p>Step-by-step career roadmaps from service to your next role.</p>
+            </div>
+          </div>
+
+        </div>
+          <a href="{{ url_for('training.list_programs') }}" class="vp-skills-cta mt-4 d-inline-flex align-items-center gap-2">
+          Explore Pathways<i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+
+      <!-- Right: Visual Panel -->
+      <div class="col-md-6">
+        <div class="vp-skills-visual">
+
+          <!-- Stat chips -->
+          <div class="vp-skills-chip vp-chip-top">
+            <i class="fas fa-user-check"></i>
+            <span><strong>1,214+</strong> Registered Veterans and Counting</span>
+          </div>
+
+          <div class="vp-skills-chip vp-chip-bottom">
+            <i class="fas fa-building"></i>
+            <span><strong>300+</strong>Partner/Employers Reached</span>
+          </div>
+
+          <!-- Central graphic -->
+          <div class="vp-skills-graphic">
+            <div class="vp-skills-orbit-ring vp-ring-1"></div>
+            <div class="vp-skills-orbit-ring vp-ring-2"></div>
+
+            <div class="vp-skills-center-badge">
+              <i class="fas fa-shield-alt"></i>
+              <span>Your Skills</span>
+            </div>
+
+            <!-- Orbiting roles -->
+            <div class="vp-orbit-item" style="--angle:0deg">
+              <i class="fas fa-hard-hat"></i><span>Engineering</span>
+            </div>
+            <div class="vp-orbit-item" style="--angle:60deg">
+              <i class="fas fa-shield-virus"></i><span>Cybersecurity</span>
+            </div>
+            <div class="vp-orbit-item" style="--angle:120deg">
+              <i class="fas fa-users-cog"></i><span>Management</span>
+            </div>
+            <div class="vp-orbit-item" style="--angle:180deg">
+              <i class="fas fa-chart-line"></i><span>Logistics</span>
+            </div>
+            <div class="vp-orbit-item" style="--angle:240deg">
+              <i class="fas fa-heartbeat"></i><span>Healthcare</span>
+            </div>
+            <div class="vp-orbit-item" style="--angle:300deg">
+              <i class="fas fa-satellite-dish"></i><span>Telecoms</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MILITARY SPOUSES
+     Reuses: section-dark, image-frame, section-label,
+             section-title, vp-divider, section-subtitle,
+             vp-story-quote, btn-vp-primary, btn-vp-ghost
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="section-dark section-gold-top">
+  <div class="container">
+    <div class="row align-items-center g-5">
+
+      <div class="col-lg-6">
+        <div class="image-frame rounded overflow-hidden" style="height:480px;">
+          <img src="{{ url_for('static', filename='images/veteran_path.webp') }}"
+               alt="Military spouse working remotely"
+               class="img-fluid w-100 h-100"
+               style="object-fit:cover;object-position:center;">
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <p class="section-label">Military Spouses</p>
+        <h2 class="section-title text-start">The Hearts That<br><em style="color:var(--gold);font-style:italic;">Hold It All Together</em></h2>
+        <div class="vp-divider left"></div>
+
+        <p style="font-size:15px;color:rgba(255,255,255,0.65);line-height:1.85;margin-bottom:16px;">
+          Spouses move when the orders come. You adapt when deployments stretch long.
+          You build home wherever the map points and somehow, you still dream of more.
+        </p>
+
+        <p style="font-size:15px;color:rgba(255,255,255,0.65);line-height:1.85;margin-bottom:16px;">
+          At VetJobPortal, we created a dedicated path just for military spouses
+          remote first roles, full-time opportunities with understanding employers, and
+          skill-building that fits around PCS moves and family rhythms.
+        </p>
+
+        <p style="font-size:15px;color:rgba(255,255,255,0.65);line-height:1.85;margin-bottom:28px;">
+          Because when you thrive in your work and in your home everyone wins.
+          Your partner serves with peace of mind. Your children grow up seeing both parents
+          chase meaningful lives. And you finally get the chance to build something that's yours.
+        </p>
+
+        <div class="vp-story-quote mb-4">
+          <p style="font-family:var(--font-display);font-size:18px;font-style:italic;color:#ffffff;margin:0;line-height:1.6;">
+            "Your family deserves stability. Your dreams deserve space. We're here to help both grow stronger together."
+          </p>
+        </div>
+
+        <div class="d-flex flex-wrap gap-3">
+          <a href="{{ url_for('auth.register') }}" class="btn-vp-primary">
+            <i class="fas fa-heart"></i>
+            <span>Explore Spouse Opportunities</span>
+          </a>
+          <a href="{{ url_for('main.contact') }}" class="btn-vp-ghost">
+            <span>Talk to Us</span>
+            <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CV UPSCALING
+     Reuses: section-surface, section-label, section-title,
+             vp-divider, section-subtitle, mission-pillars, pillar,
+             pillar-icon, pillar-title, pillar-text
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="section-surface">
+  <div class="container">
+
+    <div class="text-center mb-5">
+      <p class="section-label">Premium Service</p>
+      <h2 class="section-title">Elite CV & Resume<br><em style="color:var(--gold);font-style:italic;">Upscaling</em></h2>
+      <div class="vp-divider"></div>
+      <p class="section-subtitle mx-auto">
+        Military experience is powerful but civilian employers must understand it.
+        We translate your operational achievements into high-impact career positioning.
+      </p>
+    </div>
+
+    <div class="mission-pillars">
+
+      <div class="pillar">
+        <div class="pillar-icon">📄</div>
+        <h3 class="pillar-title">Military Skill Translation</h3>
+        <p class="pillar-text">
+          Convert MOS, ratings, and role experience into civilian job value that
+          hiring managers instantly recognise and respect.
+        </p>
+      </div>
+
+      <div class="pillar">
+        <div class="pillar-icon">🏆</div>
+        <h3 class="pillar-title">Executive Resume Structuring</h3>
+        <p class="pillar-text">
+          Position veterans for leadership and specialist roles with professional
+          formatting that commands attention from top employers.
+        </p>
+      </div>
+
+      <div class="pillar">
+        <div class="pillar-icon">💼</div>
+        <h3 class="pillar-title">LinkedIn & Personal Branding</h3>
+        <p class="pillar-text">
+          Professional online presence optimisation that attracts the right
+          recruiters and makes your profile impossible to ignore.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     EMPLOYER PARTNERS
+     Reuses: section-dark, image-frame, section-label,
+             section-title, vp-divider, vp-story-quote,
+             btn-vp-primary, btn-vp-ghost
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="section-dark section-gold-top">
+  <div class="container">
+    <div class="row align-items-center g-5 flex-lg-row-reverse">
+
+      <div class="col-lg-6">
+        <div class="image-frame rounded overflow-hidden" style="height:480px;">
+          <img src="{{ url_for('static', filename='images/vet.webp') }}"
+               alt="Employer and veteran partnership"
+               class="img-fluid w-100 h-100"
+               style="object-fit:cover;object-position:center;">
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <p class="section-label">For Employers</p>
+        <h2 class="section-title text-start">Partners Who Build<br><em style="color:var(--gold);font-style:italic;">Stronger Teams</em></h2>
+        <div class="vp-divider left"></div>
+
+        <p style="font-size:15px;color:rgba(255,255,255,0.65);line-height:1.85;margin-bottom:16px;">
+          You already know the difference exceptional talent makes. What if the next person
+          who walks through your door brings not just skills, but discipline forged in
+          high-stakes environments and leadership tested under pressure?
+        </p>
+
+        <p style="font-size:15px;color:rgba(255,255,255,0.65);line-height:1.85;margin-bottom:16px;">
+          We pre-vet candidates with military backgrounds, translate their achievements into
+          language your hiring managers already speak, and connect you directly to talent
+          that's ready to contribute from day one.
+        </p>
+
+        <p style="font-size:15px;color:rgba(255,255,255,0.65);line-height:1.85;margin-bottom:28px;">
+          No endless sourcing. No mismatched resumes. No guesswork. Just reliable access
+          to proven performers who stay longer, lead better, and help your organisation thrive.
+        </p>
+
+        <div class="vp-story-quote mb-4">
+          <p style="font-family:var(--font-display);font-size:18px;font-style:italic;color:#ffffff;margin:0;line-height:1.6;">
+            "Great teams aren't built by accident. They're built by choosing the right people. The ones who understand mission, accountability, and excellence."
+          </p>
+        </div>
+
+        <div class="d-flex flex-wrap gap-3">
+          <a href="{{ url_for('main.employers') }}" class="btn-vp-primary">
+            <i class="fas fa-handshake"></i>
+            <span>Partner With Us</span>
+          </a>
+          <a href="{{ url_for('main.contact') }}" class="btn-vp-ghost">
+            <span>Let's Talk</span>
+            <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     ALUMNI & LIFELONG SUPPORT
+     Reuses: section-surface, section-label, section-title,
+             vp-divider, sector-card, sector-icon,
+             pillar-title, pillar-text
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="section-surface">
+  <div class="container">
+
+    <div class="text-center mb-5">
+      <p class="section-label">Long-Term Support</p>
+      <h2 class="section-title">Alumni & Lifelong<br><em style="color:var(--gold);font-style:italic;">Veteran Support</em></h2>
+      <div class="vp-divider"></div>
+      <p class="section-subtitle mx-auto">
+        Transition is not a one-time event. We provide continued support, networking
+        access, and career growth opportunities long after your first placement.
+      </p>
+    </div>
+
+    <div class="row g-4">
+
+      <div class="col-md-4">
+        <div class="sector-card h-100 text-center">
+          <div class="sector-icon mx-auto">
+            <i class="fas fa-users"></i>
+          </div>
+          <h5 class="pillar-title">Alumni Network Access</h5>
+          <p class="pillar-text">
+            Connect with veterans across industries and regions. A growing
+            community of professionals who understand your journey.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="sector-card h-100 text-center">
+          <div class="sector-icon mx-auto">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <h5 class="pillar-title">Career Advancement Support</h5>
+          <p class="pillar-text">
+            Promotion pathways, leadership development, and ongoing mentorship
+            to help you keep climbing long after your first civilian role.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="sector-card h-100 text-center">
+          <div class="sector-icon mx-auto">
+            <i class="fas fa-hands-helping"></i>
+          </div>
+          <h5 class="pillar-title">Veteran Wellbeing & Guidance</h5>
+          <p class="pillar-text">
+            Transition coaching, community support, and resources to help
+            veterans thrive mentally, professionally, and personally.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TRANSITION PROGRAMS
+     Reuses: section-dark, image-frame, section-label,
+             section-title, vp-divider, vp-story-quote,
+             btn-vp-primary, btn-vp-ghost
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="section-dark section-gold-top">
+  <div class="container">
+    <div class="row align-items-center g-5">
+
+      <div class="col-lg-6">
+        <div class="image-frame rounded overflow-hidden" style="height:480px;">
+          <img src="{{ url_for('static', filename='images/7aki9.webp') }}"
+               alt="Veteran transition training session"
+               class="img-fluid w-100 h-100"
+               style="object-fit:cover;object-position:center;">
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <p class="section-label">Transition Programs</p>
+        <h2 class="section-title text-start">Programs Built<br><em style="color:var(--gold);font-style:italic;">For Real Futures</em></h2>
+        <div class="vp-divider left"></div>
+
+        <p style="font-size:15px;color:rgba(255,255,255,0.65);line-height:1.85;margin-bottom:16px;">
+          Transition isn't a single event it's a deliberate evolution. We meet you
+          where you are: still in uniform, recently separated, or years into civilian
+          life and we prepare you not just to land a job, but to own your next
+          chapter with confidence and clarity.
+        </p>
+
+        <p style="font-size:15px;color:rgba(255,255,255,0.65);line-height:1.85;margin-bottom:16px;">
+          Our programs enroll active duty members and spouses into forward looking
+          career training introducing modern tools, industry standard software,
+          data platforms, project management systems, and leadership frameworks
+          that translate directly into high-demand civilian roles.
+        </p>
+
+        <p style="font-size:15px;color:rgba(255,255,255,0.65);line-height:1.85;margin-bottom:28px;">
+          We don't wait for separation day. We start early upskilling your technical
+          edge, rewriting your CV in civilian language, optimising your LinkedIn, and
+          building a personal brand that commands respect.
+        </p>
+
+        <div class="vp-story-quote mb-4">
+          <p style="font-family:var(--font-display);font-size:18px;font-style:italic;color:#ffffff;margin:0;line-height:1.6;">
+            "Your service gave you discipline and grit. Our programs give you the tools, language, and network to turn that into a career you control."
+          </p>
+        </div>
+
+        <div class="d-flex flex-wrap gap-3">
+          <a href="{{ url_for('training.list_programs') }}" class="btn-vp-primary">
+            <i class="fas fa-rocket"></i>
+            <span>Explore Transition Programs</span>
+          </a>
+          <a href="{{ url_for('main.contact') }}" class="btn-vp-ghost">
+            <span>Get Started Today</span>
+            <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     FINAL CTA
+     Reuses: vp-cta-section, vp-cta-bg-lines, vp-cta-glow,
+             section-label, vp-cta-title, vp-divider,
+             vp-cta-subtitle, btn-vp-primary, btn-vp-ghost,
+             vp-cta-login-prompt
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="vp-cta-section">
+
+  <div class="vp-cta-bg-lines">
+    <span></span><span></span><span></span><span></span>
+  </div>
+  <div class="vp-cta-glow"></div>
+
+  <div class="container position-relative text-center" style="z-index:2;">
+
+    <p class="section-label">Begin Today</p>
+    <h2 class="vp-cta-title">
+      Ready to Start<br><em>Your Next Mission?</em>
+    </h2>
+    <div class="vp-divider"></div>
+    <p class="vp-cta-subtitle">
+      Join veterans and employers across Nigeria who are already building
+      something better — together.
+    </p>
+
+    {% if not current_user.is_authenticated %}
+      <div class="d-flex flex-wrap gap-3 justify-content-center">
+        <a href="{{ url_for('auth.register') }}" class="btn-vp-primary">
+          <i class="fas fa-user-shield"></i>
+          <span>Join VetJobPortal</span>
+        </a>
+        <a href="{{ url_for('main.employers') }}" class="btn-vp-ghost">
+          <span>I'm an Employer</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+      <p class="vp-cta-login-prompt mt-4">
+        Already have an account?
+        <a href="{{ url_for('auth.login') }}">Sign in here</a>
+      </p>
+    {% else %}
+      <a href="{{ url_for('dashboard.index') }}" class="btn-vp-primary btn-vp-primary-lg">
+        <i class="fas fa-tachometer-alt"></i>
+        <span>Go to Dashboard</span>
+      </a>
+    {% endif %}
+
+  </div>
+
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PATH INTERACTION SCRIPT — same logic, upgraded UI
+     ═══════════════════════════════════════════════════════════════ -->
+{% block extra_scripts %}
+<script>
+(() => {
+  const wrapper     = document.getElementById('get-started-wrapper');
+  const pathContent = document.getElementById('path-content');
+  const btn         = document.getElementById('get-started-btn');
+
+  if (!btn || !wrapper || !pathContent) return;
+
+  btn.addEventListener('click', e => {
+    e.preventDefault();
+    showVeteranQuestion();
+  });
+
+  function showVeteranQuestion() {
+    wrapper.innerHTML = `
+      <p class="section-label mb-3">Are you a Veteran?</p>
+      <div class="d-flex flex-wrap gap-3 justify-content-center">
+        <button class="btn-vp-primary vp-path-btn" data-answer="yes">
+          <i class="fas fa-shield-alt"></i><span>Yes, I served</span>
+        </button>
+        <button class="btn-vp-ghost vp-path-btn" data-answer="no">
+          <span>Not a veteran</span><i class="fas fa-arrow-right"></i>
+        </button>
+      </div>`;
+    wrapper.querySelectorAll('.vp-path-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        b.dataset.answer === 'yes'
+          ? window.location.href = "{{ url_for('auth.register') }}"
+          : showSpouseQuestion();
+      });
+    });
+  }
+
+  function showSpouseQuestion() {
+    pathContent.innerHTML = `
+      <div class="vp-path-card">
+        <p class="section-label mb-3">Are you a Military Spouse?</p>
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+          <button class="btn-vp-primary vp-path-btn" data-answer="yes">
+            <i class="fas fa-heart"></i><span>Yes</span>
+          </button>
+          <button class="btn-vp-ghost vp-path-btn" data-answer="no">
+            <span>No</span><i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>`;
+    pathContent.querySelectorAll('.vp-path-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        b.dataset.answer === 'yes'
+          ? window.location.href = "{{ url_for('auth.register') }}"
+          : pathContent.innerHTML = `
+            <div class="vp-path-card">
+              <p class="section-label mb-2">Thank You</p>
+              <p style="color:rgba(255,255,255,0.65);font-size:15px;line-height:1.7;margin-bottom:20px;">
+                You can still support veterans and make a difference.
+              </p>
+              <a href="{{ url_for('payments.donate_page') }}" class="btn-vp-primary">
+                <i class="fas fa-donate"></i>
+                <span>Support a Veteran</span>
+              </a>
+            </div>`;
+      });
+    });
+  }
+})();
+</script>
+{% endblock %}
+
+{% endblock %}

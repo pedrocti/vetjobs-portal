@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Secure Access - VetJobs Portal{% endblock %}
+
+{% block content %}
+<div class="vp-auth-wrapper">
+  <div class="vp-auth-card">
+
+    <!-- Header -->
+    <div class="vp-auth-header">
+      <div class="hero-top-accent" style="position:relative;height:2px;border-radius:0;"></div>
+      <div class="vp-auth-header-inner">
+        <div class="vp-auth-logo-ring">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <p class="section-label mb-1">VetJobPortal</p>
+        <h2 class="vp-auth-title">Secure Access</h2>
+        <p class="vp-auth-subtitle">Sign in to continue your mission.</p>
+      </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+
+          {# ── Unverified email — special contextual block ── #}
+          {% if category == "verify" %}
+            <div style="background:#fff8e6;border-left:4px solid #e8c84a;border-radius:0 6px 6px 0;padding:16px 18px;margin:0 0 16px;">
+              <p style="font-size:13px;color:#4a3a00;margin:0 0 10px;line-height:1.6;">
+                <strong>⚠️ Email not verified.</strong><br/>
+                Please check your inbox and click the verification link we sent you.
+              </p>
+              {% if session.get("unverified_email") %}
+                <a href="{{ url_for('auth.resend_verification') }}?email={{ session.get('unverified_email') }}"
+                   style="display:inline-block;background:#0a1628;color:#e8c84a;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 16px;border-radius:4px;text-decoration:none;">
+                  Resend Verification Email
+                </a>
+              {% else %}
+                <a href="{{ url_for('auth.resend_verification') }}"
+                   style="display:inline-block;background:#0a1628;color:#e8c84a;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 16px;border-radius:4px;text-decoration:none;">
+                  Resend Verification Email
+                </a>
+              {% endif %}
+            </div>
+
+          {# ── All other flash messages ── #}
+          {% else %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endif %}
+
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Form Body -->
+    <div class="vp-auth-body">
+      <form method="POST">
+
+        <!-- Username -->
+        <div class="mb-4">
+          <label class="form-label">Username</label>
+          <div class="vp-input-group">
+            <span class="vp-input-icon"><i class="fas fa-user"></i></span>
+            <input type="text" class="form-control vp-input-with-icon"
+                   name="username" placeholder="Enter your username"
+                   required autofocus>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="mb-4">
+          <label class="form-label">Password</label>
+          <div class="vp-input-group">
+            <span class="vp-input-icon"><i class="fas fa-lock"></i></span>
+            <input type="password" class="form-control vp-input-with-icon"
+                   name="password" placeholder="Enter your password"
+                   required>
+          </div>
+        </div>
+
+        <!-- Remember + Forgot -->
+        <div class="vp-auth-options mb-5">
+          <label class="vp-auth-check">
+            <input type="checkbox" name="remember_me" class="vp-check-input">
+            <span>Remember me</span>
+          </label>
+          <a href="{{ url_for('auth.forgot_password') }}" class="vp-auth-link">
+            <i class="fas fa-key me-1"></i>Forgot Password?
+          </a>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-vp-primary w-100 justify-content-center vp-auth-submit">
+          <i class="fas fa-user-shield"></i>
+          <span>Grant Access</span>
+        </button>
+
+      </form>
+
+      <div class="vp-auth-divider"><span>or</span></div>
+
+      <p class="vp-auth-footer-text">
+        Not yet enrolled?
+        <a href="{{ url_for('auth.register') }}" class="vp-auth-link fw-bold">Enroll Now</a>
+      </p>
+
+      <!-- Resend link for users who land here without triggering the warning -->
+      <p style="text-align:center;margin-top:12px;font-size:12px;color:#7a8a7a;">
+        Didn't receive a verification email?
+        <a href="{{ url_for('auth.resend_verification') }}" class="vp-auth-link">Resend it</a>
+      </p>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

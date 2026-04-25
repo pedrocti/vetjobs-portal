@@ -1,0 +1,482 @@
+{% extends "base.html" %}
+{% block title %}{{ program.title }} | VetJobPortal{% endblock %}
+
+{% block content %}
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HERO
+     Reuses: services-hero, hero-bg, hero-overlay, hero-top-accent,
+             hero-eyebrow, hero-gold-bar, section-title,
+             section-subtitle, btn-vp-primary
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="services-hero text-white text-center">
+
+  <div class="hero-bg"
+       style="background-image: url('{{ url_for('static', filename=program.image) if program.image else url_for('static', filename='images/vetjoblogo1.webp') }}');
+              background-position: center center;">
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-top-accent"></div>
+
+  <div class="container position-relative" style="z-index:2;">
+
+    <p class="hero-eyebrow">Training Program</p>
+    <div class="hero-gold-bar mx-auto"></div>
+
+    <h1 class="section-title mx-auto" style="font-size:clamp(28px,5vw,52px);max-width:800px;">
+      {{ program.title }}
+    </h1>
+
+    {% if program.description %}
+    <p class="section-subtitle mx-auto mt-3 mb-5" style="max-width:680px;">
+      {{ program.description[:200] }}{% if program.description|length > 200 %}...{% endif %}
+    </p>
+    {% endif %}
+
+    <a href="#apply" class="btn-vp-primary">
+      <i class="fas fa-rocket"></i>
+      <span>Begin Application</span>
+    </a>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MAIN CONTENT — Two Column Layout
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="section-dark section-gold-top">
+  <div class="container">
+    <div class="row g-5">
+
+
+      <!-- ── LEFT COLUMN ─────────────────────────────────────── -->
+      <div class="col-lg-8">
+
+
+        <!-- Program Overview -->
+        <div class="vp-program-card mb-4">
+          <p class="section-label">Overview</p>
+          <h3 class="section-title text-start" style="font-size:clamp(20px,3vw,28px);">Program Overview</h3>
+          <div class="vp-divider left"></div>
+          <p style="font-size:15px;color:rgba(255,255,255,0.7);line-height:1.85;">
+            {{ program.description or "No description available." }}
+          </p>
+        </div>
+
+
+        <!-- Program Details -->
+        <div class="vp-program-card mb-4">
+          <p class="section-label">Details</p>
+          <h3 class="section-title text-start" style="font-size:clamp(20px,3vw,28px);">Program Details</h3>
+          <div class="vp-divider left"></div>
+
+          <ul class="vp-program-details-list">
+            <li>
+              <span class="vp-detail-icon"><i class="fas fa-map-marker-alt"></i></span>
+              <span class="vp-detail-label">Location</span>
+              <span class="vp-detail-value">{{ program.location or "Not specified" }}</span>
+            </li>
+            <li>
+              <span class="vp-detail-icon"><i class="fas fa-tag"></i></span>
+              <span class="vp-detail-label">Type</span>
+              <span class="vp-detail-value">{{ program.program_type or "Not specified" }}</span>
+            </li>
+            <li>
+              <span class="vp-detail-icon"><i class="fas fa-naira-sign"></i></span>
+              <span class="vp-detail-label">Price</span>
+              <span class="vp-detail-value">{{ '₦' + program.price|string if program.price else "Not specified" }}</span>
+            </li>
+            <li>
+              <span class="vp-detail-icon"><i class="fas fa-certificate"></i></span>
+              <span class="vp-detail-label">Certification</span>
+              <span class="vp-detail-value">{{ program.certification or "Not specified" }}</span>
+            </li>
+            <li>
+              <span class="vp-detail-icon"><i class="fas fa-clock"></i></span>
+              <span class="vp-detail-label">Duration</span>
+              <span class="vp-detail-value">{{ program.duration or "Not specified" }}</span>
+            </li>
+          </ul>
+        </div>
+
+
+        <!-- How to Apply -->
+        <div class="vp-program-card mb-4" id="apply">
+          <p class="section-label">Get Started</p>
+          <h3 class="section-title text-start" style="font-size:clamp(20px,3vw,28px);">How to Apply</h3>
+          <div class="vp-divider left"></div>
+
+          <p style="font-size:15px;color:rgba(255,255,255,0.7);line-height:1.85;margin-bottom:28px;">
+            {{ program.how_to_apply or "Use one of the verified channels below to proceed with your application." }}
+          </p>
+
+          <div class="d-flex flex-wrap gap-3">
+
+            {% if program.external_link %}
+              <a href="{{ program.external_link if program.external_link.startswith('http') else 'https://' + program.external_link }}"
+                 target="_blank" class="btn-vp-primary">
+                <i class="fas fa-external-link-alt"></i>
+                <span>Apply on Website</span>
+              </a>
+            {% endif %}
+
+            {% if program.whatsapp_link %}
+              <a href="{{ program.whatsapp_link }}" target="_blank" class="vp-apply-whatsapp">
+                <i class="fab fa-whatsapp"></i>
+                <span>Apply via WhatsApp</span>
+              </a>
+            {% endif %}
+
+            {% if program.contact_email %}
+              <a href="mailto:{{ program.contact_email }}" class="btn-vp-ghost">
+                <i class="fas fa-envelope"></i>
+                <span>Apply via Email</span>
+              </a>
+            {% endif %}
+
+          </div>
+        </div>
+
+
+        <!-- Reviews -->
+        <div class="vp-program-card">
+          <p class="section-label">Community</p>
+          <h3 class="section-title text-start" style="font-size:clamp(20px,3vw,28px);">Reviews</h3>
+          <div class="vp-divider left"></div>
+
+          {% if reviews %}
+            <div class="vp-reviews-list mb-5">
+              {% for review in reviews %}
+              <div class="testimonial-card mb-3">
+                <div class="vp-star-rating mb-2">
+                  {% for i in range(1,6) %}
+                    <i class="fas fa-star {% if i <= (review.rating or 0) %}vp-star-filled{% else %}vp-star-empty{% endif %}"></i>
+                  {% endfor %}
+                </div>
+                <p class="testimonial-text">"{{ review.comment }}"</p>
+                <p class="testimonial-author mb-0">{{ review.user_name or "Anonymous" }}</p>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="vp-empty-state mb-5">
+              <i class="fas fa-star fa-2x mb-3" style="color:rgba(212,175,55,0.3);"></i>
+              <p class="section-label mb-1">No Reviews Yet</p>
+              <p style="color:rgba(255,255,255,0.35);font-size:13px;">Be the first to share your experience.</p>
+            </div>
+          {% endif %}
+
+          <!-- Review Form -->
+          <div class="vp-program-card" style="background:rgba(255,255,255,0.02);border-color:rgba(212,175,55,0.1);">
+            <p class="section-label mb-3">Leave a Review</p>
+
+            <form method="POST"
+                  action="{{ url_for('training.add_review', program_id=program.id) }}">
+
+              <div class="mb-3">
+                <label class="form-label">Your Name</label>
+                <input type="text" name="name" class="form-control" placeholder="Full name" required>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Rating</label>
+                <select name="rating" class="form-select">
+                  <option value="5">⭐⭐⭐⭐⭐ — Excellent</option>
+                  <option value="4">⭐⭐⭐⭐ — Good</option>
+                  <option value="3">⭐⭐⭐ — Average</option>
+                  <option value="2">⭐⭐ — Poor</option>
+                  <option value="1">⭐ — Bad</option>
+                </select>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label">Your Experience</label>
+                <textarea name="comment" class="form-control" rows="4"
+                          placeholder="Share your experience with this program..."></textarea>
+              </div>
+
+              <button type="submit" class="btn-vp-primary w-100 justify-content-center">
+                <i class="fas fa-paper-plane"></i>
+                <span>Submit Review</span>
+              </button>
+
+            </form>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ── RIGHT COLUMN ────────────────────────────────────── -->
+      <div class="col-lg-4">
+
+        <!-- Contact Card -->
+        <div class="vp-program-card mb-4">
+          <p class="section-label">Get In Touch</p>
+          <h4 class="section-title text-start" style="font-size:20px;">Contact</h4>
+          <div class="vp-divider left"></div>
+
+          {% if program.contact_phone %}
+          <div class="vp-contact-row">
+            <span class="vp-bullet-icon" style="flex-shrink:0;"><i class="fas fa-phone"></i></span>
+            <a href="tel:{{ program.contact_phone }}" style="color:rgba(255,255,255,0.7);font-size:14px;text-decoration:none;">
+              {{ program.contact_phone }}
+            </a>
+          </div>
+          {% endif %}
+
+          {% if program.contact_email %}
+          <div class="vp-contact-row mt-3">
+            <span class="vp-bullet-icon" style="flex-shrink:0;"><i class="fas fa-envelope"></i></span>
+            <a href="mailto:{{ program.contact_email }}" style="color:rgba(255,255,255,0.7);font-size:14px;text-decoration:none;word-break:break-all;">
+              {{ program.contact_email }}
+            </a>
+          </div>
+          {% endif %}
+
+          {% if not program.contact_phone and not program.contact_email %}
+          <p style="color:rgba(255,255,255,0.35);font-size:13px;">No contact details provided.</p>
+          {% endif %}
+
+        </div>
+
+
+        <!-- Social Links Card -->
+        {% if program.facebook_link or program.instagram_link or program.linkedin_link or program.twitter_link or program.tiktok_link %}
+        <div class="vp-program-card mb-4">
+          <p class="section-label">Follow & Connect</p>
+          <h4 class="section-title text-start" style="font-size:20px;">Social</h4>
+          <div class="vp-divider left"></div>
+
+          <div class="d-flex flex-column gap-2">
+
+            {% if program.facebook_link %}
+            <a href="{{ program.facebook_link }}" target="_blank" class="vp-social-link">
+              <i class="fab fa-facebook-f"></i> <span>Facebook</span>
+            </a>
+            {% endif %}
+
+            {% if program.instagram_link %}
+            <a href="{{ program.instagram_link }}" target="_blank" class="vp-social-link">
+              <i class="fab fa-instagram"></i> <span>Instagram</span>
+            </a>
+            {% endif %}
+
+            {% if program.linkedin_link %}
+            <a href="{{ program.linkedin_link }}" target="_blank" class="vp-social-link">
+              <i class="fab fa-linkedin-in"></i> <span>LinkedIn</span>
+            </a>
+            {% endif %}
+
+            {% if program.twitter_link %}
+            <a href="{{ program.twitter_link }}" target="_blank" class="vp-social-link">
+              <i class="fab fa-x-twitter"></i> <span>Twitter / X</span>
+            </a>
+            {% endif %}
+
+            {% if program.tiktok_link %}
+            <a href="{{ program.tiktok_link }}" target="_blank" class="vp-social-link">
+              <i class="fab fa-tiktok"></i> <span>TikTok</span>
+            </a>
+            {% endif %}
+
+          </div>
+        </div>
+        {% endif %}
+
+
+        <!-- Share Card -->
+        {% if program.sharable_link %}
+        <div class="vp-program-card">
+          <p class="section-label">Spread the Word</p>
+          <h4 class="section-title text-start" style="font-size:20px;">Share</h4>
+          <div class="vp-divider left"></div>
+          <a href="https://wa.me/?text={{ program.sharable_link }}"
+             target="_blank"
+             class="vp-apply-whatsapp w-100 justify-content-center">
+            <i class="fab fa-whatsapp"></i>
+            <span>Share on WhatsApp</span>
+          </a>
+        </div>
+        {% endif %}
+
+
+        <!-- Quick Apply Sticky -->
+        <div class="vp-program-card mt-4" style="border-color:rgba(212,175,55,0.3);position:sticky;top:90px;">
+          <p class="section-label mb-3">Ready to Join?</p>
+          <h4 style="font-family:var(--font-display);font-size:22px;color:#ffffff;margin-bottom:8px;">
+            Start Your Application
+          </h4>
+          <p style="font-size:13px;color:rgba(255,255,255,0.45);line-height:1.7;margin-bottom:20px;">
+            Take the next step in your transition journey.
+            Apply now and our team will guide you through the process.
+          </p>
+          <a href="#apply" class="btn-vp-primary w-100 justify-content-center">
+            <i class="fas fa-rocket"></i>
+            <span>Apply Now</span>
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     ADD ONLY THESE TO premium-upgrade.css
+     ═══════════════════════════════════════════════════════════════ -->
+<style>
+
+/* ── Program content card ── */
+.vp-program-card {
+  background: rgba(15, 32, 64, 0.5);
+  border: 1px solid rgba(212, 175, 55, 0.12);
+  border-radius: 14px;
+  padding: 32px;
+  transition: border-color 0.3s ease;
+}
+
+.vp-program-card:hover {
+  border-color: rgba(212, 175, 55, 0.25);
+}
+
+/* ── Program details list ── */
+.vp-program-details-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.vp-program-details-list li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.vp-program-details-list li:last-child {
+  border-bottom: none;
+}
+
+.vp-detail-icon {
+  width: 32px;
+  height: 32px;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.vp-detail-label {
+  font-family: var(--font-cond);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.vp-detail-value {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+/* ── WhatsApp apply button ── */
+.vp-apply-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 24px;
+  background: #25D366;
+  color: #ffffff;
+  font-family: var(--font-cond);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.vp-apply-whatsapp:hover {
+  background: #1ebe5d;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.3);
+}
+
+/* ── Star ratings ── */
+.vp-star-rating { display: flex; gap: 4px; }
+
+.vp-star-filled { color: var(--gold); font-size: 14px; }
+.vp-star-empty  { color: rgba(255, 255, 255, 0.15); font-size: 14px; }
+
+/* ── Contact row ── */
+.vp-contact-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ── Social links ── */
+.vp-social-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.6) !important;
+  font-size: 13px;
+  font-family: var(--font-cond);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: all 0.25s ease;
+}
+
+.vp-social-link i {
+  width: 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.3);
+  transition: color 0.25s ease;
+}
+
+.vp-social-link:hover {
+  border-color: rgba(212, 175, 55, 0.3);
+  color: var(--gold) !important;
+  background: rgba(212, 175, 55, 0.05);
+}
+
+.vp-social-link:hover i { color: var(--gold); }
+
+/* w-100 for full-width buttons */
+.btn-vp-primary.w-100,
+.vp-apply-whatsapp.w-100 {
+  width: 100%;
+  justify-content: center;
+}
+
+</style>
+
+{% endblock %}

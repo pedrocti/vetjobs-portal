@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Reset Password — VetJobPortal{% endblock %}
+
+{% block content %}
+<div class="vp-auth-wrapper">
+  <div class="vp-auth-card">
+
+    <!-- Header -->
+    <div class="vp-auth-header">
+      <div class="hero-top-accent" style="position:relative;height:2px;border-radius:0;"></div>
+      <div class="vp-auth-header-inner">
+        <div class="vp-auth-logo-ring">
+          <i class="fas fa-lock"></i>
+        </div>
+        <p class="section-label mb-1">VetJobPortal</p>
+        <h2 class="vp-auth-title">Reset Password</h2>
+        <p class="vp-auth-subtitle">Establish a new secure credential to regain access.</p>
+      </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Form Body -->
+    <div class="vp-auth-body">
+      <form method="POST" id="resetForm">
+
+        <!-- New Password -->
+        <div class="mb-4">
+          <label class="form-label">New Password</label>
+          <div class="vp-input-group">
+            <span class="vp-input-icon"><i class="fas fa-lock"></i></span>
+            <input type="password"
+                   class="form-control vp-input-with-icon"
+                   id="password"
+                   name="password"
+                   placeholder="Enter new password"
+                   required
+                   minlength="8"
+                   autofocus>
+          </div>
+          <p style="font-size:11px;color:#7a8a7a;margin:6px 0 0 2px;">Minimum 8 characters</p>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="mb-5">
+          <label class="form-label">Confirm New Password</label>
+          <div class="vp-input-group">
+            <span class="vp-input-icon"><i class="fas fa-lock"></i></span>
+            <input type="password"
+                   class="form-control vp-input-with-icon"
+                   id="confirm_password"
+                   name="confirm_password"
+                   placeholder="Re-enter new password"
+                   required
+                   minlength="8">
+          </div>
+          <p id="mismatch-hint"
+             style="display:none;font-size:11px;color:#c0392b;margin:6px 0 0 2px;">
+            Passwords do not match.
+          </p>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit"
+                id="submitBtn"
+                class="btn-vp-primary w-100 justify-content-center vp-auth-submit">
+          <i class="fas fa-check"></i>
+          <span>Update Password</span>
+        </button>
+
+      </form>
+
+      <div class="vp-auth-divider"><span>or</span></div>
+
+      <p class="vp-auth-footer-text">
+        Remember your password?
+        <a href="{{ url_for('auth.login') }}" class="vp-auth-link fw-bold">
+          <i class="fas fa-arrow-left me-1"></i>Back to Sign In
+        </a>
+      </p>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const passwordInput = document.getElementById('password');
+  const confirmInput  = document.getElementById('confirm_password');
+  const mismatchHint  = document.getElementById('mismatch-hint');
+  const submitBtn     = document.getElementById('submitBtn');
+
+  function validatePasswords() {
+    const match = passwordInput.value === confirmInput.value;
+
+    mismatchHint.style.display = (confirmInput.value.length > 0 && !match) ? 'block' : 'none';
+
+    submitBtn.disabled = (
+      !match ||
+      passwordInput.value.length < 8 ||
+      confirmInput.value.length < 8
+    );
+
+    confirmInput.setCustomValidity(match ? '' : 'Passwords do not match');
+  }
+
+  passwordInput.addEventListener('input', validatePasswords);
+  confirmInput.addEventListener('input',  validatePasswords);
+</script>
+{% endblock %}

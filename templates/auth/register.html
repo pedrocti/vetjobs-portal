@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+{% block title %}Enroll - VetJobs Portal{% endblock %}
+ 
+{% block extra_head %}
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css"/>
+{% endblock %}
+ 
+{% block content %}
+<div class="vp-auth-wrapper">
+  <div class="vp-auth-card vp-auth-card-wide">
+ 
+    <!-- Header -->
+    <div class="vp-auth-header">
+      <div class="hero-top-accent" style="position:relative;height:2px;border-radius:0;"></div>
+      <div class="vp-auth-header-inner">
+        <div class="vp-auth-logo-ring">
+          <i class="fas fa-user-shield"></i>
+        </div>
+        <p class="section-label mb-1">VetJobPortal</p>
+        <h2 class="vp-auth-title">Secure Enrollment</h2>
+        <p class="vp-auth-subtitle">Access opportunities built for service members and strategic employers.</p>
+      </div>
+    </div>
+ 
+    <!-- Form Body -->
+    <div class="vp-auth-body">
+ 
+      <!-- Step Progress -->
+      <div class="vp-step-progress mb-5">
+        <div class="vp-step-bar">
+          <div class="vp-step-fill" id="progressBar" style="width:25%;"></div>
+        </div>
+        <div class="vp-step-labels">
+          <span class="vp-step-label active" id="label-1">Identity</span>
+          <span class="vp-step-label" id="label-2">Contact</span>
+          <span class="vp-step-label" id="label-3">Role</span>
+          <span class="vp-step-label" id="label-4">Security</span>
+        </div>
+      </div>
+ 
+      <form method="POST" novalidate>
+ 
+        <!-- ── STEP 1: Identity ─────────────────────────────── -->
+        <div class="form-step active" data-step="1">
+          <p class="section-label mb-3">Step 1 of 4</p>
+          <h4 class="vp-step-title">Identity Verification</h4>
+ 
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">First Name <span class="vp-required">*</span></label>
+              <input type="text" class="form-control" name="first_name"
+                     placeholder="First name" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Last Name <span class="vp-required">*</span></label>
+              <input type="text" class="form-control" name="last_name"
+                     placeholder="Last name" required>
+            </div>
+          </div>
+ 
+          <div class="mb-4">
+            <label class="form-label">Username <span class="vp-required">*</span></label>
+            <div class="vp-input-group">
+              <span class="vp-input-icon"><i class="fas fa-user"></i></span>
+              <input type="text" class="form-control vp-input-with-icon"
+                     name="username" placeholder="Choose a username" required>
+            </div>
+            <small class="vp-form-hint">Used for secure login</small>
+          </div>
+ 
+          <button type="button" class="btn-vp-primary w-100 justify-content-center next-btn">
+            <span>Proceed</span>
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+ 
+ 
+        <!-- ── STEP 2: Contact ─────────────────────────────── -->
+        <div class="form-step" data-step="2">
+          <p class="section-label mb-3">Step 2 of 4</p>
+          <h4 class="vp-step-title">Contact Information</h4>
+ 
+          <div class="mb-3">
+            <label class="form-label">Email Address <span class="vp-required">*</span></label>
+            <input type="email" class="form-control" name="email"
+                   placeholder="your@email.com" required>
+          </div>
+ 
+          <div class="row g-3 mb-4">
+            <div class="col-md-5">
+              <label class="form-label">Country <span class="vp-required">*</span></label>
+              <input list="countries" class="form-control" id="country"
+                     name="country" placeholder="Select country" required>
+              <datalist id="countries">
+                <option value="Nigeria" data-code="+234">
+                <option value="Kenya" data-code="+254">
+                <option value="Ghana" data-code="+233">
+              </datalist>
+              <input type="hidden" id="country_code" name="country_code">
+            </div>
+            <div class="col-md-7">
+              <label class="form-label">Phone Number <span class="vp-required">*</span></label>
+              <div class="vp-input-group">
+                <span class="vp-input-icon vp-dial-code" id="dial-code">+234</span>
+                <input type="tel" class="form-control vp-input-with-icon"
+                       id="phone" name="phone"
+                       placeholder="Enter without leading zero"
+                       pattern="[0-9]{6,14}" required>
+              </div>
+              <small class="vp-form-hint">Enter number without leading zero</small>
+            </div>
+          </div>
+ 
+          <div class="d-flex gap-3">
+            <button type="button" class="btn-vp-ghost w-100 justify-content-center prev-btn">
+              <i class="fas fa-arrow-left"></i>
+              <span>Return</span>
+            </button>
+            <button type="button" class="btn-vp-primary w-100 justify-content-center next-btn">
+              <span>Proceed</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+ 
+ 
+        <!-- ── STEP 3: Role ────────────────────────────────── -->
+        <div class="form-step" data-step="3">
+          <p class="section-label mb-3">Step 3 of 4</p>
+          <h4 class="vp-step-title">Service Classification</h4>
+ 
+          <div class="mb-5">
+            <label class="form-label">Enrollment Type <span class="vp-required">*</span></label>
+ 
+            <div class="vp-role-cards">
+              <label class="vp-role-card">
+                <input type="radio" name="user_type" value="veteran" required>
+                <div class="vp-role-card-inner">
+                  <div class="vp-role-icon"><i class="fas fa-shield-alt"></i></div>
+                  <strong>Veteran / Military Spouse</strong>
+                  <small>Looking for civilian career opportunities</small>
+                </div>
+              </label>
+              <label class="vp-role-card">
+                <input type="radio" name="user_type" value="employer" required>
+                <div class="vp-role-card-inner">
+                  <div class="vp-role-icon"><i class="fas fa-building"></i></div>
+                  <strong>Employer / Organisation</strong>
+                  <small>Looking to hire veteran talent</small>
+                </div>
+              </label>
+            </div>
+          </div>
+ 
+          <div class="d-flex gap-3">
+            <button type="button" class="btn-vp-ghost w-100 justify-content-center prev-btn">
+              <i class="fas fa-arrow-left"></i>
+              <span>Return</span>
+            </button>
+            <button type="button" class="btn-vp-primary w-100 justify-content-center next-btn">
+              <span>Proceed</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+ 
+ 
+        <!-- ── STEP 4: Password ───────────────────────────── -->
+        <div class="form-step" data-step="4">
+          <p class="section-label mb-3">Step 4 of 4</p>
+          <h4 class="vp-step-title">Secure Access Setup</h4>
+ 
+          <div class="mb-3">
+            <label class="form-label">Password <span class="vp-required">*</span></label>
+            <div class="vp-input-group">
+              <span class="vp-input-icon"><i class="fas fa-lock"></i></span>
+              <input type="password" class="form-control vp-input-with-icon"
+                     name="password" placeholder="Create a password" required>
+            </div>
+            <small class="vp-form-hint">Min 8 characters — include uppercase, number & special character</small>
+          </div>
+ 
+          <div class="mb-4">
+            <label class="form-label">Confirm Password <span class="vp-required">*</span></label>
+            <div class="vp-input-group">
+              <span class="vp-input-icon"><i class="fas fa-lock"></i></span>
+              <input type="password" class="form-control vp-input-with-icon"
+                     name="confirm_password" placeholder="Repeat your password" required>
+            </div>
+          </div>
+ 
+          <label class="vp-consent-label mb-4">
+            <input type="checkbox" name="terms" required class="vp-consent-check">
+            <span>
+              I accept the
+              <a href="#" class="vp-auth-link">Terms of Service</a> and
+              <a href="#" class="vp-auth-link">Privacy Policy</a>
+            </span>
+          </label>
+ 
+          <div class="d-flex gap-3">
+            <button type="button" class="btn-vp-ghost w-100 justify-content-center prev-btn">
+              <i class="fas fa-arrow-left"></i>
+              <span>Return</span>
+            </button>
+            <button type="submit" class="btn-vp-primary w-100 justify-content-center">
+              <i class="fas fa-check-circle"></i>
+              <span>Submit Application</span>
+            </button>
+          </div>
+        </div>
+ 
+      </form>
+ 
+      <div class="vp-auth-divider"><span>or</span></div>
+ 
+      <p class="vp-auth-footer-text">
+        Already enrolled?
+        <a href="{{ url_for('auth.login') }}" class="vp-auth-link fw-bold">Sign In</a>
+      </p>
+ 
+    </div>
+  </div>
+</div>
+ 
+<!-- intl-tel-input scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"></script>
+ 
+{% block extra_scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+ 
+  /* ── Phone input ── */
+  const phone = document.querySelector("#phone");
+  if (phone) {
+    const iti = window.intlTelInput(phone, {
+      initialCountry: "auto",
+      geoIpLookup: cb => {
+        fetch("https://ipapi.co/json")
+          .then(r => r.json())
+          .then(d => cb(d.country_code || "ng"))
+          .catch(() => cb("ng"));
+      },
+      utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+    });
+    document.getElementById("country")?.addEventListener("input", function () {
+      const val  = this.value.trim().toLowerCase();
+      const opt  = Array.from(document.getElementById("countries").options)
+                       .find(o => o.value.toLowerCase() === val);
+      if (opt?.dataset.code) {
+        document.getElementById("dial-code").textContent = opt.dataset.code;
+        document.getElementById("country_code").value    = opt.dataset.code;
+      }
+    });
+    document.querySelector("form")?.addEventListener("submit", () => {
+      phone.value = iti.getNumber();
+    });
+  }
+ 
+  /* ── Multi-step ── */
+  const steps    = document.querySelectorAll(".form-step");
+  const bar      = document.getElementById("progressBar");
+  let current    = 0;
+ 
+  function updateStep() {
+    steps.forEach((s, i) => s.classList.toggle("active", i === current));
+    if (bar) bar.style.width = ((current + 1) / steps.length * 100) + "%";
+ 
+    /* Update step labels */
+    document.querySelectorAll(".vp-step-label").forEach((l, i) => {
+      l.classList.toggle("active",    i === current);
+      l.classList.toggle("completed", i < current);
+    });
+  }
+ 
+  document.querySelectorAll(".next-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (current < steps.length - 1) { current++; updateStep(); }
+    });
+  });
+ 
+  document.querySelectorAll(".prev-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (current > 0) { current--; updateStep(); }
+    });
+  });
+ 
+});
+</script>
+{% endblock %}
+ 
+{% endblock %}

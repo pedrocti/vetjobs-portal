@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Profile Boost Payment - Veteran-Employer Job Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h1 class="fw-bold text-warning">
+                    <i class="fas fa-rocket me-2"></i>Profile Boost
+                </h1>
+                <p class="text-muted">Increase your profile visibility and get noticed by employers</p>
+            </div>
+
+            <!-- Boost Benefits -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-star me-2"></i>Profile Boost Benefits (7 Days)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-up text-warning me-2"></i>
+                                    3x higher visibility in searches
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-up text-warning me-2"></i>
+                                    Priority placement in job recommendations
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-up text-warning me-2"></i>
+                                    Featured in "Boosted Veterans" section
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-up text-warning me-2"></i>
+                                    Enhanced profile highlighting
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-up text-warning me-2"></i>
+                                    Increased employer engagement
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-up text-warning me-2"></i>
+                                    Premium profile badge
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Card -->
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-credit-card me-2"></i>Boost Payment
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h4 class="text-warning mb-1">7-Day Profile Boost</h4>
+                            <p class="text-muted mb-0">
+                                Instant activation after payment. Your profile will be boosted for exactly 7 days with enhanced visibility features.
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="display-4 fw-bold text-warning">₦{{ "{:,.0f}".format(boost_fee) }}</div>
+                            <small class="text-muted">7 days boost</small>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <!-- Payment Button -->
+                    <div class="text-center">
+                        <button type="button" id="payBoostBtn" class="btn btn-warning btn-lg px-5 text-dark">
+                            <i class="fas fa-rocket me-2"></i>Boost Profile for ₦{{ "{:,.0f}".format(boost_fee) }}
+                        </button>
+                        
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-shield-alt me-1"></i>
+                                Secured by Flutterwave SSL encryption
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Boost Features -->
+            <div class="row mt-4">
+                <div class="col-md-4 text-center">
+                    <i class="fas fa-search fa-2x text-warning mb-2"></i>
+                    <h6>Enhanced Search</h6>
+                    <small class="text-muted">Higher ranking in employer searches</small>
+                </div>
+                <div class="col-md-4 text-center">
+                    <i class="fas fa-eye fa-2x text-warning mb-2"></i>
+                    <h6>Increased Views</h6>
+                    <small class="text-muted">3x more profile views during boost period</small>
+                </div>
+                <div class="col-md-4 text-center">
+                    <i class="fas fa-medal fa-2x text-warning mb-2"></i>
+                    <h6>Premium Badge</h6>
+                    <small class="text-muted">Special boosted veteran badge</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const payButton = document.getElementById('payBoostBtn');
+    
+    payButton.addEventListener('click', function() {
+        // Disable button and show loading
+        payButton.disabled = true;
+        payButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Initializing Payment...';
+        
+        // Initialize payment with Flutterwave
+        fetch('{{ url_for("payments.initialize_boost_payment") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Redirect to Flutterwave payment page
+                window.location.href = data.authorization_url;
+            } else {
+                alert('Payment initialization failed: ' + data.message);
+                payButton.disabled = false;
+                payButton.innerHTML = '<i class="fas fa-rocket me-2"></i>Boost Profile for ₦{{ "{:,.0f}".format(boost_fee) }}';
+            }
+        })
+        .catch(error => {
+            console.error('Payment error:', error);
+            alert('An error occurred. Please try again.');
+            payButton.disabled = false;
+            payButton.innerHTML = '<i class="fas fa-rocket me-2"></i>Boost Profile for ₦{{ "{:,.0f}".format(boost_fee) }}';
+        });
+    });
+});
+
+function getCsrfToken() {
+    // Get CSRF token from meta tag or form
+    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+    return csrfMeta ? csrfMeta.getAttribute('content') : '';
+}
+</script>
+{% endblock %}

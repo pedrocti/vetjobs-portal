@@ -1,0 +1,310 @@
+{% extends "base.html" %}
+
+{% block title %}My Applications{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="fw-bold mb-1">My Applications</h1>
+                    <p class="text-muted mb-0">Track your job application status</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('jobs.job_board') }}" class="btn btn-primary">
+                        <i class="fas fa-search me-2"></i>Find More Jobs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ stats.total }}</h4>
+                            <p class="mb-0">Total Applied</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-paper-plane fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ stats.pending }}</h4>
+                            <p class="mb-0">Pending</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ stats.reviewed }}</h4>
+                            <p class="mb-0">Under Review</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-eye fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ stats.accepted }}</h4>
+                            <p class="mb-0">Accepted</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Applications List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Application History
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if applications %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Job Title</th>
+                                    <th>Company</th>
+                                    <th>Applied On</th>
+                                    <th>Status</th>
+                                    <th>Last Update</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for application in applications %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <h6 class="mb-1 fw-bold">{{ application.job_post.job_title }}</h6>
+                                            <small class="text-muted">{{ application.job_post.location }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <h6 class="mb-1">{{ application.job_post.company_name }}</h6>
+                                            {% if application.job_post.salary_range %}
+                                            <small class="text-muted">{{ application.job_post.salary_range }}</small>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="small">{{ application.created_at.strftime('%B %d, %Y') }}</span>
+                                        <br>
+                                        <span class="text-muted small">{{ application.created_at.strftime('%I:%M %p') }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {{ application.get_status_badge_class() }}">
+                                            <i class="{{ application.get_status_icon() }} me-1"></i>
+                                            {{ application.get_status_display() }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if application.updated_at != application.created_at %}
+                                        <span class="small">{{ application.updated_at.strftime('%m/%d/%Y') }}</span>
+                                        {% else %}
+                                        <span class="text-muted small">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <!-- View Application -->
+                                            <button type="button" class="btn btn-outline-primary btn-sm" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#applicationModal{{ application.id }}">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <!-- Download Resume -->
+                                            <a href="{{ url_for('applications.download_resume', application_id=application.id) }}" 
+                                               class="btn btn-outline-info btn-sm" title="Download Resume">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                            <!-- Withdraw Application -->
+                                            {% if application.status in ['pending', 'reviewed'] %}
+                                            <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                    onclick="withdrawApplication({{ application.id }})">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Applications Yet</h5>
+                        <p class="text-muted mb-4">You haven't applied to any jobs yet. Start exploring opportunities!</p>
+                        <a href="{{ url_for('jobs.job_board') }}" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Browse Jobs
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Application Detail Modals -->
+{% for application in applications %}
+<div class="modal fade" id="applicationModal{{ application.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-file-alt me-2"></i>Application Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Job Information -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-primary mb-3">
+                        <i class="fas fa-briefcase me-2"></i>Job Information
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <strong>Position:</strong> {{ application.job_post.job_title }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <strong>Company:</strong> {{ application.job_post.company_name }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <strong>Location:</strong> {{ application.job_post.location }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <strong>Type:</strong> {{ application.job_post.get_job_type_display() }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Application Status -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-success mb-3">
+                        <i class="fas fa-info-circle me-2"></i>Application Status
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <strong>Current Status:</strong>
+                            <span class="badge {{ application.get_status_badge_class() }} ms-2">
+                                <i class="{{ application.get_status_icon() }} me-1"></i>
+                                {{ application.get_status_display() }}
+                            </span>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <strong>Applied On:</strong> {{ application.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                        </div>
+                        {% if application.reviewed_at %}
+                        <div class="col-md-6 mb-2">
+                            <strong>Last Reviewed:</strong> {{ application.reviewed_at.strftime('%B %d, %Y') }}
+                        </div>
+                        {% endif %}
+                        {% if application.reviewed_by_employer %}
+                        <div class="col-md-6 mb-2">
+                            <strong>Reviewed By:</strong> {{ application.reviewed_by_employer.full_name }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Employer Notes -->
+                {% if application.employer_notes %}
+                <div class="mb-4">
+                    <h6 class="fw-bold text-warning mb-3">
+                        <i class="fas fa-comment me-2"></i>Employer Notes
+                    </h6>
+                    <div class="alert alert-light">
+                        {{ application.employer_notes|replace('\n', '<br>')|safe }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Cover Letter -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-info mb-3">
+                        <i class="fas fa-file-alt me-2"></i>Your Cover Letter
+                    </h6>
+                    <div class="bg-light p-3 rounded" style="max-height: 200px; overflow-y: auto;">
+                        {{ application.cover_letter|replace('\n', '<br>')|safe }}
+                    </div>
+                </div>
+
+                <!-- Resume File -->
+                <div class="mb-0">
+                    <h6 class="fw-bold text-secondary mb-3">
+                        <i class="fas fa-file-pdf me-2"></i>Resume
+                    </h6>
+                    <a href="{{ url_for('applications.download_resume', application_id=application.id) }}" 
+                       class="btn btn-outline-primary">
+                        <i class="fas fa-download me-2"></i>Download Resume
+                    </a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                {% if application.status in ['pending', 'reviewed'] %}
+                <button type="button" class="btn btn-danger" 
+                        onclick="withdrawApplication({{ application.id }})">
+                    <i class="fas fa-times me-2"></i>Withdraw Application
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Withdraw Confirmation Form -->
+<form id="withdrawForm" method="POST" style="display: none;">
+</form>
+
+<script>
+function withdrawApplication(applicationId) {
+    if (confirm('Are you sure you want to withdraw this application? This action cannot be undone.')) {
+        var form = document.getElementById('withdrawForm');
+        form.action = '/applications/withdraw/' + applicationId;
+        form.submit();
+    }
+}
+</script>
+{% endblock %}

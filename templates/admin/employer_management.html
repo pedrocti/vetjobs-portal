@@ -1,0 +1,332 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Employer Management - Admin Panel{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="fw-bold mb-1">Employer Management</h1>
+                    <p class="text-muted mb-0">Manage employer accounts, job postings, and platform access</p>
+                </div>
+                <div>
+                    <span style="background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:2px;">
+                        <i class="fas fa-building me-1"></i>{{ stats.total }} Employers
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h3 class="mb-0">{{ stats.total }}</h3>
+                    <p class="mb-0">Total Employers</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body text-center">
+                    <h3 class="mb-0">{{ stats.pending }}</h3>
+                    <p class="mb-0">Pending Approval</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h3 class="mb-0">{{ stats.active }}</h3>
+                    <p class="mb-0">Approved</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body text-center">
+                    <h3 class="mb-0">{{ stats.rejected }}</h3>
+                    <p class="mb-0">Rejected</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('admin.employer_management') }}">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="search" class="form-label">Search Employers</label>
+                        <input type="text" class="form-control" id="search" name="search" 
+                               placeholder="Company name, email, or contact person..." 
+                               value="{{ current_filters.search }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="status" class="form-label">Account Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">All Statuses</option>
+                            <option value="pending" {{ 'selected' if current_filters.status == 'pending' else '' }}>Pending Approval</option>
+                            <option value="active" {{ 'selected' if current_filters.status == 'active' else '' }}>Approved</option>
+                            <option value="rejected" {{ 'selected' if current_filters.status == 'rejected' else '' }}>Rejected</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i>Filter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Employers List -->
+    <div class="vp-dash-card">
+        <div class="vp-dash-card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-building me-2"></i>Employer Accounts
+                {% if current_filters.search or current_filters.status %}
+                <span class="badge bg-secondary ms-2">Filtered</span>
+                {% endif %}
+            </h5>
+        </div>
+        <div class="vp-dash-card-body" style="padding:0;">
+            {% if employers %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Employer</th>
+                            <th>Contact Information</th>
+                            <th>Job Activity</th>
+                            <th>Joined</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for employer in employers %}
+                    <tr>
+                        <!-- Employer -->
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-{{ 'warning' if employer.employer_status == 'pending' else ('success' if employer.employer_status == 'active' else 'danger') }} text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                     style="width: 40px; height: 40px;">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 fw-bold">{{ employer.full_name }}</h6>
+                                    <small class="text-muted">@{{ employer.username }}</small>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Contact Information -->
+                        <td>
+                            <div>{{ employer.email }}</div>
+                            {% if employer.profile_data and employer.profile_data.recruiter_email %}
+                            <small class="text-muted d-block">
+                                <i class="fas fa-user-tie me-1"></i>{{ employer.profile_data.recruiter_email }}
+                            </small>
+                            {% endif %}
+                            {% if employer.profile_data and employer.profile_data.recruiter_phone %}
+                            <small class="text-muted d-block">
+                                <i class="fas fa-phone me-1"></i>{{ employer.profile_data.recruiter_phone }}
+                            </small>
+                            {% endif %}
+                        </td>
+
+                        <!-- Job Activity -->
+                        <td>
+                            <span class="badge bg-primary">{{ employer.job_count }} Jobs</span>
+                            {% if employer.active_job_count > 0 %}
+                            <div class="mt-1">
+                                <span class="badge bg-success">{{ employer.active_job_count }} Active</span>
+                            </div>
+                            {% endif %}
+                        </td>
+
+                        <!-- Joined -->
+                        <td>
+                            <small class="text-muted">
+                                {{ employer.created_at.strftime('%B %d, %Y') }}
+                            </small>
+                        </td>
+
+                        <!-- Status -->
+                        <td>
+                            {% if employer.employer_status == 'pending' %}
+                            <span class="badge bg-warning text-dark">
+                                <i class="fas fa-clock me-1"></i>Pending
+                            </span>
+                            {% elif employer.employer_status == 'active' %}
+                            <span style="background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);font-size:10px;font-weight:700;padding:4px 10px;border-radius:2px;">
+                                <i class="fas fa-check me-1"></i>Approved
+                            </span>
+                            {% elif employer.employer_status == 'rejected' %}
+                            <span class="badge bg-danger">
+                                <i class="fas fa-times me-1"></i>Rejected
+                            </span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Actions -->
+                        <td>
+                            <div class="d-flex flex-column gap-2">
+
+                                {% if employer.employer_status == 'pending' %}
+                                <form method="POST" action="{{ url_for('admin.approve_employer', employer_id=employer.id) }}">
+                                    <button type="submit" class="btn btn-success btn-sm w-100"
+                                            onclick="return confirm('Approve {{ employer.full_name }}?')">
+                                        <i class="fas fa-check me-1"></i>Approve
+                                    </button>
+                                </form>
+
+                                <button type="button" class="btn btn-danger btn-sm w-100"
+                                        onclick="rejectEmployer({{ employer.id }}, {{ employer.full_name|tojson }})">
+                                    Reject
+                                </button>
+                                {% else %}
+
+                                {% if employer.job_count > 0 %}
+                                <a href="{{ url_for('employer.manage_jobs') }}?employer_id={{ employer.id }}" 
+                                   class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-briefcase me-1"></i>Jobs
+                                </a>
+                                {% endif %}
+
+                                <button type="button"
+                                        class="btn btn-outline-{{ 'warning' if employer.is_active else 'success' }} btn-sm"
+                                        onclick="toggleUserStatus({{ employer.id }}, {{ employer.full_name|tojson }}, {{ employer.is_active|tojson }})">
+                                    <i class="fas fa-{{ 'ban' if employer.is_active else 'check' }}"></i>
+                                    {{ 'Suspend' if employer.is_active else 'Activate' }}
+                                </button>
+
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Optional expandable details row (keeps your rich data without breaking layout) -->
+                    {% if employer.employer_status == 'pending' and employer.profile_data %}
+                    <tr class="bg-light">
+                        <td colspan="6">
+                            <div class="p-3">
+
+                                <strong>Company:</strong> {{ employer.profile_data.company_name or 'N/A' }} |
+                                <strong>Industry:</strong> {{ employer.profile_data.industry or 'N/A' }} |
+                                <strong>Size:</strong> {{ employer.profile_data.company_size or 'N/A' }}
+
+                                {% if employer.profile_data.company_description %}
+                                <div class="mt-2">
+                                    <small>{{ employer.profile_data.company_description[:150] }}...</small>
+                                </div>
+                                {% endif %}
+
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-building fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">No Employers Found</h5>
+                {% if current_filters.search or current_filters.status %}
+                <p class="text-muted mb-4">No employers match your current filter criteria.</p>
+                <a href="{{ url_for('admin.employer_management') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-times me-2"></i>Clear Filters
+                </a>
+                {% else %}
+                <p class="text-muted mb-0">No employers have registered yet.</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Status Toggle Form -->
+<form id="statusForm" method="POST" style="display: none;">
+    <input type="hidden" name="admin_reason" id="statusReason">
+</form>
+
+<!-- Delete User Form -->
+<form id="deleteForm" method="POST" style="display: none;">
+    <input type="hidden" name="admin_reason" id="deleteReason">
+</form>
+
+<script>
+function toggleUserStatus(userId, userName, isActive) {
+    const action = isActive ? 'suspend' : 'activate';
+    const reason = prompt(`Why are you ${action}ing ${userName}?\n\nPlease provide a detailed reason:`);
+    
+    if (reason === null || reason.trim() === '') {
+        return; // User cancelled or didn't provide reason
+    }
+    
+    if (confirm(`Are you sure you want to ${action} ${userName}?\n\nReason: ${reason}`)) {
+        const form = document.getElementById('statusForm');
+        const reasonInput = document.getElementById('statusReason');
+        
+        form.action = `/admin/user/${userId}/toggle-status`;
+        reasonInput.value = reason;
+        form.submit();
+    }
+}
+
+function deleteUser(userId, userName) {
+    const reason = prompt(`Why are you deleting ${userName}'s account?\n\nThis action is PERMANENT and cannot be undone.\nAll their job posts and applications will also be deleted.\n\nPlease provide a detailed reason:`);
+    
+    if (reason === null || reason.trim() === '') {
+        return; // User cancelled or didn't provide reason
+    }
+    
+    if (confirm(`Are you ABSOLUTELY SURE you want to permanently delete ${userName}'s account?\n\nThis will:\n- Delete their profile and all job posts\n- Remove all applications to their jobs\n- Cannot be undone\n\nReason: ${reason}`)) {
+        const form = document.getElementById('deleteForm');
+        const reasonInput = document.getElementById('deleteReason');
+        
+        // Delete functionality not implemented yet
+        alert('Delete functionality will be implemented in future updates.');
+    }
+}
+
+function rejectEmployer(employerId, employerName) {
+    const reason = prompt(`Please provide a reason for rejecting ${employerName}:`);
+    
+    if (!reason || reason.trim() === '') {
+        alert('A reason is required for rejection.');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to reject ${employerName}?`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/admin/employer/${employerId}/reject`;
+        
+        const reasonInput = document.createElement('input');
+        reasonInput.type = 'hidden';
+        reasonInput.name = 'rejection_reason';
+        reasonInput.value = reason.trim();
+        
+        form.appendChild(reasonInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endblock %}

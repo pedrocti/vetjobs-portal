@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - Veteran-Employer Job Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-5">
+                <h1 class="fw-bold mb-3">Contact Us</h1>
+                <p class="lead text-muted"> Reach out to us with any questions or feedback.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Contact Form -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h4 class="fw-bold mb-4">Send us a Message</h4>
+                    
+                    <form method="POST">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="first_name" class="form-label">First Name *</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="last_name" class="form-label">Last Name *</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-envelope"></i>
+                                </span>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject *</label>
+                            <select class="form-select" id="subject" name="subject" required>
+                                <option value="">Select a subject</option>
+                                <option value="general">General Inquiry</option>
+                                <option value="veteran_support">Veteran Support</option>
+                                <option value="employer_services">Employer Services</option>
+                                <option value="technical_support">Technical Support</option>
+                                <option value="partnership">Partnership Opportunities</option>
+                                <option value="feedback">Feedback</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message *</label>
+                            <textarea class="form-control" id="message" name="message" rows="5" placeholder="Tell us how we can help you..." required></textarea>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">Get in Touch</h5>
+                    
+                    <div class="d-flex mb-3">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; min-width: 40px;">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Email</h6>
+                            <p class="text-muted mb-0">support@vetjobportal.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex mb-3">
+                        <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; min-width: 40px;">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Phone</h6>
+                            <p class="text-muted mb-0">+234-911-029-8851</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex mb-3">
+                        <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; min-width: 40px;">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Support Hours</h6>
+                            <p class="text-muted mb-0">Mon-Fri: 8AM-6PM EST</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">Quick Support</h5>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-primary">
+                            <i class="fas fa-question-circle me-2"></i>FAQ
+                        </a>
+                        <a href="#" class="btn btn-outline-success">
+                            <i class="fas fa-book me-2"></i>Help Center
+                        </a>
+                        <a href="#" class="btn btn-outline-info">
+                            <i class="fas fa-comments me-2"></i>Live Chat
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">Follow Us</h5>
+                    
+                    <div class="d-flex gap-3">
+                        <a href="https://web.facebook.com/profile.php?id=61580578907586" target="_blank" class="btn btn-outline-primary">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://x.com/VetConnectxlm" target="_blank" class="btn btn-outline-info">
+                            <i class="fab fa-x-twitter"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-primary">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="https://www.instagram.com/vetconnectxlm/" target="_blank" class="btn btn-outline-danger">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

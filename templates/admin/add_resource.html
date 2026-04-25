@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Add Resource{% endblock %}
+{% block content %}
+<div class="container my-5">
+  <h3 class="mb-4 text-primary">Add New Resource</h3>
+  <form method="POST" enctype="multipart/form-data">
+
+    <!-- Title -->
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Title</label>
+      <input type="text" name="title" class="form-control" required>
+    </div>
+
+    <!-- Category -->
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Category</label>
+      <select name="category" class="form-select" required>
+        <option value="career">Career Resources</option>
+        <option value="resume">Resume Builder</option>
+        <option value="interview">Interview Tips</option>
+        <option value="networking">Networking Events</option>
+      </select>
+    </div>
+
+    <!-- Description -->
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Description</label>
+      <textarea name="description" class="form-control" rows="6" placeholder="Enter a brief description..." required></textarea>
+    </div>
+
+    <!-- Internal Link -->
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Internal Link (optional)</label>
+      <input type="text" name="link" class="form-control" placeholder="/resources/career-guide">
+    </div>
+
+    <!-- External Link -->
+    <div class="mb-3">
+      <label class="form-label fw-semibold">External Link (optional)</label>
+      <input type="url" name="external_link" class="form-control" placeholder="https://example.com/article">
+    </div>
+
+    <!-- Image Upload -->
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Upload Image (optional)</label>
+      <input type="file" name="image" class="form-control">
+    </div>
+
+    <button class="btn btn-success px-4">Save Resource</button>
+  </form>
+</div>
+{% endblock %}

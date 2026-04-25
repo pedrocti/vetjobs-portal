@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Saved Veterans - VetLink{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3>
+                <i class="fas fa-bookmark me-2 text-primary"></i>Saved Veterans
+            </h3>
+            <p class="text-muted mb-0">Veterans you've saved for future consideration</p>
+        </div>
+        <a href="{{ url_for('search.search_veterans') }}" class="btn btn-primary">
+            <i class="fas fa-search me-2"></i>Search More Veterans
+        </a>
+    </div>
+
+    {% if saved_veterans.items %}
+    <div class="row">
+        {% for saved_item, user, profile in saved_veterans.items %}
+        <div class="col-lg-6 col-xl-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <!-- Veteran Header -->
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                 style="width: 50px; height: 50px;">
+                                <i class="fas fa-user fs-5"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title mb-1">
+                                {{ user.full_name }}
+                                {% if profile.is_verified %}
+                                <i class="fas fa-shield-alt text-success ms-1" title="Verified Veteran"></i>
+                                {% endif %}
+                            </h6>
+                            <p class="text-muted small mb-1">
+                                {% if profile.rank %}{{ profile.rank }}, {% endif %}
+                                {{ profile.military_branch or 'Military Veteran' }}
+                            </p>
+                            <p class="text-muted small mb-0">
+                                <i class="fas fa-map-marker-alt me-1"></i>
+                                {{ profile.location or user.location or 'Location not specified' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Service Info -->
+                    {% if profile.years_of_service %}
+                    <div class="mb-2">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            {{ profile.years_of_service }} years of service
+                        </small>
+                    </div>
+                    {% endif %}
+
+                    <!-- Skills -->
+                    {% if profile.skills %}
+                    <div class="mb-3">
+                        <div class="skills-container">
+                            {% for skill in profile.skills.split(',')[:4] %}
+                            <span class="badge bg-light text-dark me-1 mb-1">{{ skill.strip() }}</span>
+                            {% endfor %}
+                            {% if profile.skills.split(',')|length > 4 %}
+                            <span class="badge bg-secondary">+{{ profile.skills.split(',')|length - 4 }} more</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Personal Notes -->
+                    {% if saved_item.notes %}
+                    <div class="mb-3">
+                        <strong class="small">Your Notes:</strong>
+                        <p class="small text-muted mb-0">{{ saved_item.notes }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Saved Date -->
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar me-1"></i>
+                            Saved {{ saved_item.created_at.strftime('%B %d, %Y') }}
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Card Actions -->
+                <div class="card-footer bg-transparent">
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('veteran.public_profile', user_id=user.id) }}" 
+                           class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye me-1"></i>View Profile
+                        </a>
+                        <button class="btn btn-outline-danger btn-sm remove-veteran-btn" 
+                                data-veteran-id="{{ user.id }}">
+                            <i class="fas fa-trash me-1"></i>Remove
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if saved_veterans.pages > 1 %}
+    <nav aria-label="Saved veterans pagination">
+        <ul class="pagination justify-content-center">
+            {% if saved_veterans.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('search.my_saved_veterans', page=saved_veterans.prev_num) }}">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for page_num in saved_veterans.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num != saved_veterans.page %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('search.my_saved_veterans', page=page_num) }}">{{ page_num }}</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_num }}</span>
+                    </li>
+                    {% endif %}
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if saved_veterans.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('search.my_saved_veterans', page=saved_veterans.next_num) }}">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- No Saved Veterans -->
+    <div class="text-center py-5">
+        <i class="fas fa-bookmark text-muted" style="font-size: 4rem;"></i>
+        <h4 class="mt-3">No Saved Veterans</h4>
+        <p class="text-muted">
+            You haven't saved any veterans yet. Start by searching for veterans and clicking the "Save" button on profiles you're interested in.
+        </p>
+        <a href="{{ url_for('search.search_veterans') }}" class="btn btn-primary">
+            <i class="fas fa-search me-2"></i>Search Veterans
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Remove veteran functionality
+    const removeButtons = document.querySelectorAll('.remove-veteran-btn');
+    
+    removeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const veteranId = this.dataset.veteranId;
+            
+            if (confirm('Are you sure you want to remove this veteran from your saved list?')) {
+                removeVeteran(veteranId, this);
+            }
+        });
+    });
+
+    function removeVeteran(veteranId, button) {
+        fetch(`/search/unsave-veteran/${veteranId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove the card from view
+                const card = button.closest('.col-lg-6');
+                card.remove();
+                
+                // Show success message
+                showAlert('Veteran removed from saved list', 'success');
+                
+                // Check if page is now empty
+                const remainingCards = document.querySelectorAll('.col-lg-6').length;
+                if (remainingCards === 0) {
+                    location.reload(); // Reload to show empty state
+                }
+            } else {
+                showAlert(data.message || 'Error removing veteran', 'error');
+            }
+        })
+        .catch(error => {
+            showAlert('Error removing veteran', 'error');
+        });
+    }
+
+    function showAlert(message, type) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        const container = document.querySelector('.container');
+        container.insertBefore(alertDiv, container.firstChild);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  <div class="row g-0">
+
+    <!-- ── SIDEBAR ──────────────────────────────────────────────── -->
+    <nav class="vp-sidebar col-md-3 col-lg-2 d-none d-md-flex">
+
+      <!-- Identity -->
+      <div class="vp-sidebar-identity">
+        <div class="vp-auth-logo-ring" style="margin:0 auto 12px;">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <p class="section-label mb-1" style="font-size:10px;">Veteran Panel</p>
+        <span class="vp-sidebar-badge">
+          <i class="fas fa-medal me-1"></i>Veteran
+        </span>
+      </div>
+
+      <!-- Nav Links -->
+      <ul class="vp-sidebar-nav">
+
+        <li>
+          <a class="vp-sidebar-link {% if request.endpoint == 'dashboard.veteran' %}active{% endif %}"
+             href="{{ url_for('dashboard.veteran') }}">
+            <i class="fas fa-tachometer-alt fa-fw"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li>
+          <a class="vp-sidebar-link {% if request.endpoint == 'jobs.job_board' %}active{% endif %}"
+             href="{{ url_for('jobs.job_board') }}">
+            <i class="fas fa-briefcase fa-fw"></i>
+            <span>Browse Jobs</span>
+          </a>
+        </li>
+
+        <li>
+          <a class="vp-sidebar-link {% if request.endpoint == 'applications.my_applications' %}active{% endif %}"
+             href="{{ url_for('applications.my_applications') }}">
+            <i class="fas fa-file-alt fa-fw"></i>
+            <span>My Applications</span>
+          </a>
+        </li>
+
+        <li>
+          <a class="vp-sidebar-link {% if request.endpoint == 'messaging.inbox' %}active{% endif %}"
+             href="{{ url_for('messaging.inbox') }}">
+            <i class="fas fa-envelope fa-fw"></i>
+            <span>Messages</span>
+          </a>
+        </li>
+
+        <li>
+          <a class="vp-sidebar-link {% if request.endpoint == 'dashboard.profile' %}active{% endif %}"
+             href="{{ url_for('dashboard.profile') }}">
+            <i class="fas fa-user fa-fw"></i>
+            <span>My Profile</span>
+          </a>
+        </li>
+
+        <div class="vp-sidebar-rule"></div>
+
+        <li>
+          <a class="vp-sidebar-link {% if request.endpoint == 'services.cv_optimize_page' %}active{% endif %}"
+             href="{{ url_for('services.cv_optimize_page') }}">
+            <i class="fas fa-file-pdf fa-fw"></i>
+            <span>Resume Builder</span>
+          </a>
+        </li>
+
+        <li>
+          <a class="vp-sidebar-link vp-sidebar-boost {% if request.endpoint == 'payments.veteran_boost_payment' %}active{% endif %}"
+             href="{{ url_for('payments.veteran_boost_payment') }}">
+            <i class="fas fa-rocket fa-fw"></i>
+            <span>Boost Profile</span>
+          </a>
+        </li>
+
+        <li>
+          <a class="vp-sidebar-link vp-sidebar-community"
+             href="https://chat.whatsapp.com/FiXN7lzXYi6IvxjhXMcx2E"
+             target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-whatsapp fa-fw"></i>
+            <span>Veteran Community</span>
+          </a>
+        </li>
+
+        <div class="vp-sidebar-rule"></div>
+
+        <li>
+          <a class="vp-sidebar-link vp-sidebar-logout"
+             href="{{ url_for('auth.logout') }}">
+            <i class="fas fa-sign-out-alt fa-fw"></i>
+            <span>Logout</span>
+          </a>
+        </li>
+
+      </ul>
+
+    </nav>
+
+    <!-- ── MAIN CONTENT ─────────────────────────────────────────── -->
+    <main class="vp-dashboard-main col-12 col-md-9 col-lg-10">
+      {% block dashboard_content %}{% endblock %}
+    </main>
+
+  </div>
+</div>
+{% endblock %}

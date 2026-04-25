@@ -1,0 +1,456 @@
+{% extends "layouts/dashboard_base.html" %}
+{% block dashboard_content %}
+ 
+<div class="container-fluid p-0">
+ 
+  <!-- ── WELCOME HEADER ──────────────────────────────────────── -->
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+      <p class="section-label mb-1">Veteran Dashboard</p>
+      <h1 style="font-family:var(--font-display);font-size:clamp(24px,4vw,36px);font-weight:700;color:#ffffff;margin:0;">
+        Welcome back, <em style="color:var(--gold);font-style:italic;">{{ current_user.first_name }}</em>
+      </h1>
+      <p style="color:rgba(255,255,255,0.4);font-size:13px;margin-top:4px;">
+        Explore jobs, programs, and resources tailored for you.
+      </p>
+    </div>
+    <span class="vp-sidebar-badge" style="padding:6px 16px;font-size:11px;">
+      <i class="fas fa-medal me-1"></i>Verified Veteran
+    </span>
+  </div>
+ 
+ 
+  <!-- ── PROFILE ALERTS ────────────────────────────────────── -->
+  {% if current_user.veteran_profile %}
+    {% set profile = current_user.veteran_profile %}
+    {% if profile.verification_status == 'pending' %}
+    <div class="vp-dash-alert vp-dash-alert-warning">
+      <i class="fas fa-clock"></i>
+      <span>Your profile is under review. You'll be notified once verified.</span>
+    </div>
+    {% elif profile.verification_status == 'approved' %}
+        <div class="vp-dash-alert vp-dash-alert-success auto-dismiss">
+      <i class="fas fa-check-circle"></i>
+      <span>Profile verified! You can now apply for jobs.</span>
+      <a href="{{ url_for('jobs.job_board') }}" class="btn-vp-primary ms-auto"
+         style="padding:8px 18px;font-size:11px;">
+        <i class="fas fa-briefcase"></i><span>Browse Jobs</span>
+      </a>
+    </div>
+    {% endif %}
+  {% else %}
+  <div class="vp-dash-alert vp-dash-alert-info">
+    <i class="fas fa-info-circle"></i>
+    <span>Complete your profile to access jobs and all platform resources.</span>
+    <a href="{{ url_for('veteran.complete_profile') }}" class="btn-vp-primary ms-auto"
+       style="padding:8px 18px;font-size:11px;">
+      <i class="fas fa-user-plus"></i><span>Complete Profile</span>
+    </a>
+  </div>
+  {% endif %}
+ 
+ 
+  <!-- ── STAT CARDS ────────────────────────────────────────── -->
+  <div class="row g-3 mb-4">
+ 
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number">{{ stats.total_applications }}</div>
+          <div class="vp-dash-stat-label">Applications</div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(212,175,55,0.1);color:var(--gold);">
+          <i class="fas fa-file-alt"></i>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number">{{ stats.interviews }}</div>
+          <div class="vp-dash-stat-label">Interviews</div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(74,222,128,0.1);color:#4ade80;">
+          <i class="fas fa-handshake"></i>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number">{{ stats.active_jobs }}</div>
+          <div class="vp-dash-stat-label">Active Jobs</div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(96,165,250,0.1);color:#60a5fa;">
+          <i class="fas fa-briefcase"></i>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number">{{ stats.profile_completion }}%</div>
+          <div class="vp-dash-stat-label">Profile Complete</div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24;">
+          <i class="fas fa-user"></i>
+        </div>
+      </div>
+    </div>
+ 
+  </div>
+ 
+ 
+  <div class="row g-4">
+ 
+    <!-- ── MAIN COLUMN ─────────────────────────────────────── -->
+    <div class="col-lg-8">
+ 
+      <!-- Quick Actions -->
+      <div class="vp-dash-card">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-rocket me-2"></i>Quick Actions</span>
+        </div>
+        <div class="vp-dash-card-body">
+          <div class="row g-3">
+            <div class="col-6 col-md-3">
+              <a href="{{ url_for('jobs.job_board') }}" class="vp-quick-action">
+                <i class="fas fa-search"></i>
+                <strong>Browse Jobs</strong>
+                <small>Find opportunities</small>
+              </a>
+            </div>
+            <div class="col-6 col-md-3">
+              <a href="{{ url_for('applications.my_applications') }}" class="vp-quick-action">
+                <i class="fas fa-file-alt"></i>
+                <strong>Applications</strong>
+                <small>Track your jobs</small>
+              </a>
+            </div>
+            <div class="col-6 col-md-3">
+              <a href="{{ url_for('dashboard.profile') }}" class="vp-quick-action">
+                <i class="fas fa-user-edit"></i>
+                <strong>Profile</strong>
+                <small>Update your info</small>
+              </a>
+            </div>
+            <div class="col-6 col-md-3">
+              <a href="{{ url_for('services.cv_optimize_page') }}" class="vp-quick-action">
+                <i class="fas fa-magic"></i>
+                <strong>Optimize CV</strong>
+                <small>Stand out to employers</small>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+ 
+ 
+      <!-- Recent Applications -->
+      <div class="vp-dash-card">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-file-alt me-2"></i>Recent Applications</span>
+          {% if recent_applications %}
+          <a href="{{ url_for('applications.my_applications') }}"
+             class="vp-auth-link" style="font-size:12px;">View All →</a>
+          {% endif %}
+        </div>
+        <div class="vp-dash-card-body">
+          {% if recent_applications %}
+            {% for application in recent_applications %}
+            <div class="vp-application-item">
+              <div>
+                <span class="vp-application-title">{{ application.job_post.title }}</span>
+                <span class="vp-application-meta">
+                  {{ application.job_post.company_name }} &nbsp;•&nbsp;
+                  Applied {{ application.created_at.strftime('%b %d, %Y') }}
+                </span>
+              </div>
+              <span class="badge"
+                    style="background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);font-family:var(--font-cond);font-size:10px;letter-spacing:1px;padding:4px 10px;border-radius:2px;white-space:nowrap;">
+                {{ application.get_status_display() }}
+              </span>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="vp-empty-state py-3">
+              <i class="fas fa-inbox fa-2x mb-3" style="color:rgba(212,175,55,0.3);"></i>
+              <p class="section-label mb-2">No Applications Yet</p>
+              <p style="color:rgba(255,255,255,0.35);font-size:13px;margin-bottom:16px;">
+                Start applying to jobs that match your military background.
+              </p>
+              <a href="{{ url_for('jobs.job_board') }}" class="btn-vp-primary" style="padding:10px 24px;">
+                <i class="fas fa-search"></i><span>Browse Jobs</span>
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+ 
+ 
+      <!-- Recommended Jobs -->
+      <div class="vp-dash-card">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-lightbulb me-2"></i>Recommended Jobs</span>
+        </div>
+        <div class="vp-dash-card-body" id="recommendedJobs">
+          <div class="text-center py-3" style="color:rgba(255,255,255,0.3);">
+            <i class="fas fa-spinner fa-spin me-2"></i>Loading recommendations...
+          </div>
+        </div>
+      </div>
+ 
+    </div>
+ 
+ 
+    <!-- ── SIDEBAR COLUMN ──────────────────────────────────── -->
+    <div class="col-lg-4">
+ 
+      <!-- Profile Completion -->
+      <div class="vp-dash-card">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-tasks me-2"></i>Profile Status</span>
+        </div>
+        <div class="vp-dash-card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span style="font-size:13px;color:rgba(255,255,255,0.5);">Completion</span>
+            <span style="font-family:var(--font-cond);font-weight:800;color:var(--gold);">
+              {{ stats.profile_completion }}%
+            </span>
+          </div>
+          <div class="vp-progress-bar-wrapper mb-4">
+            <div class="vp-progress-bar-fill" style="width:{{ stats.profile_completion }}%;"></div>
+          </div>
+ 
+          <div class="vp-checklist-item">
+            <i class="fas {% if current_user.first_name and current_user.last_name %}fa-check-circle vp-check-yes{% else %}fa-circle vp-check-no{% endif %}"></i>
+            <span>Basic Information</span>
+          </div>
+          <div class="vp-checklist-item">
+            <i class="fas {% if current_user.veteran_profile and current_user.veteran_profile.service_branch and current_user.veteran_profile.rank %}fa-check-circle vp-check-yes{% else %}fa-circle vp-check-no{% endif %}"></i>
+            <span>Military Experience</span>
+          </div>
+          <div class="vp-checklist-item">
+            <i class="fas {% if current_user.veteran_profile and ((current_user.veteran_profile.skills or '')|length > 0 or (current_user.veteran_profile.certifications or '')|length > 0) %}fa-check-circle vp-check-yes{% else %}fa-circle vp-check-no{% endif %}"></i>
+            <span>Skills & Certifications</span>
+          </div>
+        </div>
+      </div>
+ 
+ 
+      <!-- Boost Card -->
+      <div class="vp-dash-card {% if current_user.veteran_profile and current_user.veteran_profile.is_boosted() %}vp-boost-card-active{% endif %}">
+        {% if current_user.veteran_profile and current_user.veteran_profile.is_boosted() %}
+        <div class="vp-dash-card-header" style="color:#fbbf24;border-bottom-color:rgba(251,191,36,0.1);">
+          <span><i class="fas fa-fire me-2"></i>Profile Boosted</span>
+          <span style="background:rgba(251,191,36,0.15);color:#fbbf24;font-size:10px;padding:3px 8px;border-radius:2px;border:1px solid rgba(251,191,36,0.3);">ACTIVE</span>
+        </div>
+        <div class="vp-dash-card-body text-center">
+          <p style="font-family:var(--font-display);font-size:15px;color:rgba(255,255,255,0.65);line-height:1.7;margin-bottom:16px;">
+            Your profile is appearing at the top of employer searches and AI suggestions.
+          </p>
+          <p style="font-size:13px;color:#fbbf24;margin-bottom:20px;">
+            <i class="fas fa-clock me-1"></i>
+            {{ current_user.veteran_profile.boost_days_remaining() }} day{{ 's' if current_user.veteran_profile.boost_days_remaining() != 1 else '' }} remaining
+          </p>
+          <a href="{{ url_for('payments.veteran_boost_payment') }}"
+             style="display:inline-flex;align-items:center;gap:8px;padding:11px 24px;background:rgba(251,191,36,0.15);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;border-radius:2px;font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-decoration:none;width:100%;justify-content:center;transition:all 0.2s ease;">
+            <i class="fas fa-plus"></i> Extend Boost (₦{{ "{:,.0f}".format(boost_fee) }})
+          </a>
+        </div>
+ 
+        {% else %}
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-rocket me-2" style="color:#fbbf24;"></i>Boost Your Profile</span>
+        </div>
+        <div class="vp-dash-card-body">
+          <p style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:16px;">
+            Appear at the top of employer searches and AI suggestions for <strong style="color:#ffffff;">7 days</strong>.
+          </p>
+          <ul class="vp-employer-bullets mb-4" style="gap:10px;">
+            <li>
+              <span class="vp-bullet-icon" style="width:24px;height:24px;font-size:9px;background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.3);color:#fbbf24;">
+                <i class="fas fa-arrow-up"></i>
+              </span>
+              <span style="font-size:13px;">Top of all employer searches</span>
+            </li>
+            <li>
+              <span class="vp-bullet-icon" style="width:24px;height:24px;font-size:9px;background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.3);color:#fbbf24;">
+                <i class="fas fa-robot"></i>
+              </span>
+              <span style="font-size:13px;">First in AI matching results</span>
+            </li>
+            <li>
+              <span class="vp-bullet-icon" style="width:24px;height:24px;font-size:9px;background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.3);color:#fbbf24;">
+                <i class="fas fa-star"></i>
+              </span>
+              <span style="font-size:13px;">Boosted badge on your profile</span>
+            </li>
+          </ul>
+          <a href="{{ url_for('payments.veteran_boost_payment') }}"
+             style="display:inline-flex;align-items:center;gap:8px;padding:13px 24px;background:#fbbf24;color:#0a1628;border-radius:2px;font-family:var(--font-cond);font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;text-decoration:none;width:100%;justify-content:center;transition:all 0.2s ease;">
+            <i class="fas fa-rocket"></i> Boost for ₦{{ "{:,.0f}".format(boost_fee) }}
+          </a>
+          <small style="display:block;text-align:center;margin-top:10px;color:rgba(255,255,255,0.25);font-size:11px;">
+            7-day boost · Instant activation
+          </small>
+        </div>
+        {% endif %}
+      </div>
+ 
+ 
+      <!-- Resources -->
+      <div class="vp-dash-card">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-book me-2"></i>Resources</span>
+        </div>
+        <div class="vp-dash-card-body">
+          <a href="{{ url_for('resources.by_category', category='career') }}" class="vp-resource-btn">
+            <i class="fas fa-graduation-cap"></i> Career Resources
+          </a>
+          <a href="{{ url_for('services.cv_optimize_page') }}" class="vp-resource-btn">
+            <i class="fas fa-file-pdf"></i> Upgrade CV
+          </a>
+          <a href="{{ url_for('resources.by_category', category='interview') }}" class="vp-resource-btn">
+            <i class="fas fa-comments"></i> Interview Tips
+          </a>
+          <a href="{{ url_for('resources.by_category', category='networking') }}" class="vp-resource-btn">
+            <i class="fas fa-network-wired"></i> Networking Events
+          </a>
+          <a href="https://chat.whatsapp.com/FiXN7lzXYi6IvxjhXMcx2E"
+             target="_blank" rel="noopener noreferrer"
+             class="vp-resource-btn" style="color:rgba(37,211,102,0.7);border-color:rgba(37,211,102,0.15);">
+            <i class="fab fa-whatsapp" style="color:rgba(37,211,102,0.5);"></i> Veteran Community
+          </a>
+        </div>
+      </div>
+ 
+ 
+      <!-- Support -->
+      <div class="vp-dash-card">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-life-ring me-2"></i>Support</span>
+        </div>
+        <div class="vp-dash-card-body">
+          <p style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:16px;line-height:1.7;">
+            Need help? Our veteran support team is ready to assist you.
+          </p>
+          <a href="{{ url_for('main.contact') }}" class="vp-resource-btn">
+            <i class="fas fa-envelope"></i> Contact Support
+          </a>
+          <a href="#" class="vp-resource-btn">
+            <i class="fas fa-question-circle"></i> FAQ
+          </a>
+        </div>
+      </div>
+ 
+    </div>
+  </div>
+</div>
+ {% endblock %}
+ 
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  const container = document.getElementById('recommendedJobs');
+  if (!container) return;
+
+  fetch('/search/suggestions/jobs')
+    .then(r => r.json())
+    .then(data => {
+      container.innerHTML = '';
+      const jobs = data.recommendations || [];
+
+      if (!jobs.length) {
+        container.innerHTML = `
+          <div class="vp-empty-state py-3">
+            <i class="fas fa-briefcase fa-2x mb-3" style="color:rgba(212,175,55,0.3);"></i>
+            <p class="section-label mb-1">No Recommendations Yet</p>
+            <p style="color:rgba(255,255,255,0.35);font-size:13px;">
+              Complete your profile or boost to unlock smarter matches.
+            </p>
+          </div>`;
+        return;
+      }
+
+      jobs.forEach(job => {
+        const card = document.createElement('div');
+        card.className = 'vp-job-rec-card';
+        card.innerHTML = `
+          <a href="${job.job_url}" class="vp-job-rec-title">${job.title}
+            ${job.match_score > 0
+              ? `<span style="background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);font-family:var(--font-cond);font-size:10px;letter-spacing:1px;padding:2px 8px;border-radius:2px;margin-left:8px;">${job.match_score}% Match</span>`
+              : ''}
+          </a>
+          <p class="vp-job-rec-meta">${job.company_name} &nbsp;•&nbsp; ${job.location}</p>
+          <a href="${job.apply_url}" class="vp-job-rec-btn">
+            <i class="fas fa-arrow-right"></i> Apply Now
+          </a>`;
+        container.appendChild(card);
+      });
+    })
+    .catch(() => {
+      container.innerHTML = `
+        <div class="vp-empty-state py-3">
+          <i class="fas fa-briefcase fa-2x mb-3" style="color:rgba(212,175,55,0.3);"></i>
+          <p style="color:rgba(255,255,255,0.35);font-size:13px;">
+            No recommendations yet. Complete your profile to unlock smarter matches.
+          </p>
+        </div>`;
+    });
+
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  const alerts = document.querySelectorAll('.auto-dismiss');
+
+  alerts.forEach(alert => {
+    setTimeout(() => {
+      alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      alert.style.opacity = '0';
+      alert.style.transform = 'translateY(-10px)';
+
+      setTimeout(() => {
+        alert.remove();
+      }, 500);
+
+    }, 4000); // ⏱ 4 seconds (adjust if needed)
+  });
+
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  const alert = document.querySelector('.auto-dismiss');
+
+  if (!alert) return;
+
+  // prevent showing again
+  if (localStorage.getItem('profileAlertSeen')) {
+    alert.remove();
+    return;
+  }
+
+  setTimeout(() => {
+    alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    alert.style.opacity = '0';
+    alert.style.transform = 'translateY(-10px)';
+
+    setTimeout(() => {
+      alert.remove();
+    }, 500);
+
+    localStorage.setItem('profileAlertSeen', 'true');
+
+  }, 4000);
+
+});
+</script>
+{% endblock %}

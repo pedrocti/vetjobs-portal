@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+{% block title %}Complete Employer Profile - VetJobs Portal{% endblock %}
+
+{% block content %}
+<div class="vp-auth-wrapper" style="align-items:flex-start;padding:40px 20px;">
+  <div class="vp-auth-card" style="max-width:900px;width:100%;">
+
+    <!-- Header -->
+    <div class="vp-auth-header">
+      <div class="hero-top-accent" style="position:relative;height:2px;border-radius:0;"></div>
+      <div class="vp-auth-header-inner">
+        <div class="vp-auth-logo-ring">
+          <i class="fas fa-building"></i>
+        </div>
+        <p class="section-label mb-1">VetJobPortal</p>
+        <h2 class="vp-auth-title">Complete Your Employer Profile</h2>
+        <p class="vp-auth-subtitle" style="max-width:640px;margin:0 auto;">
+          Finalize your organisation details to unlock full access to veteran talent pools,
+          post opportunities, and build meaningful partnerships across Africa.
+        </p>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="vp-auth-body" style="padding:40px 48px;">
+      <form method="POST" enctype="multipart/form-data" id="employerProfileForm">
+
+
+        <!-- ── ORGANISATION DETAILS ──────────────────────────── -->
+        <div class="vp-profile-section">
+          <div class="vp-profile-section-header">
+            <div class="vp-detail-icon"><i class="fas fa-building"></i></div>
+            <h5 class="vp-profile-section-title">Organisation Details</h5>
+          </div>
+          <div class="vp-divider left"></div>
+
+          <div class="row g-4 mb-2">
+
+            <div class="col-md-6">
+              <label class="form-label">Company Name <span class="vp-required">*</span></label>
+              <input type="text" class="form-control" name="company_name"
+                     value="{{ profile.company_name if profile else '' }}"
+                     placeholder="Your company name" required maxlength="200">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Company Email <span class="vp-required">*</span></label>
+              <input type="email" class="form-control" name="company_email"
+                     value="{{ profile.company_email if profile else '' }}"
+                     placeholder="company@email.com" required maxlength="120">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Company Website</label>
+              <input type="text" class="form-control" name="company_website"
+                     value="{{ profile.company_website if profile else '' }}"
+                     placeholder="https://yourcompany.com" maxlength="200">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Company Logo</label>
+              <input type="file" class="form-control" name="company_logo" accept="image/*">
+              <small class="vp-form-hint">PNG or JPG recommended — max 5MB</small>
+              {% if profile and profile.company_logo %}
+              <div class="vp-employer-logo-preview mt-3">
+                <img src="{{ url_for('static', filename='uploads/' ~ profile.company_logo) }}"
+                     alt="Current Logo">
+                <small class="vp-form-hint d-block mt-2">Current logo — upload new to replace</small>
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Industry <span class="vp-required">*</span></label>
+              <select class="form-select" name="industry" required>
+                <option value="">Select Industry</option>
+                {% for i in ['Technology','Healthcare','Finance','Manufacturing','Construction','Retail','Education','Government','Non-Profit','Other'] %}
+                  <option value="{{ i }}" {{ 'selected' if profile and profile.industry == i else '' }}>{{ i }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Company Size</label>
+              <select class="form-select" name="company_size">
+                <option value="">Select Size</option>
+                {% for size in ['1-10','11-50','51-200','201-500','500+'] %}
+                  <option value="{{ size }}" {{ 'selected' if profile and profile.company_size == size else '' }}>
+                    {{ size }} employees
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Company Address</label>
+              <textarea class="form-control" name="company_address" rows="2"
+                        placeholder="Full company address">{{ profile.company_address if profile else '' }}</textarea>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Company Description</label>
+              <textarea class="form-control" name="company_description" rows="4"
+                        placeholder="What does your organisation do? What makes you stand out?">{{ profile.company_description if profile else '' }}</textarea>
+              <small class="vp-form-hint">Visible to veterans browsing employer profiles — make it compelling.</small>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Diversity & Inclusion Statement</label>
+              <textarea class="form-control" name="diversity_statement" rows="4"
+                        placeholder="Describe your commitment to diversity, equity, and inclusion">{{ profile.diversity_statement if profile else '' }}</textarea>
+              <small class="vp-form-hint">Veterans respond strongly to employers who articulate their values clearly.</small>
+            </div>
+
+          </div>
+        </div>
+
+
+        <!-- ── PRIMARY CONTACT ───────────────────────────────── -->
+        <div class="vp-profile-section">
+          <div class="vp-profile-section-header">
+            <div class="vp-detail-icon"><i class="fas fa-user-tie"></i></div>
+            <h5 class="vp-profile-section-title">Primary Contact (HR / Recruiter)</h5>
+          </div>
+          <div class="vp-divider left"></div>
+
+          <div class="row g-4 mb-2">
+
+            <div class="col-md-6">
+              <label class="form-label">Full Name <span class="vp-required">*</span></label>
+              <input type="text" class="form-control" name="recruiter_name"
+                     value="{{ profile.recruiter_name if profile else '' }}"
+                     placeholder="Recruiter or HR manager name"
+                     required maxlength="100">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Position / Title <span class="vp-required">*</span></label>
+              <input type="text" class="form-control" name="recruiter_position"
+                     value="{{ profile.recruiter_position if profile else '' }}"
+                     placeholder="e.g. HR Manager, Talent Acquisition Lead"
+                     required maxlength="100">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Email Address <span class="vp-required">*</span></label>
+              <input type="email" class="form-control" name="recruiter_email"
+                     value="{{ profile.recruiter_email if profile else '' }}"
+                     placeholder="recruiter@company.com"
+                     required maxlength="120">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Phone Number</label>
+              <div class="vp-input-group">
+                <span class="vp-input-icon"><i class="fas fa-phone"></i></span>
+                <input type="tel" class="form-control vp-input-with-icon"
+                       id="recruiter_phone" name="recruiter_phone"
+                       value="{{ profile.recruiter_phone if profile else '' }}"
+                       placeholder="+234 000 000 0000"
+                       maxlength="20">
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">LinkedIn Profile</label>
+              <div class="vp-input-group">
+                <span class="vp-input-icon"><i class="fab fa-linkedin-in"></i></span>
+                <input type="url" class="form-control vp-input-with-icon"
+                       name="hr_linkedin"
+                       value="{{ profile.hr_linkedin if profile else '' }}"
+                       placeholder="https://linkedin.com/in/yourprofile"
+                       maxlength="200">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+
+        <!-- ── WORK ENVIRONMENT & BENEFITS ───────────────────── -->
+        <div class="vp-profile-section">
+          <div class="vp-profile-section-header">
+            <div class="vp-detail-icon"><i class="fas fa-briefcase"></i></div>
+            <h5 class="vp-profile-section-title">Work Environment & Benefits</h5>
+          </div>
+          <div class="vp-divider left"></div>
+
+          <div class="row g-4 mb-2">
+
+            <div class="col-12">
+              <label class="form-label">Work Type</label>
+              <input type="text" class="form-control" name="work_type"
+                     value="{{ profile.work_type if profile else '' }}"
+                     placeholder="e.g. Hybrid, Remote, On-site, Flexible">
+              <small class="vp-form-hint">Veterans highly value flexibility — be specific.</small>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Employee Benefits</label>
+              <textarea class="form-control" name="benefits" rows="4"
+                        placeholder="Health insurance, flexible hours, professional development, pension...">{{ profile.benefits if profile else '' }}</textarea>
+              <small class="vp-form-hint">List key benefits clearly — this influences a veteran's decision to apply.</small>
+            </div>
+
+          </div>
+        </div>
+
+
+        <!-- ── ADMIN SECTION (admin only) ────────────────────── -->
+        {% if current_user.is_admin() %}
+        <div class="vp-profile-section">
+          <div class="vp-profile-section-header">
+            <div class="vp-detail-icon" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);">
+              <i class="fas fa-user-shield" style="color:#f87171;"></i>
+            </div>
+            <h5 class="vp-profile-section-title" style="color:#f87171;">Admin Review</h5>
+          </div>
+          <div class="vp-divider left" style="background:linear-gradient(90deg,#ef4444,transparent);"></div>
+
+          <div class="row g-4 mb-2">
+            <div class="col-md-6">
+              <label class="form-label">Verification Status</label>
+              <select class="form-select" name="verification_status">
+                <option value="pending"  {{ 'selected' if profile and profile.verification_status == 'pending'  else '' }}>Pending</option>
+                <option value="approved" {{ 'selected' if profile and profile.verification_status == 'approved' else '' }}>Approved</option>
+                <option value="rejected" {{ 'selected' if profile and profile.verification_status == 'rejected' else '' }}>Rejected</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Admin Notes</label>
+              <textarea class="form-control" name="admin_notes" rows="3"
+                        placeholder="Internal notes for review...">{{ profile.admin_notes if profile else '' }}</textarea>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+
+        <!-- ── CONSENT ────────────────────────────────────────── -->
+        <div class="vp-profile-section" style="border-bottom:none;padding-bottom:0;margin-bottom:32px;">
+          <label class="vp-consent-label">
+            <input type="checkbox" name="data_consent" class="vp-consent-check" required>
+            <span>
+              I consent to the secure use of this organisation and contact data for verification,
+              matching, and communication purposes within the VetJobPortal ecosystem.
+            </span>
+          </label>
+        </div>
+
+
+        <!-- ── SUBMIT ─────────────────────────────────────────── -->
+        <div class="d-flex flex-column flex-md-row gap-3 justify-content-center pt-4"
+             style="border-top:1px solid rgba(212,175,55,0.1);">
+          <button type="submit" class="btn-vp-primary" id="submitBtn">
+            <i class="fas fa-check-circle"></i>
+            <span>Save & Complete Profile</span>
+          </button>
+          <a href="mailto:support@veteranjobportal.com" class="btn-vp-ghost">
+            <i class="fas fa-life-ring"></i>
+            <span>Contact Support</span>
+          </a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     ADD ONLY THESE TO premium-upgrade.css — 1 tiny block
+     ═══════════════════════════════════════════════════════════════ -->
+<style>
+
+/* ── Employer logo preview ── */
+.vp-employer-logo-preview img {
+  max-width: 160px;
+  border-radius: 8px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+</style>
+
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  const form      = document.getElementById('employerProfileForm');
+  const submitBtn = document.getElementById('submitBtn');
+
+  /* ── Form validation + loading state ── */
+  form.addEventListener('submit', function (e) {
+    const requiredFields = form.querySelectorAll('[required]');
+    let hasError = false;
+
+    requiredFields.forEach(field => {
+      if (field.type === 'checkbox') {
+        field.classList.toggle('vp-field-error', !field.checked);
+        if (!field.checked) hasError = true;
+      } else {
+        const empty = !field.value.trim();
+        field.classList.toggle('is-invalid', empty);
+        if (empty) hasError = true;
+      }
+    });
+
+    if (hasError) {
+      e.preventDefault();
+      alert('Please complete all required fields and accept the consent agreement.');
+      return false;
+    }
+
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Saving Profile...</span>';
+    submitBtn.style.opacity      = '0.7';
+    submitBtn.style.pointerEvents = 'none';
+  });
+
+  /* ── Real-time validation ── */
+  form.querySelectorAll('input[required], select[required], textarea[required]').forEach(input => {
+    input.addEventListener('blur',  function () {
+      if (!this.value.trim() && this.type !== 'checkbox') this.classList.add('is-invalid');
+      else this.classList.remove('is-invalid');
+    });
+    input.addEventListener('input', function () {
+      if (this.value.trim()) this.classList.remove('is-invalid');
+    });
+  });
+
+  /* ── Phone formatting (Nigeria-focused) ── */
+  const phoneInput = document.getElementById('recruiter_phone');
+  if (phoneInput) {
+    phoneInput.addEventListener('input', function (e) {
+      let val = e.target.value.replace(/\D/g, '');
+      if (val.startsWith('234')) val = '+' + val;
+      else if (val.length > 0 && !val.startsWith('+')) val = '+234' + val;
+      e.target.value = val;
+    });
+  }
+
+});
+</script>
+{% endblock %}
+
+{% endblock %}

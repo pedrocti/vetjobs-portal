@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to the Platform!{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Success Header -->
+            <div class="text-center mb-5">
+                <div class="mb-4">
+                    <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                </div>
+                <h1 class="h2 text-success mb-3">
+                    🎉 Onboarding Complete!
+                </h1>
+                <p class="lead text-muted">
+                    Welcome to the Veteran-Employer Job Portal, <strong>{{ profile.company_name }}</strong>!
+                </p>
+            </div>
+
+            <!-- Success Message Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5 class="text-success mb-3">
+                                <i class="fas fa-building me-2"></i>Your Company Profile is Ready
+                            </h5>
+                            <p class="mb-3">
+                                Your employer profile has been successfully created and is currently under review. 
+                                Here's what happens next:
+                            </p>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-clock text-warning me-2"></i>
+                                    <strong>Pending Verification:</strong> Our team will review your company information within 24-48 hours
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-calendar-days text-info me-2"></i>
+                                    <strong>7-Day Free Trial:</strong> You have full access to all features during verification
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-users text-primary me-2"></i>
+                                    <strong>Access to Veterans:</strong> Browse and connect with qualified military professionals
+                                </li>
+                                <li class="mb-0">
+                                    <i class="fas fa-briefcase text-success me-2"></i>
+                                    <strong>Job Posting:</strong> Start posting job opportunities immediately
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="bg-light rounded p-3">
+                                <h6 class="text-muted mb-2">Verification Status</h6>
+                                <span class="badge bg-warning fs-6 px-3 py-2">
+                                    <i class="fas fa-clock me-1"></i>Pending Review
+                                </span>
+                                <div class="mt-3 text-muted small">
+                                    <i class="fas fa-info-circle"></i>
+                                    You'll receive an email once verified
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="card h-100 border-primary">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="fas fa-tachometer-alt text-primary" style="font-size: 2rem;"></i>
+                            </div>
+                            <h5 class="card-title">Go to Dashboard</h5>
+                            <p class="card-text text-muted">
+                                Access your employer dashboard to post jobs, manage applications, and browse veteran profiles.
+                            </p>
+                            <a href="{{ url_for('dashboard.employer') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-arrow-right me-2"></i>Go to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100 border-secondary">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="fas fa-credit-card text-secondary" style="font-size: 2rem;"></i>
+                            </div>
+                            <h5 class="card-title">Choose Subscription Plan</h5>
+                            <p class="card-text text-muted">
+                                Explore our subscription plans to unlock premium features and extended access to our platform.
+                            </p>
+                            <a href="#" class="btn btn-outline-secondary btn-lg" onclick="showSubscriptionModal()">
+                                <i class="fas fa-crown me-2"></i>Choose Plan
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Getting Started Tips -->
+            <div class="card border-info mb-4">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>Getting Started Tips
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-info">
+                                <i class="fas fa-rocket me-2"></i>Quick Start
+                            </h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-plus text-success me-2"></i>
+                                    <a href="{{ url_for('employer.post_job') }}" class="text-decoration-none">Post your first job</a>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-search text-primary me-2"></i>
+                                    <a href="{{ url_for('search.search_veterans') }}" class="text-decoration-none">Browse veteran profiles</a>
+                                </li>
+                                <li class="mb-0">
+                                    <i class="fas fa-cog text-secondary me-2"></i>
+                                    <a href="{{ url_for('dashboard.profile') }}" class="text-decoration-none">Update your settings</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-info">
+                                <i class="fas fa-question-circle me-2"></i>Need Help?
+                            </h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-book text-warning me-2"></i>
+                                    <a href="#" class="text-decoration-none">Platform Guide</a>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-envelope text-info me-2"></i>
+                                    <a href="mailto:support@veteranjobportal.com" class="text-decoration-none">Contact Support</a>
+                                </li>
+                                <li class="mb-0">
+                                    <i class="fas fa-phone text-success me-2"></i>
+                                    <span class="text-muted">Call us: +234 XXX XXX XXXX</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Company Information Summary -->
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="text-muted mb-3">
+                        <i class="fas fa-info-circle me-2"></i>Your Company Information
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Company:</strong> {{ profile.company_name }}</p>
+                            <p class="mb-1"><strong>Industry:</strong> {{ profile.industry }}</p>
+                            {% if profile.company_size %}
+                            <p class="mb-1"><strong>Size:</strong> {{ profile.company_size }} employees</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Recruiter:</strong> {{ profile.recruiter_name }}</p>
+                            <p class="mb-1"><strong>Email:</strong> {{ profile.recruiter_email }}</p>
+                            <p class="mb-1"><strong>Phone:</strong> {{ profile.recruiter_phone }}</p>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('employer.complete_profile') }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-edit me-1"></i>Edit Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Subscription Plans Modal -->
+<div class="modal fade" id="subscriptionModal" tabindex="-1" aria-labelledby="subscriptionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="subscriptionModalLabel">
+                    <i class="fas fa-crown me-2"></i>Choose Your Subscription Plan
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <!-- Basic Plan -->
+                    <div class="col-md-4">
+                        <div class="card border-secondary h-100">
+                            <div class="card-header bg-secondary text-white text-center">
+                                <h6 class="mb-0">Basic</h6>
+                            </div>
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <span class="h3">₦{{ "{:,}".format(basic_plan_amount|int) }}</span>
+                                    <span class="text-muted">/month</span>
+                                </div>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">✅ 5 Job Postings</li>
+                                    <li class="mb-2">✅ Basic Veteran Search</li>
+                                    <li class="mb-2">✅ Email Support</li>
+                                    <li class="mb-2">❌ Premium Features</li>
+                                </ul>
+                                <button class="btn btn-outline-secondary">Choose Basic</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Premium Plan -->
+                    <div class="col-md-4">
+                        <div class="card border-primary h-100">
+                            <div class="card-header bg-primary text-white text-center">
+                                <h6 class="mb-0">Premium <span class="badge bg-warning text-dark">Popular</span></h6>
+                            </div>
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <span class="h3">₦{{ "{:,}".format(premium_plan_amount|int) }}</span>
+                                    <span class="text-muted">/month</span>
+                                </div>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">✅ Unlimited Job Postings</li>
+                                    <li class="mb-2">✅ Advanced Search & Filters</li>
+                                    <li class="mb-2">✅ Priority Support</li>
+                                    <li class="mb-2">✅ Analytics & Insights</li>
+                                </ul>
+                                <button class="btn btn-primary">Choose Premium</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Enterprise Plan -->
+                    <div class="col-md-4">
+                        <div class="card border-warning h-100">
+                            <div class="card-header bg-warning text-dark text-center">
+                                <h6 class="mb-0">Enterprise</h6>
+                            </div>
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <span class="h3">₦75,000</span>
+                                    <span class="text-muted">/month</span>
+                                </div>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">✅ Everything in Premium</li>
+                                    <li class="mb-2">✅ Dedicated Account Manager</li>
+                                    <li class="mb-2">✅ Custom Integrations</li>
+                                    <li class="mb-2">✅ White-label Options</li>
+                                </ul>
+                                <button class="btn btn-warning">Contact Sales</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-4">
+                    <i class="fas fa-gift me-2"></i>
+                    <strong>Special Offer:</strong> You're currently on a 7-day free trial with full Premium access. 
+                    Choose a plan before your trial ends to continue using all features.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Maybe Later</button>
+                <a href="{{ url_for('dashboard.employer') }}" class="btn btn-primary">Continue with Free Trial</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showSubscriptionModal() {
+    const modal = new bootstrap.Modal(document.getElementById('subscriptionModal'));
+    modal.show();
+}
+
+// Remove auto-redirect - let user choose their own path
+// User will manually click on either "Go to Dashboard" or "Choose Subscription Plan"
+</script>
+{% endblock %}

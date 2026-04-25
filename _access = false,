@@ -1,0 +1,46 @@
+                                                Table "public.subscription"
+           Column           |            Type             | Collation | Nullable |                 Default                  
+----------------------------+-----------------------------+-----------+----------+------------------------------------------
+ id                         | integer                     |           | not null | nextval('subscription_id_seq'::regclass)
+ user_id                    | integer                     |           | not null | 
+ plan_type                  | character varying(30)       |           | not null | 
+ status                     | character varying(20)       |           |          | 
+ amount                     | numeric(10,2)               |           | not null | 
+ currency                   | character varying(3)        |           |          | 
+ billing_cycle              | character varying(20)       |           |          | 
+ started_at                 | timestamp without time zone |           | not null | 
+ expires_at                 | timestamp without time zone |           | not null | 
+ renewed_at                 | timestamp without time zone |           |          | 
+ cancelled_at               | timestamp without time zone |           |          | 
+ paystack_customer_code     | character varying(100)      |           |          | 
+ paystack_subscription_code | character varying(100)      |           |          | 
+ paystack_email_token       | character varying(100)      |           |          | 
+ auto_renew                 | boolean                     |           |          | 
+ next_payment_date          | timestamp without time zone |           |          | 
+ max_job_posts              | integer                     |           |          | 
+ can_contact_candidates     | boolean                     |           |          | 
+ can_export_resumes         | boolean                     |           |          | 
+ priority_support           | boolean                     |           |          | 
+ featured_jobs              | boolean                     |           |          | 
+ created_at                 | timestamp without time zone |           |          | 
+ updated_at                 | timestamp without time zone |           |          | 
+ social_promotion           | boolean                     |           |          | 
+ analytics_access           | boolean                     |           |          | 
+ dedicated_manager          | boolean                     |           |          | 
+ api_access                 | boolean                     |           |          | 
+ smart_candidate_matching   | boolean                     |           |          | 
+ ai_talent_suggestions      | boolean                     |           |          | 
+ bulk_messaging             | boolean                     |           |          | 
+ job_post_notifications     | boolean                     |           |          | 
+ employer_branding_page     | boolean                     |           |          | 
+ job_boosts                 | integer                     |           |          | 
+ team_accounts              | boolean                     |           |          | 
+ onboarding_training        | boolean                     |           |          | 
+ quarterly_hiring_report    | boolean                     |           |          | 
+ white_label_portal         | boolean                     |           |          | 
+ co_branded_sponsorship     | boolean                     |           |          | 
+Indexes:
+    "subscription_pkey" PRIMARY KEY, btree (id)
+Foreign-key constraints:
+    "subscription_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id)
+

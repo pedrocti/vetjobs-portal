@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}New Message{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card p-4 shadow-sm">
+        <h4>Message {{ recipient.full_name or recipient.username }}</h4>
+        <form method="POST" action="{{ url_for('messaging.start_conversation', recipient_id=recipient.id) }}">
+            <div class="mb-3">
+                <label>Subject</label>
+                <input type="text" name="subject" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Message</label>
+                <textarea name="body" class="form-control" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

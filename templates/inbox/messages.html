@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}Inbox - {{ current_user.full_name }}{% endblock %}
+
+{% block content %}
+
+{% macro render_message(message) %}
+<a href="{{ url_for('messaging.view_message', message_id=message.id) }}"
+   class="list-group-item list-group-item-action d-flex align-items-start {{ 'unread-message' if not message.is_read else 'read-message' }}">
+
+    <!-- Avatar -->
+    <div class="avatar-circle me-3">
+        {{ message.sender.full_name[0]|upper }}
+    </div>
+
+    <div class="flex-grow-1">
+        <div class="d-flex justify-content-between">
+            <div>
+                <h6 class="mb-1 {{ 'fw-bold' if not message.is_read else '' }}">
+                    {{ message.subject }}
+                </h6>
+                <small class="text-muted">
+                    From: {{ message.sender.full_name }}
+                </small>
+            </div>
+            <small class="text-muted">
+                {{ message.created_at.strftime('%b %d') }}
+            </small>
+        </div>
+
+        <p class="mb-1 text-muted">
+            {{ message.body[:100] }}{% if message.body|length > 100 %}...{% endif %}
+        </p>
+
+        <div class="d-flex align-items-center">
+            {% if not message.is_read %}
+                <span class="badge bg-primary me-2">New</span>
+            {% endif %}
+
+            <span class="{{ message.priority_class }}">
+                <i class="{{ message.priority_icon }}"></i>
+            </span>
+
+            <small class="text-muted ms-2">
+                {{ message.formatted_created_at }}
+            </small>
+        </div>
+    </div>
+</a>
+{% endmacro %}
+
+<div class="container-fluid py-4">
+
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('dashboard.' + ('employer' if current_user.is_employer() else 'veteran')) }}">
+                    Dashboard
+                </a>
+            </li>
+            <li class="breadcrumb-item active">Inbox</li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">
+                <i class="fas fa-inbox me-2"></i>Inbox
+            </h1>
+            <p class="text-muted mb-0">
+                {% if current_user.is_employer() %}
+                    Messages (Inbox)
+                {% elif current_user.is_veteran() %}
+                    Messages from employers & admins
+                {% else %}
+                    Messages
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="btn-group">
+            <a href="{{ url_for('messaging.inbox') }}" class="btn btn-outline-primary">Inbox</a>
+            <a href="{{ url_for('messaging.sent_messages') }}" class="btn btn-outline-secondary">Sent</a>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card bg-primary text-white text-center">
+                <div class="card-body">
+                    <h3>{{ messages|length }}</h3>
+                    <p class="mb-0">Total</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card bg-warning text-dark text-center">
+                <div class="card-body">
+                    <h3>{{ unread_count }}</h3>
+                    <p class="mb-0">Unread</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card bg-success text-white text-center">
+                <div class="card-body">
+                    <h3>{{ messages|length - unread_count }}</h3>
+                    <p class="mb-0">Read</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-pills mb-3" id="messageTabs">
+        <li class="nav-item">
+            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#unread">
+                Unread ({{ unread_count }})
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#read">
+                Read ({{ messages|length - unread_count }})
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+
+        <!-- Unread -->
+        <div class="tab-pane fade show active" id="unread">
+            <div class="list-group">
+                {% set has_unread = false %}
+                {% for message in messages %}
+                    {% if not message.is_read %}
+                        {% set has_unread = true %}
+                        {{ render_message(message) }}
+                    {% endif %}
+                {% endfor %}
+
+                {% if not has_unread %}
+                    <div class="text-center py-4 text-muted"></div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Read -->
+        <div class="tab-pane fade" id="read">
+            <div class="list-group">
+                {% set has_read = false %}
+                {% for message in messages %}
+                    {% if message.is_read %}
+                        {% set has_read = true %}
+                        {{ render_message(message) }}
+                    {% endif %}
+                {% endfor %}
+
+                {% if not has_read %}
+                    <div class="text-center py-4 text-muted">No read messages</div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+/* Avatar */
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #0d6efd;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* Unread styling */
+.unread-message {
+    background-color: #000080;
+}
+
+/* Read styling */
+.read-message {
+    background-color: #040273;
+}
+</style>
+
+{% endblock %}

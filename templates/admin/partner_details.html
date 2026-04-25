@@ -1,0 +1,33 @@
+{% extends "admin/base.html" %}
+{% block admin_content %}
+<div class="container mt-4">
+    <h2>Partner Details</h2>
+    <div class="card p-4 mb-4">
+        <h5>{{ partner.name }}</h5>
+        <p><strong>Email:</strong> {{ partner.email }}</p>
+        <p><strong>Organization:</strong> {{ partner.organization or '-' }}</p>
+        <p><strong>Website:</strong> 
+            {% if partner.website %}
+                <a href="{{ partner.website }}" target="_blank">{{ partner.website }}</a>
+            {% else %}
+                -
+            {% endif %}
+        </p>
+        <p><strong>Status:</strong> 
+            {% if partner.is_verified %}
+                <span class="badge bg-success">Verified</span>
+            {% else %}
+                <span class="badge bg-warning text-dark">Pending</span>
+            {% endif %}
+        </p>
+
+        {% if not partner.is_verified %}
+        <form action="{{ url_for('training_partners.approve_partner', partner_id=partner.id) }}" method="POST">
+            <button type="submit" class="btn btn-success">Approve Partner</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <a href="{{ url_for('admin.manage_partners') }}" class="btn btn-secondary">Back to List</a>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="card">
+                <div class="card-body p-5">
+                    <i class="fas fa-exclamation-circle fa-4x text-danger mb-4"></i>
+                    <h1 class="h2 mb-3">Oops! Something went wrong</h1>
+                    <p class="lead text-muted mb-4">
+                        We're experiencing a temporary issue. Our team has been notified and is working to fix this.
+                    </p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{{ url_for('main.index') }}" class="btn btn-primary">
+                            <i class="fas fa-home me-1"></i>Go Home
+                        </a>
+                        <a href="javascript:location.reload()" class="btn btn-outline-secondary">
+                            <i class="fas fa-sync-alt me-1"></i>Try Again
+                        </a>
+                    </div>
+                    {% if config.DEBUG %}
+                    <div class="mt-4 text-start">
+                        <details class="small">
+                            <summary class="text-muted">Technical Details (Debug Mode)</summary>
+                            <pre class="mt-2 p-3 bg-light border rounded">{{ error_details if error_details else "No additional error details available." }}</pre>
+                        </details>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

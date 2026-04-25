@@ -1,0 +1,654 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Payment Settings - Admin Dashboard{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold">
+                        <i class="fas fa-cog me-2"></i>Payment Settings
+                    </h2>
+                    <p class="text-muted mb-0">Manage payment fees and pricing configuration</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('admin.payments_tracking') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-chart-line me-2"></i>View Revenue Analytics
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="row">
+    <!-- Payment Fees Configuration -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-money-bill-wave me-2"></i>Payment Fees & Pricing
+                </h5>
+            </div>
+                <div class="card-body bg-transparent">
+                <form method="POST" action="{{ url_for('admin.update_payment_settings') }}" id="paymentSettingsForm">
+                    <div class="row">
+                        <!-- Veteran Fees -->
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-primary mb-3">
+                                <i class="fas fa-shield-alt me-2"></i>Veteran Fees
+                            </h6>
+                            
+                            <div class="mb-3">
+                                <label for="verification_fee" class="form-label">
+                                    Verification Fee (₦)
+                                </label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="verification_fee" 
+                                       name="verification_fee" 
+                                       value="{{ settings.verification_fee.value if settings.verification_fee else '2000' }}"
+                                       min="0" 
+                                       step="100">
+                                <small class="form-text text-muted">
+                                    Fee charged for veteran account verification
+                                </small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="boost_fee" class="form-label">
+                                    Profile Boost Fee (₦)
+                                </label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="boost_fee" 
+                                       name="boost_fee" 
+                                       value="{{ settings.boost_fee.value if settings.boost_fee else '1000' }}"
+                                       min="0" 
+                                       step="100">
+                                <small class="form-text text-muted">
+                                    Fee charged for 7-day profile boost
+                                </small>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cv_optimization_fee" class="form-label">
+                                CV Optimization Fee (₦)
+                            </label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="cv_optimization_fee" 
+                                   name="cv_optimization_fee" 
+                                   value="{{ settings.cv_optimization_fee.value if settings.cv_optimization_fee else '5000' }}"
+                                   min="0" 
+                                   step="500">
+                            <small class="form-text text-muted">
+                                Fee charged for professional CV optimization service
+                            </small>
+                        </div>
+                        
+                    <!-- Employer Subscription Plans -->
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-warning mb-3">
+                            <i class="fas fa-crown me-2"></i>Employer Subscriptions
+                        </h6>
+
+                        <div class="mb-3">
+                            <label for="starter_plan_amount" class="form-label">
+                                Starter Plan (₦/month)
+                            </label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="starter_plan_amount" 
+                                   name="starter_plan_amount" 
+                                   value="{{ settings.starter_plan_amount.value if settings.starter_plan_amount else '20000' }}"
+                                   min="0" 
+                                   step="1000">
+                            <small class="form-text text-muted">
+                                Monthly fee for Starter subscription plan
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="professional_plan_amount" class="form-label">
+                                Professional Plan (₦/month)
+                            </label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="professional_plan_amount" 
+                                   name="professional_plan_amount" 
+                                   value="{{ settings.professional_plan_amount.value if settings.professional_plan_amount else '40000' }}"
+                                   min="0" 
+                                   step="1000">
+                            <small class="form-text text-muted">
+                                Monthly fee for Professional subscription plan
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="enterprise_plus_plan_amount" class="form-label">
+                                Enterprise Plus Plan (₦/month)
+                            </label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="enterprise_plus_plan_amount" 
+                                   name="enterprise_plus_plan_amount" 
+                                   value="{{ settings.enterprise_plus_plan_amount.value if settings.enterprise_plus_plan_amount else '120000' }}"
+                                   min="0" 
+                                   step="1000">
+                            <small class="form-text text-muted">
+                                Monthly fee for Enterprise Plus subscription plan
+                            </small>
+                        </div>
+                    </div>
+                    </div>
+
+                   
+                    <!-- Payment Gateway Selection -->
+                    <hr class="my-4">
+                    <div class="row">
+                        <div class="col-12">
+                            <h6 class="fw-bold text-success mb-3">
+                                <i class="fas fa-credit-card me-2"></i>Payment Gateway Configuration
+                            </h6>
+                        </div>
+                        
+                        <div class="col-md-12 mb-4">
+                            <div class="mb-3">
+                                <label for="payment_gateway" class="form-label">
+                                    Primary Payment Gateway
+                                </label>
+                                <select class="form-select" id="payment_gateway" name="payment_gateway">
+                                    <option value="paystack" {{ 'selected' if not settings.payment_gateway or settings.payment_gateway.value == 'paystack' else '' }}>
+                                        Paystack
+                                    </option>
+                                    <option value="flutterwave" {{ 'selected' if settings.payment_gateway and settings.payment_gateway.value == 'flutterwave' else '' }}>
+                                        Flutterwave
+                                    </option>
+                                </select>
+                                <small class="form-text text-muted">
+                                    Choose your preferred payment gateway for processing transactions
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Gateway Tabs -->
+                    <div class="row">
+                        <div class="col-12">
+                            <ul class="nav nav-tabs" id="gatewayTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="paystack-tab" data-bs-toggle="tab" data-bs-target="#paystack" type="button" role="tab">
+                                        <i class="fas fa-shield-alt me-2"></i>Paystack Configuration
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="flutterwave-tab" data-bs-toggle="tab" data-bs-target="#flutterwave" type="button" role="tab">
+                                        <i class="fas fa-wave-square me-2"></i>Flutterwave Configuration
+                                    </button>
+                                </li>
+                            </ul>
+                            
+                            <div class="tab-content mt-3" id="gatewayTabContent">
+                                <!-- Paystack Tab -->
+                                <div class="tab-pane fade show active" id="paystack" role="tabpanel">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="paystack_mode" class="form-label">
+                                                    Paystack Mode
+                                                </label>
+                                                <select class="form-select" id="paystack_mode" name="paystack_mode">
+                                                    <option value="test" {{ 'selected' if settings.paystack_mode and settings.paystack_mode.value == 'test' else '' }}>
+                                                        Test Mode
+                                                    </option>
+                                                    <option value="live" {{ 'selected' if settings.paystack_mode and settings.paystack_mode.value == 'live' else '' }}>
+                                                        Live Mode
+                                                    </option>
+                                                </select>
+                                                <small class="form-text text-muted">
+                                                    Choose test mode for development, live mode for production
+                                                </small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                <strong>Current Mode:</strong> 
+                                                <span class="badge bg-{{ 'warning' if not settings.paystack_mode or settings.paystack_mode.value == 'test' else 'success' }}">
+                                                    {{ settings.paystack_mode.value|title if settings.paystack_mode else 'Test' }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                    
+                                    <!-- Paystack API Keys Section -->
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="text-warning mb-3">
+                                                <i class="fas fa-flask me-2"></i>Test API Keys
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label for="paystack_public_key_test" class="form-label">
+                                                    Test Public Key
+                                                </label>
+                                                <input type="text" 
+                                                       class="form-control" 
+                                                       id="paystack_public_key_test" 
+                                                       name="paystack_public_key_test" 
+                                                       value="{{ settings.paystack_public_key_test.value if settings.paystack_public_key_test else '' }}"
+                                                       placeholder="pk_test_...">
+                                                <small class="form-text text-muted">
+                                                    Paystack test public key for development
+                                                </small>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="paystack_secret_key_test" class="form-label">
+                                                    Test Secret Key
+                                                </label>
+                                                <input type="password" 
+                                                       class="form-control" 
+                                                       id="paystack_secret_key_test" 
+                                                       name="paystack_secret_key_test" 
+                                                       value="{{ settings.paystack_secret_key_test.value if settings.paystack_secret_key_test else '' }}"
+                                                       placeholder="sk_test_...">
+                                                <small class="form-text text-muted">
+                                                    Paystack test secret key (keep confidential)
+                                                </small>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Live API Keys -->
+                                        <div class="col-md-6">
+                                            <h6 class="text-danger mb-3">
+                                                <i class="fas fa-globe me-2"></i>Live API Keys
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label for="paystack_public_key_live" class="form-label">
+                                                    Live Public Key
+                                                </label>
+                                                <input type="text" 
+                                                       class="form-control" 
+                                                       id="paystack_public_key_live" 
+                                                       name="paystack_public_key_live" 
+                                                       value="{{ settings.paystack_public_key_live.value if settings.paystack_public_key_live else '' }}"
+                                                       placeholder="pk_live_...">
+                                                <small class="form-text text-muted">
+                                                    Paystack live public key for production
+                                                </small>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="paystack_secret_key_live" class="form-label">
+                                                    Live Secret Key
+                                                </label>
+                                                <input type="password" 
+                                                       class="form-control" 
+                                                       id="paystack_secret_key_live" 
+                                                       name="paystack_secret_key_live" 
+                                                       value="{{ settings.paystack_secret_key_live.value if settings.paystack_secret_key_live else '' }}"
+                                                       placeholder="sk_live_...">
+                                                <small class="form-text text-muted">
+                                                    Paystack live secret key (keep confidential)
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Flutterwave Tab -->
+                                <div class="tab-pane fade" id="flutterwave" role="tabpanel">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="flutterwave_mode" class="form-label">
+                                                    Flutterwave Mode
+                                                </label>
+                                                <select class="form-select" id="flutterwave_mode" name="flutterwave_mode">
+                                                    <option value="test" {{ 'selected' if settings.flutterwave_mode and settings.flutterwave_mode.value == 'test' else '' }}>
+                                                        Test Mode
+                                                    </option>
+                                                    <option value="live" {{ 'selected' if settings.flutterwave_mode and settings.flutterwave_mode.value == 'live' else '' }}>
+                                                        Live Mode
+                                                    </option>
+                                                </select>
+                                                <small class="form-text text-muted">
+                                                    Choose test mode for development, live mode for production
+                                                </small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                <strong>Current Mode:</strong> 
+                                                <span class="badge bg-{{ 'warning' if not settings.flutterwave_mode or settings.flutterwave_mode.value == 'test' else 'success' }}">
+                                                    {{ settings.flutterwave_mode.value|title if settings.flutterwave_mode else 'Test' }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Flutterwave API Keys Section -->
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="text-warning mb-3">
+                                                <i class="fas fa-flask me-2"></i>Test API Keys
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label for="flutterwave_public_key_test" class="form-label">
+                                                    Test Public Key
+                                                </label>
+                                                <input type="text" 
+                                                       class="form-control" 
+                                                       id="flutterwave_public_key_test" 
+                                                       name="flutterwave_public_key_test" 
+                                                       value="{{ settings.flutterwave_public_key_test.value if settings.flutterwave_public_key_test else '' }}"
+                                                       placeholder="FLWPUBK_TEST-...">
+                                                <small class="form-text text-muted">
+                                                    Flutterwave test public key for development
+                                                </small>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="flutterwave_secret_key_test" class="form-label">
+                                                    Test Secret Key
+                                                </label>
+                                                <input type="password" 
+                                                       class="form-control" 
+                                                       id="flutterwave_secret_key_test" 
+                                                       name="flutterwave_secret_key_test" 
+                                                       value="{{ settings.flutterwave_secret_key_test.value if settings.flutterwave_secret_key_test else '' }}"
+                                                       placeholder="FLWSECK_TEST-...">
+                                                <small class="form-text text-muted">
+                                                    Flutterwave test secret key (keep confidential)
+                                                </small>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Live API Keys -->
+                                        <div class="col-md-6">
+                                            <h6 class="text-danger mb-3">
+                                                <i class="fas fa-globe me-2"></i>Live API Keys
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label for="flutterwave_public_key_live" class="form-label">
+                                                    Live Public Key
+                                                </label>
+                                                <input type="text" 
+                                                       class="form-control" 
+                                                       id="flutterwave_public_key_live" 
+                                                       name="flutterwave_public_key_live" 
+                                                       value="{{ settings.flutterwave_public_key_live.value if settings.flutterwave_public_key_live else '' }}"
+                                                       placeholder="FLWPUBK-...">
+                                                <small class="form-text text-muted">
+                                                    Flutterwave live public key for production
+                                                </small>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="flutterwave_secret_key_live" class="form-label">
+                                                    Live Secret Key
+                                                </label>
+                                                <input type="password" 
+                                                       class="form-control" 
+                                                       id="flutterwave_secret_key_live" 
+                                                       name="flutterwave_secret_key_live" 
+                                                       value="{{ settings.flutterwave_secret_key_live.value if settings.flutterwave_secret_key_live else '' }}"
+                                                       placeholder="FLWSECK-...">
+                                                <small class="form-text text-muted">
+                                                    Flutterwave live secret key (keep confidential)
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted">
+                            <small>
+                                <i class="fas fa-info-circle me-1"></i>
+                                Changes take effect immediately for new transactions
+                            </small>
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-primary btn-lg" id="saveSettingsBtn">
+                                <span class="btn-text">
+                                    <i class="fas fa-save me-2"></i>Save Payment Settings
+                                </span>
+                                <span class="btn-loading d-none">
+                                    <i class="fas fa-spinner fa-spin me-2"></i>Saving...
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Settings History & Information -->
+    <div class="col-lg-4">
+        <!-- Current Settings Summary -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Current Settings
+                </h6>
+            </div>
+            <div class="card-body bg-transparent">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="fw-bold text-primary">₦{{ settings.verification_fee.value if settings.verification_fee else '2,000' }}</div>
+                        <small class="text-muted">Verification</small>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="fw-bold text-warning">₦{{ settings.boost_fee.value if settings.boost_fee else '1,000' }}</div>
+                        <small class="text-muted">Boost</small>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="fw-bold text-primary">
+                            ₦{{ settings.cv_optimization_fee.value if settings.cv_optimization_fee else '5,000' }}
+                        </div>
+                        <small class="text-muted">CV Optimization</small>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="fw-bold text-success">₦{{ settings.starter_plan_amount.value if settings.starter_plan_amount else '20,000' }}</div>
+                        <small class="text-muted">Starter Plan</small>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="fw-bold text-info">₦{{ settings.professional_plan_amount.value if settings.professional_plan_amount else '40,000' }}</div>
+                        <small class="text-muted">Professional Plan</small>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="fw-bold text-warning">₦{{ settings.enterprise_plus_plan_amount.value if settings.enterprise_plus_plan_amount else '120,000' }}</div>
+                        <small class="text-muted">Enterprise Plus</small>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <!-- Payment Gateway Status -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-credit-card me-2"></i>Active Payment Gateway
+                </h6>
+            </div>
+            <div class="card-body bg-transparent">
+                {% if not settings.payment_gateway or settings.payment_gateway.value == 'paystack' %}
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="https://paystack.com/assets/img/logo/logo-mark.png" 
+                             alt="Paystack" 
+                             width="32" 
+                             height="32" 
+                             class="me-3">
+                        <div>
+                            <div class="fw-bold">Paystack</div>
+                            <small class="text-success">
+                                <i class="fas fa-check-circle me-1"></i>Primary Gateway
+                            </small>
+                        </div>
+                    </div>
+                    <div class="alert alert-{{ 'warning' if not settings.paystack_mode or settings.paystack_mode.value == 'test' else 'success' }}">
+                        <small>
+                            <i class="fas fa-{{ 'flask' if not settings.paystack_mode or settings.paystack_mode.value == 'test' else 'globe' }} me-1"></i>
+                            Currently running in {{ settings.paystack_mode.value if settings.paystack_mode else 'test' }} mode.
+                        </small>
+                    </div>
+                {% else %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px;">
+                            <i class="fas fa-wave-square"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold">Flutterwave</div>
+                            <small class="text-success">
+                                <i class="fas fa-check-circle me-1"></i>Primary Gateway
+                            </small>
+                        </div>
+                    </div>
+                    <div class="alert alert-{{ 'warning' if not settings.flutterwave_mode or settings.flutterwave_mode.value == 'test' else 'success' }}">
+                        <small>
+                            <i class="fas fa-{{ 'flask' if not settings.flutterwave_mode or settings.flutterwave_mode.value == 'test' else 'globe' }} me-1"></i>
+                            Currently running in {{ settings.flutterwave_mode.value if settings.flutterwave_mode else 'test' }} mode.
+                        </small>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Pricing Guidelines -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-lightbulb me-2"></i>Pricing Guidelines
+                </h6>
+            </div>
+            <div class="card-body bg-transparent">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <small class="text-muted">
+                            <i class="fas fa-arrow-right me-1"></i>
+                            Verification fees should cover admin review costs
+                        </small>
+                    </li>
+                    <li class="mb-2">
+                        <small class="text-muted">
+                            <i class="fas fa-arrow-right me-1"></i>
+                            Boost fees encourage profile optimization
+                        </small>
+                    </li>
+                    <li class="mb-2">
+                        <small class="text-muted">
+                            <i class="fas fa-arrow-right me-1"></i>
+                            Subscription pricing should reflect value provided
+                        </small>
+                    </li>
+                    <li class="mb-0">
+                        <small class="text-muted">
+                            <i class="fas fa-arrow-right me-1"></i>
+                            Consider market rates and competition
+                        </small>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Update History -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-history me-2"></i>Recent Changes
+                </h6>
+            </div>
+            <div class="card-body bg-transparent">
+                {% if settings %}
+                <div class="table-responsive bg-transparent">
+                    <table class="table table-dark table-sm table-hover align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Setting</th>
+                                <th>Current Value</th>
+                                <th>Last Updated</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, setting in settings.items() %}
+                            <tr>
+                                <td class="fw-bold">{{ key.replace('_', ' ').title() }}</td>
+                                <td>
+                                    <span class="badge bg-primary">
+                                        {% if 'fee' in key or 'amount' in key %}₦{% endif %}{{ setting.value }}
+                                        {% if 'plan' in key %}/month{% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        {% if setting.updated_at %}
+                                        {{ setting.updated_at.strftime('%b %d, %Y at %I:%M %p') }}
+                                        {% else %}
+                                        Not updated
+                                        {% endif %}
+                                    </small>
+                                </td>
+                                <td>
+                                    <small class="text-muted">{{ setting.description }}</small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-3">
+                    <i class="fas fa-cog fa-2x text-muted mb-2"></i>
+                    <p class="text-muted">No settings configured yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('paymentSettingsForm');
+    const saveBtn = document.getElementById('saveSettingsBtn');
+    const btnText = saveBtn.querySelector('.btn-text');
+    const btnLoading = saveBtn.querySelector('.btn-loading');
+    
+    form.addEventListener('submit', function(e) {
+        // Show loading state
+        btnText.classList.add('d-none');
+        btnLoading.classList.remove('d-none');
+        saveBtn.disabled = true;
+        
+        console.log('Form submitted with data:', new FormData(form));
+    });
+});
+</script>
+<style>
+    .table-dark {
+        --bs-table-bg: transparent;
+        --bs-table-striped-bg: rgba(255,255,255,0.03);
+        --bs-table-hover-bg: rgba(255,255,255,0.06);
+        color: #e5e7eb;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "admin/base.html" %}
+{% block title %}Manage Partners{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-white mb-0">
+            <i class="fas fa-handshake me-2"></i>Manage Partners
+        </h2>
+    </div>
+
+    <!-- Add Partner Form -->
+    <div class="vp-dash-card mb-4">
+        <div class="vp-dash-card-body">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <input type="text" name="name" class="form-control"
+                               placeholder="Partner Name" required>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="url" name="website" class="form-control"
+                               placeholder="Website (optional)">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="file" name="logo" accept="image/*"
+                               class="form-control" required>
+                    </div>
+                    <div class="col-md-1 d-grid">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Partner Cards -->
+    <div class="row g-4">
+        {% for partner in partners %}
+        <div class="col-md-3">
+            <div class="vp-dash-card text-center h-100">
+                <div class="vp-dash-card-body">
+                    
+                    <img src="{{ url_for('static', filename='uploads/partners/' + partner.logo) }}"
+                         class="img-fluid mb-3"
+                         style="max-height: 80px; object-fit: contain;"
+                         alt="{{ partner.name }}">
+
+                    <h6 class="fw-bold text-white mb-1">{{ partner.name }}</h6>
+
+                    {% if partner.website %}
+                        <a href="{{ partner.website }}" target="_blank"
+                           class="small text-muted d-block mb-2 text-truncate">
+                           {{ partner.website }}
+                        </a>
+                    {% endif %}
+
+                    <form action="{{ url_for('admin.delete_partner', id=partner.id) }}"
+                          method="POST">
+                        <button class="btn btn-sm btn-danger">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

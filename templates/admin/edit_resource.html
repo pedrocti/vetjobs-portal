@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Edit Resource{% endblock %}
+{% block content %}
+<div class="container my-5">
+  <h3 class="text-primary mb-4">Edit Resource</h3>
+  <form method="POST" enctype="multipart/form-data">
+
+    <!-- Title -->
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Title</label>
+      <input type="text" name="title" class="form-control" value="{{ resource.title }}" required>
+    </div>
+
+    <!-- Category -->
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Category</label>
+      <select name="category" class="form-select">
+        <option value="career" {% if resource.category == 'career' %}selected{% endif %}>Career Resources</option>
+        <option value="resume" {% if resource.category == 'resume' %}selected{% endif %}>Resume Builder</option>
+        <option value="interview" {% if resource.category == 'interview' %}selected{% endif %}>Interview Tips</option>
+        <option value="networking" {% if resource.category == 'networking' %}selected{% endif %}>Networking Events</option>
+      </select>
+    </div>
+
+    <!-- Description -->
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Description</label>
+      <textarea name="description" class="form-control" rows="6">{{ resource.description }}</textarea>
+    </div>
+
+    <!-- Internal & External Links -->
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Internal Link (optional)</label>
+      <input type="text" name="link" class="form-control" value="{{ resource.link or '' }}">
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">External Link (optional)</label>
+      <input type="url" name="external_link" class="form-control" value="{{ resource.external_link or '' }}">
+    </div>
+
+    <!-- Image Upload -->
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Change Image (optional)</label>
+      {% if resource.image_url %}
+        <div><img src="{{ resource.image_url }}" alt="" width="150" class="rounded mb-2"></div>
+      {% endif %}
+      <input type="file" name="image" class="form-control">
+    </div>
+
+    <button class="btn btn-primary px-4">Update Resource</button>
+  </form>
+</div>
+{% endblock %}

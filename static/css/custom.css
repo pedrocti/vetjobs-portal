@@ -1,0 +1,566 @@
+/* ==============================
+   CUSTOM.CSS
+   - Page-specific overrides only
+   - All global styles live in theme.css, base.css, components.css
+   ============================== */
+
+
+/* ── Image frame (career pathways section) ────────────────── */
+.image-frame {
+    position: relative;
+    overflow: hidden;
+    border: 4px solid rgba(13, 110, 253, 0.3);
+    box-shadow: 0 0 60px rgba(13, 110, 253, 0.2), 0 0 20px rgba(255, 255, 255, 0.05);
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+
+.image-frame:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 80px rgba(13, 110, 253, 0.35), 0 0 25px rgba(255, 255, 255, 0.1);
+}
+
+
+/* ── Navbar brand font override ──────────────────────────── */
+.navbar-brand { font-size: 1.5rem; }
+
+
+/* ── Footer link hover ───────────────────────────────────── */
+footer a:hover {
+    color: var(--bs-primary) !important;
+    transition: color 0.2s ease-in-out;
+}
+
+/* ============================================================
+   ADMIN SCOPED OVERRIDES
+   Add this block to the BOTTOM of custom.css.
+   All rules are scoped to .vp-dashboard-main so they only
+   affect admin pages and never touch the public site.
+   ============================================================ */
+
+/* ── BASE RESET FOR ADMIN CONTENT AREA ─────────────────────
+   Restore readable text and backgrounds that premium-upgrade
+   overrides with !important rules globally.
+──────────────────────────────────────────────────────────── */
+
+.vp-dashboard-main .text-muted {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+.vp-dashboard-main small.text-muted,
+.vp-dashboard-main .small.text-muted {
+  color: rgba(255, 255, 255, 0.35) !important;
+}
+
+.vp-dashboard-main .fw-bold {
+  color: #ffffff;
+}
+
+/* ── COLORED STAT CARDS ─────────────────────────────────────
+   premium-upgrade.css forces all .card to navy background.
+   Restore Bootstrap's colored cards for the admin stat row.
+──────────────────────────────────────────────────────────── */
+
+.vp-dashboard-main .card.bg-primary {
+  background: linear-gradient(135deg, #1a56db, #1e429f) !important;
+  border: none !important;
+  color: #ffffff !important;
+}
+
+.vp-dashboard-main .card.bg-success {
+  background: linear-gradient(135deg, #057a55, #046c4e) !important;
+  border: none !important;
+  color: #ffffff !important;
+}
+
+.vp-dashboard-main .card.bg-warning {
+  background: linear-gradient(135deg, #c27803, #9f6f00) !important;
+  border: none !important;
+}
+
+.vp-dashboard-main .card.bg-warning.text-dark,
+.vp-dashboard-main .card.bg-warning .card-body {
+  color: #ffffff !important;
+}
+
+.vp-dashboard-main .card.bg-danger {
+  background: linear-gradient(135deg, #c81e1e, #9b1c1c) !important;
+  border: none !important;
+  color: #ffffff !important;
+}
+
+.vp-dashboard-main .card.bg-info {
+  background: linear-gradient(135deg, #0e9f6e, #057a55) !important;
+  border: none !important;
+  color: #ffffff !important;
+}
+
+/* Text color inside colored cards */
+.vp-dashboard-main .card.bg-primary h3,
+.vp-dashboard-main .card.bg-primary p,
+.vp-dashboard-main .card.bg-success h3,
+.vp-dashboard-main .card.bg-success p,
+.vp-dashboard-main .card.bg-warning h3,
+.vp-dashboard-main .card.bg-warning p,
+.vp-dashboard-main .card.bg-danger h3,
+.vp-dashboard-main .card.bg-danger p,
+.vp-dashboard-main .card.bg-info h3,
+.vp-dashboard-main .card.bg-info p {
+  color: #ffffff !important;
+}
+
+/* Border-only stat cards (revenue section) */
+.vp-dashboard-main .card.border-success {
+  border: 1px solid rgba(74, 222, 128, 0.4) !important;
+  background: rgba(15, 32, 64, 0.6) !important;
+}
+
+.vp-dashboard-main .card.border-primary {
+  border: 1px solid rgba(96, 165, 250, 0.4) !important;
+  background: rgba(15, 32, 64, 0.6) !important;
+}
+
+.vp-dashboard-main .card.border-warning {
+  border: 1px solid rgba(251, 191, 36, 0.4) !important;
+  background: rgba(15, 32, 64, 0.6) !important;
+}
+
+.vp-dashboard-main .card.border-info {
+  border: 1px solid rgba(96, 165, 250, 0.3) !important;
+  background: rgba(15, 32, 64, 0.6) !important;
+}
+
+/* ── REGULAR CARDS (filters, tables, settings) ──────────────
+   These are fine as navy/dark — just ensure text is visible.
+──────────────────────────────────────────────────────────── */
+
+.vp-dashboard-main .card-title { color: #ffffff !important; }
+.vp-dashboard-main .card-text  { color: rgba(255,255,255,0.65) !important; }
+
+.vp-dashboard-main .card-header h5,
+.vp-dashboard-main .card-header h6 {
+  color: #ffffff !important;
+  font-family: var(--font-cond);
+  letter-spacing: 0.5px;
+}
+
+/* ── BADGES ─────────────────────────────────────────────────
+   Restore Bootstrap's semantic badge colours. premium-upgrade
+   maps everything to gold. Admin needs green/red/yellow/blue.
+──────────────────────────────────────────────────────────── */
+
+.vp-dashboard-main .badge.bg-primary {
+  background: rgba(96, 165, 250, 0.2) !important;
+  color: #60a5fa !important;
+  border: 1px solid rgba(96, 165, 250, 0.35) !important;
+}
+
+.vp-dashboard-main .badge.bg-success {
+  background: rgba(74, 222, 128, 0.15) !important;
+  color: #4ade80 !important;
+  border: 1px solid rgba(74, 222, 128, 0.3) !important;
+}
+
+.vp-dashboard-main .badge.bg-warning {
+  background: rgba(251, 191, 36, 0.15) !important;
+  color: #fbbf24 !important;
+  border: 1px solid rgba(251, 191, 36, 0.3) !important;
+}
+
+.vp-dashboard-main .badge.bg-warning.text-dark {
+  color: #fbbf24 !important;
+}
+
+.vp-dashboard-main .badge.bg-danger {
+  background: rgba(248, 113, 113, 0.15) !important;
+  color: #f87171 !important;
+  border: 1px solid rgba(248, 113, 113, 0.3) !important;
+}
+
+.vp-dashboard-main .badge.bg-info {
+  background: rgba(96, 165, 250, 0.15) !important;
+  color: #93c5fd !important;
+  border: 1px solid rgba(96, 165, 250, 0.3) !important;
+}
+
+.vp-dashboard-main .badge.bg-secondary {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.55) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.vp-dashboard-main .badge.fs-6 {
+  font-size: 13px !important;
+  padding: 6px 14px !important;
+}
+
+/* ── TABLES ─────────────────────────────────────────────────
+   Restore legible table headers. table-light and table-dark
+   both need to be readable on the dark admin background.
+──────────────────────────────────────────────────────────── */
+
+.vp-dashboard-main .table {
+  color: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* table-light → use subtle gold header (same as admin dashboard) */
+.vp-dashboard-main .table-light th,
+.vp-dashboard-main thead.table-light th {
+  background: rgba(212, 175, 55, 0.08) !important;
+  color: var(--gold) !important;
+  font-family: var(--font-cond) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2) !important;
+  padding: 14px 16px !important;
+  white-space: nowrap;
+}
+
+/* table-dark → darker navy header */
+.vp-dashboard-main .table-dark th,
+.vp-dashboard-main thead.table-dark th {
+  background: rgba(4, 8, 15, 0.8) !important;
+  color: var(--gold) !important;
+  font-family: var(--font-cond) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2) !important;
+  padding: 14px 16px !important;
+}
+
+.vp-dashboard-main .table tbody td {
+  padding: 13px 16px;
+  vertical-align: middle;
+  color: rgba(255, 255, 255, 0.75) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.vp-dashboard-main .table tbody tr:hover {
+  background: rgba(212, 175, 55, 0.04) !important;
+}
+
+/* table-striped rows */
+.vp-dashboard-main .table-striped > tbody > tr:nth-of-type(odd) > * {
+  background: rgba(255, 255, 255, 0.02) !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* table-sm */
+.vp-dashboard-main .table-sm td,
+.vp-dashboard-main .table-sm th {
+  padding: 8px 12px;
+}
+
+/* ── BUTTONS ─────────────────────────────────────────────────
+   Restore outline button colours and solid btn-primary.
+──────────────────────────────────────────────────────────── */
+
+.vp-dashboard-main .btn-primary {
+  background: var(--gold) !important;
+  border-color: var(--gold) !important;
+  color: var(--navy) !important;
+  font-family: var(--font-cond);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.vp-dashboard-main .btn-primary:hover {
+  background: var(--gold-light) !important;
+  border-color: var(--gold-light) !important;
+  color: var(--navy) !important;
+}
+
+.vp-dashboard-main .btn-outline-primary {
+  color: #60a5fa !important;
+  border-color: rgba(96, 165, 250, 0.4) !important;
+  background: transparent !important;
+}
+
+.vp-dashboard-main .btn-outline-primary:hover {
+  background: rgba(96, 165, 250, 0.1) !important;
+  color: #93c5fd !important;
+  border-color: #60a5fa !important;
+}
+
+.vp-dashboard-main .btn-outline-success {
+  color: #4ade80 !important;
+  border-color: rgba(74, 222, 128, 0.4) !important;
+  background: transparent !important;
+}
+
+.vp-dashboard-main .btn-outline-success:hover {
+  background: rgba(74, 222, 128, 0.1) !important;
+  color: #4ade80 !important;
+}
+
+.vp-dashboard-main .btn-success {
+  background: rgba(74, 222, 128, 0.2) !important;
+  border-color: rgba(74, 222, 128, 0.4) !important;
+  color: #4ade80 !important;
+  font-family: var(--font-cond);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.vp-dashboard-main .btn-success:hover {
+  background: rgba(74, 222, 128, 0.3) !important;
+}
+
+.vp-dashboard-main .btn-outline-warning {
+  color: #fbbf24 !important;
+  border-color: rgba(251, 191, 36, 0.4) !important;
+  background: transparent !important;
+}
+
+.vp-dashboard-main .btn-outline-warning:hover {
+  background: rgba(251, 191, 36, 0.1) !important;
+  color: #fbbf24 !important;
+}
+
+.vp-dashboard-main .btn-outline-danger {
+  color: #f87171 !important;
+  border-color: rgba(248, 113, 113, 0.4) !important;
+  background: transparent !important;
+}
+
+.vp-dashboard-main .btn-outline-danger:hover {
+  background: rgba(248, 113, 113, 0.1) !important;
+  color: #f87171 !important;
+}
+
+.vp-dashboard-main .btn-danger {
+  background: rgba(248, 113, 113, 0.2) !important;
+  border-color: rgba(248, 113, 113, 0.4) !important;
+  color: #f87171 !important;
+  font-family: var(--font-cond);
+  font-weight: 700;
+}
+
+.vp-dashboard-main .btn-danger:hover {
+  background: rgba(248, 113, 113, 0.3) !important;
+}
+
+.vp-dashboard-main .btn-outline-info {
+  color: #93c5fd !important;
+  border-color: rgba(96, 165, 250, 0.4) !important;
+  background: transparent !important;
+}
+
+.vp-dashboard-main .btn-outline-info:hover {
+  background: rgba(96, 165, 250, 0.1) !important;
+}
+
+.vp-dashboard-main .btn-outline-secondary {
+  color: rgba(255, 255, 255, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  background: transparent !important;
+}
+
+.vp-dashboard-main .btn-outline-secondary:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.vp-dashboard-main .btn-lg {
+  padding: 12px 28px !important;
+  font-size: 14px !important;
+}
+
+.vp-dashboard-main .btn-sm {
+  padding: 5px 12px !important;
+  font-size: 11px !important;
+}
+
+/* ── ALERTS ──────────────────────────────────────────────────
+   Restore semantic alert colours inside admin.
+──────────────────────────────────────────────────────────── */
+
+.vp-dashboard-main .alert {
+  border-radius: 8px !important;
+  font-size: 14px;
+  padding: 14px 18px;
+}
+
+.vp-dashboard-main .alert-info {
+  background: rgba(96, 165, 250, 0.08) !important;
+  color: #93c5fd !important;
+  border-left: 3px solid #60a5fa !important;
+  border: none;
+}
+
+.vp-dashboard-main .alert-success {
+  background: rgba(74, 222, 128, 0.08) !important;
+  color: #4ade80 !important;
+  border-left: 3px solid #4ade80 !important;
+  border: none;
+}
+
+.vp-dashboard-main .alert-warning {
+  background: rgba(251, 191, 36, 0.08) !important;
+  color: #fbbf24 !important;
+  border-left: 3px solid #fbbf24 !important;
+  border: none;
+}
+
+.vp-dashboard-main .alert-danger {
+  background: rgba(248, 113, 113, 0.08) !important;
+  color: #f87171 !important;
+  border-left: 3px solid #f87171 !important;
+  border: none;
+}
+
+.vp-dashboard-main .alert strong { color: inherit; }
+
+/* ── FORM ELEMENTS ───────────────────────────────────────────
+   Labels, hints, and form-text need to be visible.
+──────────────────────────────────────────────────────────── */
+
+.vp-dashboard-main .form-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-cond);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.vp-dashboard-main .form-text,
+.vp-dashboard-main small.form-text {
+  color: rgba(255, 255, 255, 0.35) !important;
+  font-size: 12px;
+}
+
+.vp-dashboard-main code {
+  background: rgba(212, 175, 55, 0.1);
+  color: var(--gold);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+/* ── TYPOGRAPHY ──────────────────────────────────────────────
+   Coloured text utilities used for section headings and labels.
+──────────────────────────────────────────────────────────── */
+
+.vp-dashboard-main .text-primary  { color: #60a5fa !important; }
+.vp-dashboard-main .text-success  { color: #4ade80 !important; }
+.vp-dashboard-main .text-warning  { color: #fbbf24 !important; }
+.vp-dashboard-main .text-danger   { color: #f87171 !important; }
+.vp-dashboard-main .text-info     { color: #93c5fd !important; }
+.vp-dashboard-main .text-white    { color: #ffffff !important; }
+
+/* ── PAGINATION ──────────────────────────────────────────────
+   Already handled by premium-upgrade, just ensure admin
+   context is consistent.
+──────────────────────────────────────────────────────────── */
+
+.vp-dashboard-main .page-link {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(212, 175, 55, 0.15) !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.vp-dashboard-main .page-link:hover {
+  background: rgba(212, 175, 55, 0.08) !important;
+  color: var(--gold) !important;
+}
+
+.vp-dashboard-main .page-item.active .page-link {
+  background: var(--gold) !important;
+  border-color: var(--gold) !important;
+  color: var(--navy) !important;
+}
+
+/* ── USER AVATAR CIRCLES ─────────────────────────────────────
+   The blue circles with user icons in tables.
+──────────────────────────────────────────────────────────── */
+
+.vp-dashboard-main .rounded-circle.bg-primary {
+  background: rgba(96, 165, 250, 0.2) !important;
+  color: #60a5fa !important;
+  border: 1px solid rgba(96, 165, 250, 0.3) !important;
+}
+
+.vp-dashboard-main .rounded-circle.bg-warning {
+  background: rgba(251, 191, 36, 0.2) !important;
+  color: #fbbf24 !important;
+  border: 1px solid rgba(251, 191, 36, 0.3) !important;
+}
+
+.vp-dashboard-main .rounded-circle.bg-success {
+  background: rgba(74, 222, 128, 0.2) !important;
+  color: #4ade80 !important;
+  border: 1px solid rgba(74, 222, 128, 0.3) !important;
+}
+
+.vp-dashboard-main .rounded-circle.bg-danger {
+  background: rgba(248, 113, 113, 0.2) !important;
+  color: #f87171 !important;
+  border: 1px solid rgba(248, 113, 113, 0.3) !important;
+}
+
+/* ── EMPTY STATES ────────────────────────────────────────────
+   Icons and text in empty table states.
+──────────────────────────────────────────────────────────── */
+
+.vp-dashboard-main .fa-4x.text-muted { color: rgba(255,255,255,0.15) !important; }
+.vp-dashboard-main h5.text-muted     { color: rgba(255,255,255,0.4) !important; }
+
+/* ── ADD THIS to the ADMIN SCOPED OVERRIDES block in custom.css ──
+   Fixes the white background appearing in Recent Activity table
+   inside vp-dash-card-body with padding:0
+─────────────────────────────────────────────────────────────── */
+
+.vp-dashboard-main .vp-dash-card-body .table,
+.vp-dashboard-main .vp-dash-card-body .table-responsive,
+.vp-dashboard-main .vp-dash-card-body .table > :not(caption) > * > * {
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.vp-dashboard-main .vp-dash-card-body .table tbody tr {
+  background: transparent !important;
+}
+
+.vp-dashboard-main .vp-dash-card-body .table tbody tr:hover {
+  background: rgba(212, 175, 55, 0.04) !important;
+}
+
+/* Also fix any table inside a vp-dash-card on any admin page */
+.vp-dashboard-main .vp-dash-card .table > :not(caption) > * {
+  background: transparent !important;
+}
+
+/* ===== Admin Table Fix (GLOBAL) ===== */
+.table {
+  background: transparent !important;
+  color: inherit;
+}
+
+.table thead,
+.table-light,
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background: transparent !important;
+}
+
+.table th {
+  background: rgba(255,255,255,0.03) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+.table td {
+  border-color: rgba(255,255,255,0.05) !important;
+}
+
+.card {
+  background: transparent !important;
+  border: none !important;
+}

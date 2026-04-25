@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Resume Builder{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card shadow-lg p-4 mx-auto" style="max-width: 800px;">
+        <h3 class="text-primary mb-4 text-center">
+            <i class="fas fa-file-alt me-2"></i> Build Your Resume
+        </h3>
+        <p class="text-muted text-center mb-4">
+            Fill in your details to generate a professional resume. Choose between 
+            <strong>Classic (Free)</strong> or <strong>Modern (paid)</strong>. 
+            You can also request a <strong>Professional Review (paid)</strong>.
+        </p>
+
+        <form method="POST" enctype="multipart/form-data">
+            <!-- Personal Information -->
+            <h5 class="mb-3 text-secondary">Personal Information</h5>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="text" name="name" id="name" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" name="email" id="email" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="phone" class="form-label">Phone Number</label>
+                    <input type="text" name="phone" id="phone" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="address" class="form-label">Address</label>
+                    <input type="text" name="address" id="address" class="form-control" placeholder="City, State">
+                </div>
+            </div>
+
+            <!-- Profile Photo -->
+            <div class="mb-4">
+                <label for="photo" class="form-label">Profile Photo (optional)</label>
+                <input type="file" name="photo" id="photo" accept="image/*" class="form-control">
+                <small class="text-muted">Used only for modern template.</small>
+            </div>
+
+            <!-- Bio -->
+            <div class="mb-4">
+                <label for="bio" class="form-label">Short Bio</label>
+                <textarea name="bio" id="bio" class="form-control" rows="2" placeholder="Brief introduction about yourself..."></textarea>
+            </div>
+
+            <!-- Professional Summary -->
+            <div class="mb-4">
+                <label for="summary" class="form-label">Professional Summary</label>
+                <textarea name="summary" id="summary" class="form-control" rows="3" required></textarea>
+            </div>
+
+            <!-- Education -->
+            <div class="mb-4">
+                <label for="education" class="form-label">Education</label>
+                <textarea name="education" id="education" class="form-control" rows="3" placeholder="List your education details..."></textarea>
+            </div>
+
+            <!-- Experience -->
+            <div class="mb-4">
+                <label for="experience" class="form-label">Work Experience</label>
+                <textarea name="experience" id="experience" class="form-control" rows="3" placeholder="List your work experience..."></textarea>
+            </div>
+
+            <!-- Skills -->
+            <div class="mb-4">
+                <label for="skills" class="form-label">Skills</label>
+                <textarea name="skills" id="skills" class="form-control" rows="2" placeholder="E.g. Leadership, Communication, Project Management"></textarea>
+            </div>
+
+            <!-- Template Selection -->
+            <div class="mb-4">
+                <label for="template" class="form-label">Choose Resume Template</label>
+                <select name="template" id="template" class="form-select" required>
+                    <option value="classic">🧾 Classic (Free)</option>
+                    <option value="modern">✨ Modern / Minimalist (Paid)</option>
+                </select>
+                <small class="text-muted">Modern includes elegant layout and color with photo option.</small>
+            </div>
+
+            <!-- Submit -->
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-download me-2"></i> Generate My Resume
+                </button>
+            </div>
+        </form>
+
+        <!-- Resume Upload -->
+        <div class="mb-4">
+          <label for="resume_file" class="form-label fw-bold">
+            <i class="fas fa-file-upload me-2 text-primary"></i>Resume *
+          </label>
+
+          <div class="input-group">
+            <input 
+              type="file" 
+              class="form-control" 
+              id="resume_file" 
+              name="resume_file" 
+              accept=".pdf,.doc,.docx"
+              required>
+            <div class="invalid-feedback">
+              Please upload your resume.
+            </div>
+          </div>
+
+          <div class="form-text">
+            <small>
+              <i class="fas fa-info-circle me-1"></i>
+              Accepted formats: PDF, DOC, DOCX. Maximum size: 16MB.
+            </small>
+          </div>
+
+          <!-- Optional Resume Builder -->
+          <div class="text-center mt-3">
+            <p class="text-muted mb-1">Don’t have a resume yet?</p>
+            <a href="{{ url_for('resources.resume_builder') }}" class="btn btn-outline-info btn-sm mb-3">
+              <i class="fas fa-file-alt me-2"></i>Generate Resume with Our Builder
+            </a>
+
+            <hr class="my-3">
+
+            <p class="text-muted mb-1">Already have a resume but want it professionally reviewed?</p>
+            <a href="{{ url_for('payments.init_payment', feature='review') }}" class="btn btn-outline-success btn-sm">
+              <i class="fas fa-user-check me-2"></i>Submit for Professional Review
+            </a>
+          </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

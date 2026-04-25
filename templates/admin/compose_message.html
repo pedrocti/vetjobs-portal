@@ -1,0 +1,205 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Compose Message - Admin Panel{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="fw-bold mb-1">Compose Message</h1>
+                    <p class="text-muted mb-0">Send a message to veterans and employers</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('admin.messages') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Messages
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Compose Form -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>New Message
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('admin.send_message') }}" method="post">
+                        <!-- Recipients Section -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Recipients</label>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="recipient_type" id="recipients_all" value="all" onchange="toggleRecipientOptions()">
+                                        <label class="form-check-label" for="recipients_all">
+                                            <strong>All Users</strong>
+                                            <br><small class="text-muted">Send to all veterans and employers</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="recipient_type" id="recipients_veterans" value="veterans" onchange="toggleRecipientOptions()">
+                                        <label class="form-check-label" for="recipients_veterans">
+                                            <strong>All Veterans</strong>
+                                            <br><small class="text-muted">{{ veterans|length }} active veterans</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="recipient_type" id="recipients_employers" value="employers" onchange="toggleRecipientOptions()">
+                                        <label class="form-check-label" for="recipients_employers">
+                                            <strong>All Employers</strong>
+                                            <br><small class="text-muted">{{ employers|length }} active employers</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="recipient_type" id="recipients_specific" value="specific" onchange="toggleRecipientOptions()">
+                                        <label class="form-check-label" for="recipients_specific">
+                                            <strong>Specific User</strong>
+                                            <br><small class="text-muted">Choose individual user</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Specific User Selection -->
+                            <div id="specific_user_selection" class="mt-3" style="display: none;">
+                                <label for="specific_user" class="form-label">Select User</label>
+                                <select class="form-select" id="specific_user" name="specific_user">
+                                    <option value="">Choose a user...</option>
+                                    <optgroup label="Veterans">
+                                        {% for veteran in veterans %}
+                                        <option value="{{ veteran.id }}">{{ veteran.full_name }} ({{ veteran.email }})</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                    <optgroup label="Employers">
+                                        {% for employer in employers %}
+                                        <option value="{{ employer.id }}">{{ employer.full_name }} ({{ employer.email }})</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Priority Selection -->
+                        <div class="mb-3">
+                            <label for="priority" class="form-label">Priority</label>
+                            <select class="form-select" id="priority" name="priority">
+                                <option value="low">Low Priority</option>
+                                <option value="normal" selected>Normal Priority</option>
+                                <option value="high">High Priority</option>
+                                <option value="urgent">Urgent Priority</option>
+                            </select>
+                        </div>
+
+                        <!-- Email Copy Option -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="send_email_copy" name="send_email_copy">
+                                <label class="form-check-label" for="send_email_copy">
+                                    <strong>Send Email Copy</strong>
+                                    <br><small class="text-muted">Also send an email notification to recipients</small>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Subject -->
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="subject" name="subject" required 
+                                   placeholder="Enter message subject">
+                        </div>
+
+                        <!-- Message Body -->
+                        <div class="mb-4">
+                            <label for="body" class="form-label">Message <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="body" name="body" rows="8" required 
+                                      placeholder="Enter your message here..."></textarea>
+                            <div class="form-text">You can use plain text formatting. Keep messages clear and professional.</div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('admin.messages') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-1"></i>Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Message Tips -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>Message Tips
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Best Practices</h6>
+                        <ul class="small text-muted">
+                            <li>Keep subjects clear and descriptive</li>
+                            <li>Be professional and respectful</li>
+                            <li>Include relevant action items</li>
+                            <li>Use appropriate priority levels</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Priority Guidelines</h6>
+                        <ul class="small text-muted">
+                            <li><strong>Low:</strong> General announcements</li>
+                            <li><strong>Normal:</strong> Regular updates</li>
+                            <li><strong>High:</strong> Important notifications</li>
+                            <li><strong>Urgent:</strong> Critical alerts only</li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-info small">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Messages will be stored in the recipient's inbox and they will be notified when they log in.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleRecipientOptions() {
+    const specificSelection = document.getElementById('specific_user_selection');
+    const specificRadio = document.getElementById('recipients_specific');
+    
+    if (specificRadio.checked) {
+        specificSelection.style.display = 'block';
+    } else {
+        specificSelection.style.display = 'none';
+        document.getElementById('specific_user').value = '';
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Check the first radio button by default
+    document.getElementById('recipients_all').checked = true;
+});
+</script>
+{% endblock %}

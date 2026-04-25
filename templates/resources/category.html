@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ category|capitalize }} Resources{% endblock %}
+{% block content %}
+<div class="container my-5">
+  <h2 class="mb-4 text-primary">{{ category|capitalize }} Resources</h2>
+
+  <div class="row">
+    {% for res in resources %}
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        {% if res.image_url %}
+          <img src="{{ res.image_url }}" class="card-img-top" style="height:200px;object-fit:cover;">
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{ res.title }}</h5>
+          <p class="card-text">
+            {{ res.description[:120] }}{% if res.description|length > 120 %}...{% endif %}
+          </p>
+          <a href="{{ url_for('resources.view_resource', id=res.id) }}" class="btn btn-outline-primary btn-sm">Read More</a>
+        </div>
+      </div>
+    </div>
+    {% else %}
+      <p>No resources found in this category.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
