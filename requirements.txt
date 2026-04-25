@@ -31,4 +31,4 @@ python-dotenv==1.0.1
 # twilio==9.8.0
 # qrcode==8.2
 # reportlab==4.4.4
-# PyJWT==2.10.1
+# PyJWT==2.10.1requests
