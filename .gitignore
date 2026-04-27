@@ -19,3 +19,13 @@ venv/
 
 # Logs
 *.log
+.env
+*.db
+*.db-shm
+*.db-wal
+backup.sql
+static/resumes/
+static/uploads/
+__pycache__/
+*.pyc
+.env
