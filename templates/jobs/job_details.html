@@ -2,135 +2,534 @@
 {% block title %}{{ job.title }} - {{ job.company_name }} | Veteran-Employer Job Portal{% endblock %}
 
 {% block content %}
-<div class="container py-5">
+<style>
+    /* ── Sticky Apply Sidebar ── */
+    .sticky-sidebar {
+        position: sticky;
+        top: 80px;
+    }
 
-    <!-- Job Header with Company Logo -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body d-flex align-items-center">
-            <!-- Company Logo -->
-            <!-- Company Logo -->
-            <div class="me-3">
-                {% if job.company_logo %}
-                    <img src="{{ url_for('static', filename=job.company_logo) }}"
-                         alt="Company Logo"
-                         class="border rounded shadow-sm"
-                         style="width:150px; height:auto; max-height:80px; object-fit:contain; background-color:white; padding:5px;">
+    /* ── Section headings ── */
+    .section-heading {
+        font-size: 0.8rem !important;
+        font-weight: 800 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.08em !important;
+        color: #ffffff !important;
+        background-color: #1a1a2e !important;
+        padding: 0.45rem 0.85rem !important;
+        border-radius: 4px !important;
+        margin-bottom: 1.25rem !important;
+        display: block !important;
+    }
 
-                {% elif job.employer and job.employer.employer_profile and job.employer.employer_profile.company_logo %}
-                    <img src="{{ url_for('static', filename='uploads/' + job.employer.employer_profile.company_logo) }}"
-                         alt="{{ job.company_name }} Logo"
-                         class="border rounded shadow-sm"
-                         style="width:150px; height:auto; max-height:80px; object-fit:contain; background-color:white; padding:5px;">
+    /* ── Formatted text blocks ── */
+    .job-text-block {
+        white-space: pre-line;
+        line-height: 1.85;
+        color: #495057;
+        font-size: 0.97rem;
+    }
 
-                {% else %}
-                    <img src="{{ url_for('static', filename='images/vetjoblogo1.webp') }}"
-                         alt="Default Logo"
-                         class="border rounded shadow-sm"
-                         style="width:150px; height:auto; max-height:80px; object-fit:contain; background-color:white; padding:5px;">
-                {% endif %}  
+    /* ── Meta pill badges ── */
+    .meta-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: #f1f3f5;
+        border-radius: 50px;
+        padding: 0.4rem 0.9rem;
+        font-size: 0.875rem;
+        color: #343a40;
+        font-weight: 500;
+    }
+
+    /* ── Urgency badge ── */
+    .urgency-badge {
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+    }
+
+    /* ── Share buttons ── */
+    .share-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        transition: opacity 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+    .share-btn:hover { opacity: 0.8; }
+
+    /* ── Mobile sticky apply bar ── */
+    @media (max-width: 991.98px) {
+        .mobile-apply-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+            background: #fff;
+            border-top: 1px solid #dee2e6;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+        }
+        .body-mobile-pad { padding-bottom: 90px; }
+    }
+    @media (min-width: 992px) {
+        .mobile-apply-bar { display: none !important; }
+    }
+
+    /* ── Company contact list ── */
+    .contact-list li {
+        padding: 0.45rem 0;
+        border-bottom: 1px solid #f1f3f5;
+        font-size: 0.9rem;
+    }
+    .contact-list li:last-child { border-bottom: none; }
+
+    /* ── Related job cards ── */
+    .related-job-card {
+        transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .related-job-card:hover {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.10) !important;
+        transform: translateY(-2px);
+    }
+</style>
+
+<div class="container py-4 body-mobile-pad">
+
+    <!-- ── Breadcrumb ── -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('jobs.job_board') }}">Jobs</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ job.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+
+        <!-- ══════════════════════════════════
+             MAIN CONTENT COLUMN
+        ══════════════════════════════════ -->
+        <div class="col-lg-8">
+
+            <!-- ── Job Header Card ── -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-start gap-3 flex-wrap">
+
+                        <!-- Company Logo -->
+                        <div class="flex-shrink-0">
+                            {% if job.company_logo %}
+                                <img src="{{ url_for('static', filename=job.company_logo) }}"
+                                     alt="{{ job.company_name }} Logo"
+                                     class="border rounded shadow-sm"
+                                     style="width:90px; height:90px; object-fit:contain; background:#fff; padding:6px;">
+                            {% elif job.employer and job.employer.employer_profile and job.employer.employer_profile.company_logo %}
+                                <img src="{{ url_for('static', filename='uploads/' + job.employer.employer_profile.company_logo) }}"
+                                     alt="{{ job.company_name }} Logo"
+                                     class="border rounded shadow-sm"
+                                     style="width:90px; height:90px; object-fit:contain; background:#fff; padding:6px;">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/vetjoblogo1.webp') }}"
+                                     alt="Default Logo"
+                                     class="border rounded shadow-sm"
+                                     style="width:90px; height:90px; object-fit:contain; background:#fff; padding:6px;">
+                            {% endif %}
+                        </div>
+
+                        <!-- Title, Company, Urgency -->
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
+                                <div>
+                                    <h1 class="fw-bold mb-1 fs-3">{{ job.title }}</h1>
+                                    <h2 class="text-primary mb-2 fs-5 fw-semibold">{{ job.company_name }}</h2>
+                                </div>
+
+                                {% if job.deadline is defined and job.deadline and now is defined %}
+                                    {% set days_left = (job.deadline - now).days %}
+                                    {% if days_left <= 7 and days_left >= 0 %}
+                                        <span class="badge bg-danger urgency-badge align-self-start">
+                                            <i class="fas fa-fire me-1"></i>Closes in {{ days_left }} day{{ 's' if days_left != 1 else '' }}
+                                        </span>
+                                    {% elif days_left < 0 %}
+                                        <span class="badge bg-secondary urgency-badge align-self-start">Closed</span>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+
+                            <!-- Meta pills -->
+                            <div class="d-flex flex-wrap gap-2 mt-1">
+                                <span class="meta-pill">
+                                    <i class="fas fa-map-marker-alt text-danger"></i>
+                                    {{ job.location or "Location not specified" }}
+                                </span>
+
+                                {% if job.job_type %}
+                                <span class="meta-pill">
+                                    <i class="fas fa-briefcase text-primary"></i>
+                                    {{ job.job_type|capitalize }}
+                                </span>
+                                {% endif %}
+
+                                {% if job.salary_min and job.salary_max %}
+                                <span class="meta-pill">
+                                    <i class="fas fa-money-bill-wave text-success"></i>
+                                    &#8358;{{ "{:,}".format(job.salary_min) }} &ndash; &#8358;{{ "{:,}".format(job.salary_max) }}
+                                </span>
+                                {% elif job.salary_min %}
+                                <span class="meta-pill">
+                                    <i class="fas fa-money-bill-wave text-success"></i>
+                                    &#8358;{{ "{:,}".format(job.salary_min) }}+
+                                </span>
+                                {% endif %}
+
+                                {% if job.created_at %}
+                                <span class="meta-pill">
+                                    <i class="fas fa-calendar-alt text-secondary"></i>
+                                    Posted {{ job.created_at.strftime('%d %b %Y') }}
+                                </span>
+                                {% endif %}
+
+                                {% if job.deadline is defined and job.deadline %}
+                                <span class="meta-pill">
+                                    <i class="fas fa-hourglass-end text-warning"></i>
+                                    Deadline {{ job.deadline.strftime('%d %b %Y') }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Apply row (top of page) + Share -->
+                    <div class="mt-4 pt-3 border-top d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        {% if job.external_apply_url %}
+                            <a href="{{ job.external_apply_url }}"
+                               target="_blank" rel="noopener noreferrer"
+                               class="btn btn-success btn-lg px-5">
+                                <i class="fas fa-external-link-alt me-2"></i>Apply on Company Website
+                            </a>
+                        {% elif current_user.is_authenticated and current_user.is_veteran() %}
+                            <a href="{{ url_for('applications.apply_to_job', job_id=job.id) }}"
+                               class="btn btn-success btn-lg px-5">
+                                <i class="fas fa-paper-plane me-2"></i>Apply Now
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('auth.login') }}"
+                               class="btn btn-primary btn-lg px-5">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login to Apply
+                            </a>
+                        {% endif %}
+
+                        <div class="d-flex align-items-center gap-2">
+                            <small class="text-muted">Share:</small>
+                            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url | urlencode }}"
+                               target="_blank" rel="noopener noreferrer"
+                               class="share-btn"
+                               style="background:#0077b5; color:#fff;"
+                               title="Share on LinkedIn">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            <a href="https://wa.me/?text={{ (job.title ~ ' at ' ~ job.company_name ~ ' — ' ~ request.url) | urlencode }}"
+                               target="_blank" rel="noopener noreferrer"
+                               class="share-btn"
+                               style="background:#25d366; color:#fff;"
+                               title="Share on WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                            <button class="share-btn"
+                                    style="background:#6c757d; color:#fff;"
+                                    title="Copy link"
+                                    onclick="copyJobLink(this)">
+                                <i class="fas fa-link"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
             </div>
+            <!-- /Job Header Card -->
 
 
-            <!-- Job Title and Company -->
-            <div>
-                <h2 class="fw-bold mb-1">{{ job.title }}</h2>
-                <h5 class="text-primary mb-0">{{ job.company_name }}</h5>
+            <!-- ── Job Description Card ── -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+
+                    <h3 class="section-heading">Job Description</h3>
+                    <div class="job-text-block">{{ job.description | safe }}</div>
+
+                    {% if job.requirements %}
+                    <h3 class="section-heading mt-5">Requirements</h3>
+                    <div class="job-text-block">{{ job.requirements | safe }}</div>
+                    {% endif %}
+
+                    {% if job.benefits %}
+                    <h3 class="section-heading mt-5">What We Offer</h3>
+                    <div class="job-text-block">{{ job.benefits | safe }}</div>
+                    {% endif %}
+
+                </div>
             </div>
-        </div>
-    </div>
+            <!-- /Job Description Card -->
 
-    <!-- Job Info (Location & Salary) -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body d-flex flex-wrap justify-content-between align-items-center">
-            <div class="mb-2">
-                <i class="fas fa-map-marker-alt text-danger me-2"></i>
-                <strong>Location:</strong> {{ job.location or "Not specified" }}
-            </div>
 
-            {% if job.salary_min and job.salary_max %}
-            <div class="mb-2">
-                <i class="fas fa-money-bill text-success me-2"></i>
-                <strong>Salary Range:</strong> ₦{{ "{:,}".format(job.salary_min) }} - ₦{{ "{:,}".format(job.salary_max) }}
-            </div>
-            {% elif job.salary_min %}
-            <div class="mb-2">
-                <i class="fas fa-money-bill text-success me-2"></i>
-                <strong>Salary:</strong> ₦{{ "{:,}".format(job.salary_min) }}+
+            <!-- ── About the Company Card ── -->
+            {% if job.employer and job.employer.employer_profile %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light py-3">
+                    <h3 class="mb-0 fs-6 fw-bold">
+                        <i class="fas fa-building me-2 text-primary"></i>
+                        About {{ job.employer.employer_profile.company_name }}
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    {% if job.employer.employer_profile.company_description %}
+                    <div class="job-text-block mb-3">{{ job.employer.employer_profile.company_description }}</div>
+                    {% endif %}
+
+                    <ul class="list-unstyled contact-list mb-0">
+                        {% if job.employer.employer_profile.company_website %}
+                        <li>
+                            <i class="fas fa-globe me-2 text-primary"></i>
+                            <a href="{{ job.employer.employer_profile.company_website }}"
+                               target="_blank" rel="noopener noreferrer">
+                                {{ job.employer.employer_profile.company_website }}
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% if job.employer.employer_profile.recruiter_email %}
+                        <li>
+                            <i class="fas fa-envelope me-2 text-primary"></i>
+                            {{ job.employer.employer_profile.recruiter_email }}
+                        </li>
+                        {% endif %}
+                        {% if job.employer.employer_profile.recruiter_phone %}
+                        <li>
+                            <i class="fas fa-phone me-2 text-primary"></i>
+                            {{ job.employer.employer_profile.recruiter_phone }}
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
             </div>
             {% endif %}
+            <!-- /About Company Card -->
 
-            {% if job.job_type %}
-            <div class="mb-2">
-                <i class="fas fa-briefcase text-primary me-2"></i>
-                <strong>Job Type:</strong> {{ job.job_type|capitalize }}
+
+            <!-- ── Related Jobs ── -->
+            {% if related_jobs %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light py-3">
+                    <h3 class="mb-0 fs-6 fw-bold">
+                        <i class="fas fa-th-list me-2 text-primary"></i>Similar Jobs
+                    </h3>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row g-3">
+                        {% for rjob in related_jobs %}
+                        <div class="col-md-6">
+                            <a href="{{ url_for('jobs.job_details', job_id=rjob.id) }}"
+                               class="text-decoration-none">
+                                <div class="card border related-job-card h-100 shadow-sm">
+                                    <div class="card-body p-3">
+                                        <h6 class="fw-bold text-dark mb-1">{{ rjob.title }}</h6>
+                                        <p class="text-primary small mb-2">{{ rjob.company_name }}</p>
+                                        <span class="meta-pill" style="font-size:0.78rem;">
+                                            <i class="fas fa-map-marker-alt text-danger"></i>
+                                            {{ rjob.location or "N/A" }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
             {% endif %}
+            <!-- /Related Jobs -->
+
         </div>
+        <!-- /Main Column -->
+
+
+        <!-- ══════════════════════════════════
+             STICKY SIDEBAR (desktop only)
+        ══════════════════════════════════ -->
+        <div class="col-lg-4 d-none d-lg-block">
+            <div class="sticky-sidebar">
+
+                <!-- Apply CTA -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body p-4 text-center">
+                        {% if job.external_apply_url %}
+                            <a href="{{ job.external_apply_url }}"
+                               target="_blank" rel="noopener noreferrer"
+                               class="btn btn-success btn-lg w-100 mb-3">
+                                <i class="fas fa-external-link-alt me-2"></i>Apply on Company Website
+                            </a>
+                        {% elif current_user.is_authenticated and current_user.is_veteran() %}
+                            <a href="{{ url_for('applications.apply_to_job', job_id=job.id) }}"
+                               class="btn btn-success btn-lg w-100 mb-3">
+                                <i class="fas fa-paper-plane me-2"></i>Apply for this Job
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('auth.login') }}"
+                               class="btn btn-primary btn-lg w-100 mb-3">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login to Apply
+                            </a>
+                        {% endif %}
+
+                        {% if job.deadline is defined and job.deadline and now is defined %}
+                            {% set days_left = (job.deadline - now).days %}
+                            {% if days_left >= 0 %}
+                            <p class="text-muted small mb-0">
+                                <i class="fas fa-hourglass-half me-1"></i>
+                                {{ days_left }} day{{ 's' if days_left != 1 else '' }} left to apply
+                            </p>
+                            {% else %}
+                            <p class="text-danger small mb-0">
+                                <i class="fas fa-times-circle me-1"></i>Application period has closed
+                            </p>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Job Summary -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light py-3">
+                        <h3 class="mb-0 fs-6 fw-bold">Job Summary</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3">
+                                <span class="text-muted small">
+                                    <i class="fas fa-map-marker-alt me-2 text-danger"></i>Location
+                                </span>
+                                <span class="fw-semibold small text-end">{{ job.location or "Not specified" }}</span>
+                            </li>
+
+                            {% if job.job_type %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3">
+                                <span class="text-muted small">
+                                    <i class="fas fa-briefcase me-2 text-primary"></i>Job Type
+                                </span>
+                                <span class="fw-semibold small">{{ job.job_type|capitalize }}</span>
+                            </li>
+                            {% endif %}
+
+                            {% if job.salary_min or job.salary_max %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3">
+                                <span class="text-muted small">
+                                    <i class="fas fa-money-bill-wave me-2 text-success"></i>Salary
+                                </span>
+                                <span class="fw-semibold small text-end">
+                                    {% if job.salary_min and job.salary_max %}
+                                        &#8358;{{ "{:,}".format(job.salary_min) }} &ndash; &#8358;{{ "{:,}".format(job.salary_max) }}
+                                    {% elif job.salary_min %}
+                                        &#8358;{{ "{:,}".format(job.salary_min) }}+
+                                    {% endif %}
+                                </span>
+                            </li>
+                            {% endif %}
+
+                            {% if job.created_at %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3">
+                                <span class="text-muted small">
+                                    <i class="fas fa-calendar-alt me-2 text-secondary"></i>Posted
+                                </span>
+                                <span class="fw-semibold small">{{ job.created_at.strftime('%d %b %Y') }}</span>
+                            </li>
+                            {% endif %}
+
+                            {% if job.deadline is defined and job.deadline %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3">
+                                <span class="text-muted small">
+                                    <i class="fas fa-hourglass-end me-2 text-warning"></i>Deadline
+                                </span>
+                                <span class="fw-semibold small">{{ job.deadline.strftime('%d %b %Y') }}</span>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Back to Jobs -->
+                <a href="{{ url_for('jobs.job_board') }}"
+                   class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-arrow-left me-2"></i>Back to All Jobs
+                </a>
+
+            </div>
+        </div>
+        <!-- /Sidebar -->
+
     </div>
+    <!-- /row -->
+
+</div>
+<!-- /container -->
 
 
-    <!-- Job Details -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="fw-bold mb-3">Job Description</h5>
-            <p class="text-muted">{{ job.description | safe }}</p>
-
-            {% if job.requirements %}
-            <h6 class="fw-bold mt-4">Requirements</h6>
-            <p class="text-muted">{{ job.requirements | safe }}</p>
-            {% endif %}
-
-            {% if job.benefits %}
-            <h6 class="fw-bold mt-4">Benefits</h6>
-            <p class="text-muted">{{ job.benefits | safe }}</p>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Company Info -->
-    {% if job.employer and job.employer.employer_profile %}
-    <div class="card mb-4">
-        <div class="card-header bg-light">
-            <h5 class="mb-0"><i class="fas fa-building me-2"></i>About {{ job.employer.employer_profile.company_name }}</h5>
-        </div>
-        <div class="card-body">
-            <p>{{ job.employer.employer_profile.company_description }}</p>
-
-            <ul class="list-unstyled mb-0">
-                {% if job.employer.employer_profile.company_website %}
-                <li><i class="fas fa-globe me-2 text-primary"></i>
-                    <a href="{{ job.employer.employer_profile.company_website }}" target="_blank">
-                        {{ job.employer.employer_profile.company_website }}
-                    </a>
-                </li>
-                {% endif %}
-                {% if job.employer.employer_profile.recruiter_email %}
-                <li><i class="fas fa-envelope me-2 text-primary"></i>
-                    {{ job.employer.employer_profile.recruiter_email }}
-                </li>
-                {% endif %}
-                {% if job.employer.employer_profile.recruiter_phone %}
-                <li><i class="fas fa-phone me-2 text-primary"></i>
-                    {{ job.employer.employer_profile.recruiter_phone }}
-                </li>
-                {% endif %}
-            </ul>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Apply Button -->
-    <div class="text-center">
-        {% if current_user.is_authenticated and current_user.is_veteran() %}
-            <a href="{{ url_for('applications.apply_to_job', job_id=job.id) }}" class="btn btn-success btn-lg">
-                <i class="fas fa-paper-plane me-2"></i>Apply for this Job
+<!-- ── Mobile Sticky Apply Bar (hidden on desktop) ── -->
+<div class="mobile-apply-bar d-lg-none">
+    <div class="d-flex align-items-center gap-2">
+        {% if job.external_apply_url %}
+            <a href="{{ job.external_apply_url }}"
+               target="_blank" rel="noopener noreferrer"
+               class="btn btn-success btn-lg flex-grow-1">
+                <i class="fas fa-external-link-alt me-2"></i>Apply on Company Website
+            </a>
+        {% elif current_user.is_authenticated and current_user.is_veteran() %}
+            <a href="{{ url_for('applications.apply_to_job', job_id=job.id) }}"
+               class="btn btn-success btn-lg flex-grow-1">
+                <i class="fas fa-paper-plane me-2"></i>Apply Now
             </a>
         {% else %}
-            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg">
+            <a href="{{ url_for('auth.login') }}"
+               class="btn btn-primary btn-lg flex-grow-1">
                 <i class="fas fa-sign-in-alt me-2"></i>Login to Apply
             </a>
         {% endif %}
+        <a href="{{ url_for('jobs.job_board') }}"
+           class="btn btn-outline-secondary btn-lg"
+           title="Back to jobs">
+            <i class="fas fa-arrow-left"></i>
+        </a>
     </div>
-
 </div>
+
+
+<script>
+/* Copy job URL to clipboard with visual feedback */
+function copyJobLink(btn) {
+    navigator.clipboard.writeText(window.location.href).then(function () {
+        var icon = btn.querySelector('i');
+        icon.className = 'fas fa-check';
+        btn.style.background = '#198754';
+        setTimeout(function () {
+            icon.className = 'fas fa-link';
+            btn.style.background = '#6c757d';
+        }, 2000);
+    }).catch(function () {
+        /* Fallback for older browsers */
+        var temp = document.createElement('input');
+        temp.value = window.location.href;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+    });
+}
+</script>
+
 {% endblock %}

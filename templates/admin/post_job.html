@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% block title %}Post a Job - Admin | Veteran-Employer Job Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-9 mx-auto">
+
+            <!-- Header -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h1 class="fw-bold mb-1">Post a Job</h1>
+                    <p class="text-muted mb-0">Admin post — goes live immediately, no review required.</p>
+                </div>
+                <a href="{{ url_for('admin.job_moderation') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Moderation
+                </a>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+
+                <!-- ── Job Information ── -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h5 class="mb-0"><i class="fas fa-briefcase me-2"></i>Job Information</h5>
+                    </div>
+                    <div class="card-body p-4">
+
+                        <div class="mb-3">
+                            <label for="job_title" class="form-label fw-semibold">Job Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="job_title" name="job_title"
+                                   placeholder="e.g., Aviation Operations Supervisor"
+                                   value="{{ request.form.get('job_title', '') }}" required>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="company_name" class="form-label fw-semibold">Company Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="company_name" name="company_name"
+                                       placeholder="e.g., Shell Nigeria"
+                                       value="{{ request.form.get('company_name', '') }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="location" class="form-label fw-semibold">Location <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="location" name="location"
+                                       placeholder="e.g., Lagos, Nigeria"
+                                       value="{{ request.form.get('location', '') }}" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="job_type" class="form-label fw-semibold">Job Type <span class="text-danger">*</span></label>
+                                <select class="form-select" id="job_type" name="job_type" required>
+                                    <option value="">Select type</option>
+                                    <option value="full-time" {{ 'selected' if request.form.get('job_type') == 'full-time' }}>Full-time</option>
+                                    <option value="part-time" {{ 'selected' if request.form.get('job_type') == 'part-time' }}>Part-time</option>
+                                    <option value="contract" {{ 'selected' if request.form.get('job_type') == 'contract' }}>Contract</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="industry" class="form-label fw-semibold">Industry</label>
+                                <input type="text" class="form-control" id="industry" name="industry"
+                                       placeholder="e.g., Oil & Gas, Aviation"
+                                       value="{{ request.form.get('industry', '') }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="experience_level" class="form-label fw-semibold">Experience Level</label>
+                                <select class="form-select" id="experience_level" name="experience_level">
+                                    <option value="">Select level</option>
+                                    <option value="entry" {{ 'selected' if request.form.get('experience_level') == 'entry' }}>Entry Level</option>
+                                    <option value="mid" {{ 'selected' if request.form.get('experience_level') == 'mid' }}>Mid Level</option>
+                                    <option value="senior" {{ 'selected' if request.form.get('experience_level') == 'senior' }}>Senior Level</option>
+                                    <option value="executive" {{ 'selected' if request.form.get('experience_level') == 'executive' }}>Executive</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="salary_min" class="form-label fw-semibold">Salary Min (₦)</label>
+                                <input type="number" class="form-control" id="salary_min" name="salary_min"
+                                       placeholder="e.g., 3000000"
+                                       value="{{ request.form.get('salary_min', '') }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="salary_max" class="form-label fw-semibold">Salary Max (₦)</label>
+                                <input type="number" class="form-control" id="salary_max" name="salary_max"
+                                       placeholder="e.g., 5000000"
+                                       value="{{ request.form.get('salary_max', '') }}">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ── Admin-Only Fields ── -->
+                <div class="card shadow-sm mb-4 border-warning">
+                    <div class="card-header py-3" style="background:#1a1a2e; color:#fff;">
+                        <h5 class="mb-0"><i class="fas fa-user-shield me-2"></i>Admin Options</h5>
+                    </div>
+                    <div class="card-body p-4">
+
+                        <!-- Company Logo Upload -->
+                        <div class="mb-4">
+                            <label for="company_logo" class="form-label fw-semibold">
+                                Company Logo
+                                <small class="text-muted fw-normal ms-1">(optional — falls back to platform logo)</small>
+                            </label>
+                            <input type="file" class="form-control" id="company_logo" name="company_logo"
+                                   accept=".png,.jpg,.jpeg,.webp,.gif">
+                            <div class="form-text">PNG, JPG, WEBP or GIF. Max recommended size: 400×400px.</div>
+                        </div>
+
+                        <!-- External Apply URL -->
+                        <div class="mb-4">
+                            <label for="external_apply_url" class="form-label fw-semibold">
+                                External Apply Link
+                                <small class="text-muted fw-normal ms-1">(optional — for companies not registered on platform)</small>
+                            </label>
+                            <input type="url" class="form-control" id="external_apply_url" name="external_apply_url"
+                                   placeholder="https://company.com/careers/apply"
+                                   value="{{ request.form.get('external_apply_url', '') }}">
+                            <div class="form-text">
+                                When set, veterans will see an "Apply on Company Website" button instead of the internal apply form.
+                            </div>
+                        </div>
+
+                        <!-- Application Deadline -->
+                        <div class="mb-2">
+                            <label for="deadline" class="form-label fw-semibold">
+                                Application Deadline
+                                <small class="text-muted fw-normal ms-1">(optional)</small>
+                            </label>
+                            <input type="date" class="form-control" id="deadline" name="deadline"
+                                   value="{{ request.form.get('deadline', '') }}"
+                                   style="max-width: 220px;">
+                            <div class="form-text">Shows a countdown and urgency badge on the job detail page.</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ── Job Description ── -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white py-3">
+                        <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Job Description</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <label for="job_description" class="form-label fw-semibold">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="job_description" name="job_description" rows="8"
+                                      placeholder="Describe the role, responsibilities, and what makes this position attractive..." required>{{ request.form.get('job_description', '') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Requirements ── -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-warning text-white py-3">
+                        <h5 class="mb-0"><i class="fas fa-list-check me-2"></i>Requirements</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <label for="requirements" class="form-label fw-semibold">Requirements <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="requirements" name="requirements" rows="6"
+                                      placeholder="List required skills, qualifications, and experience..." required>{{ request.form.get('requirements', '') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Benefits ── -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-info text-white py-3">
+                        <h5 class="mb-0"><i class="fas fa-gift me-2"></i>What We Offer <small class="fw-normal">(optional)</small></h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <label for="benefits" class="form-label fw-semibold">Benefits & Perks</label>
+                            <textarea class="form-control" id="benefits" name="benefits" rows="5"
+                                      placeholder="List benefits, perks, growth opportunities...">{{ request.form.get('benefits', '') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Actions ── -->
+                <div class="d-flex gap-3 mb-5">
+                    <button type="submit" class="btn btn-success btn-lg px-5">
+                        <i class="fas fa-paper-plane me-2"></i>Post Job Now
+                    </button>
+                    <a href="{{ url_for('admin.job_moderation') }}" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

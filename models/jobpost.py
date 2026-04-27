@@ -12,10 +12,9 @@ class JobPosting(db.Model):
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=False)
     requirements = db.Column(db.Text, nullable=False)
+    benefits = db.Column(db.Text, nullable=True)           # ✅ NEW
     company_name = db.Column(db.String(100), nullable=False)
-
-    # ✅ NEW: store logo path (used for employer OR admin fallback)
-    company_logo = db.Column(db.String(255))
+    company_logo = db.Column(db.String(255))               # uploadable logo path
 
     location = db.Column(db.String(100), nullable=False)
 
@@ -35,19 +34,28 @@ class JobPosting(db.Model):
     experience_level = db.Column(db.String(50))
     is_veteran_friendly = db.Column(db.Boolean, default=False)
 
+    # Application details
+    deadline = db.Column(db.Date, nullable=True)                        # ✅ NEW
+    external_apply_url = db.Column(db.String(500), nullable=True)       # ✅ NEW
+
     # Employer (User)
     posted_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     # Moderation + status
     status = db.Column(db.String(20), default="pending", nullable=False)
     is_active = db.Column(db.Boolean, default=True, nullable=False)
+    moderated_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    moderated_at = db.Column(db.DateTime, nullable=True)
+    admin_notes = db.Column(db.Text, nullable=True)
 
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
-    employer = db.relationship("User", backref=db.backref("job_postings", lazy=True))
+    employer = db.relationship("User", foreign_keys=[posted_by],
+                               backref=db.backref("job_postings", lazy=True))
+    moderated_by_admin = db.relationship("User", foreign_keys=[moderated_by])
 
     # ---- Display / Utility Methods ----
 
@@ -79,10 +87,23 @@ class JobPosting(db.Model):
         }
         return badge_classes.get(self.status, "secondary")
 
+    def is_expired(self):
+        """Returns True if deadline has passed."""
+        if self.deadline:
+            return datetime.utcnow().date() > self.deadline
+        return False
+
+    def days_until_deadline(self):
+        """Returns days remaining, or None if no deadline set."""
+        if self.deadline:
+            delta = self.deadline - datetime.utcnow().date()
+            return delta.days
+        return None
+
     def __repr__(self):
         return f"<JobPosting {self.title} at {self.company_name}>"
 
-    # ---- Compatibility Alias (IMPORTANT) ----
+    # ---- Compatibility Alias ----
     @property
     def job_title(self):
         """Alias for backward compatibility with old code/templates"""
@@ -92,15 +113,20 @@ class JobPosting(db.Model):
     def job_title(self, value):
         self.title = value
 
-    # ---- NEW: Logo helper (VERY IMPORTANT) ----
+    # ---- Logo helper ----
     def get_company_logo(self):
         """
         Returns the correct logo for display:
-        - Employer logo if available
-        - Otherwise fallback to platform logo
+        - Job-level logo if uploaded (admin-posted jobs with company logo)
+        - Employer profile logo if available
+        - Platform fallback logo
         """
         if self.company_logo:
             return self.company_logo
+        if self.employer and hasattr(self.employer, 'employer_profile') \
+                and self.employer.employer_profile \
+                and self.employer.employer_profile.company_logo:
+            return 'uploads/' + self.employer.employer_profile.company_logo
         return "images/vetjoblogo1.png"
 
     # ---- Business Logic ----
@@ -114,11 +140,9 @@ class JobPosting(db.Model):
         if not user:
             return False
 
-        # ✅ Allow admin
         if getattr(user, "is_admin", False):
             return True
 
-        # Employer logic (unchanged)
         if user.user_type != "employer":
             return False
 

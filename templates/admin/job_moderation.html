@@ -11,7 +11,11 @@
                     <h1 class="fw-bold mb-1">Job Moderation</h1>
                     <p class="text-muted mb-0">Review and moderate employer job postings</p>
                 </div>
-                <div>
+                <div class="d-flex align-items-center gap-3">
+                    <!-- ✅ Post Job button — in header, not inside a table row -->
+                    <a href="{{ url_for('admin.post_job') }}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Post a Job
+                    </a>
                     <span class="badge bg-danger fs-6">
                         <i class="fas fa-user-shield me-1"></i>Administrator
                     </span>
@@ -84,7 +88,7 @@
         </div>
     </div>
 
-    <!-- Pending Jobs -->
+    <!-- ── Pending Jobs ── -->
     <div class="row">
         <div class="col-12">
             <div class="card shadow mb-4">
@@ -112,19 +116,17 @@
                                 {% for job in pending_jobs %}
                                 <tr>
                                     <td>
-                                        <div>
-                                            <h6 class="mb-1">{{ job.job_title }}</h6>
-                                            {% if job.salary_range %}
-                                            <small class="text-muted">{{ job.salary_range }}</small>
-                                            {% endif %}
-                                        </div>
+                                        <h6 class="mb-1">{{ job.job_title }}</h6>
+                                        {% if job.salary_min and job.salary_max %}
+                                        <small class="text-muted">
+                                            &#8358;{{ "{:,}".format(job.salary_min) }} &ndash; &#8358;{{ "{:,}".format(job.salary_max) }}
+                                        </small>
+                                        {% endif %}
                                     </td>
                                     <td>{{ job.company_name }}</td>
                                     <td>
-                                        <div>
-                                            <h6 class="mb-1">{{ job.employer.full_name }}</h6>
-                                            <small class="text-muted">{{ job.employer.email }}</small>
-                                        </div>
+                                        <h6 class="mb-1">{{ job.employer.full_name }}</h6>
+                                        <small class="text-muted">{{ job.employer.email }}</small>
                                     </td>
                                     <td>
                                         <i class="fas fa-map-marker-alt me-1 text-muted"></i>
@@ -134,13 +136,21 @@
                                         <span class="badge bg-info">{{ job.get_job_type_display() }}</span>
                                     </td>
                                     <td>
-                                        <small>{{ job.created_at.strftime('%m/%d/%Y') }}</small>
+                                        <small>{{ job.created_at.strftime('%d/%m/%Y') }}</small>
                                     </td>
                                     <td>
-                                        <a href="{{ url_for('admin.review_job', job_id=job.id) }}" 
-                                           class="btn btn-primary btn-sm">
-                                            <i class="fas fa-eye me-1"></i>Review
-                                        </a>
+                                        <!-- ✅ Edit button in correct place — inside each row's Actions cell -->
+                                        <div class="d-flex gap-1">
+                                            <a href="{{ url_for('admin.review_job', job_id=job.id) }}"
+                                               class="btn btn-primary btn-sm">
+                                                <i class="fas fa-eye me-1"></i>Review
+                                            </a>
+                                            <a href="{{ url_for('admin.edit_job', job_id=job.id) }}"
+                                               class="btn btn-warning btn-sm"
+                                               title="Edit this job">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -159,7 +169,7 @@
         </div>
     </div>
 
-    <!-- Approved Jobs -->
+    <!-- ── Approved Jobs ── -->
     {% if approved_jobs %}
     <div class="row">
         <div class="col-12">
@@ -178,7 +188,8 @@
                                     <th>Company</th>
                                     <th>Status</th>
                                     <th>Approved By</th>
-                                    <th>Approved Date</th>
+                                    <th>Date</th>
+                                    <th>Deadline</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -186,44 +197,70 @@
                                 {% for job in approved_jobs[:10] %}
                                 <tr>
                                     <td>
-                                        <div>
-                                            <h6 class="mb-1">{{ job.job_title }}</h6>
-                                            <small class="text-muted">{{ job.company_name }}</small>
-                                        </div>
+                                        <h6 class="mb-1">{{ job.job_title }}</h6>
+                                        <small class="text-muted">{{ job.company_name }}</small>
                                     </td>
                                     <td>{{ job.company_name }}</td>
                                     <td>
-                                        <span class="badge bg-success">Active</span>
-                                        {% if not job.is_active %}
-                                        <span class="badge bg-secondary">Inactive</span>
+                                        {% if job.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        {% endif %}
+                                        {% if job.external_apply_url %}
+                                            <span class="badge bg-info ms-1"
+                                                  title="Has external apply link">
+                                                <i class="fas fa-external-link-alt"></i>
+                                            </span>
                                         {% endif %}
                                     </td>
                                     <td>
                                         {% if job.moderated_by_admin %}
                                             {{ job.moderated_by_admin.full_name }}
                                         {% else %}
-                                            System
+                                            <span class="text-muted">System</span>
                                         {% endif %}
                                     </td>
                                     <td>
                                         {% if job.moderated_at %}
-                                            <small>{{ job.moderated_at.strftime('%m/%d/%Y') }}</small>
+                                            <small>{{ job.moderated_at.strftime('%d/%m/%Y') }}</small>
                                         {% else %}
-                                            <small>N/A</small>
+                                            <small class="text-muted">N/A</small>
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{{ url_for('admin.review_job', job_id=job.id) }}" 
-                                           class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-eye me-1"></i>View
-                                        </a>
+                                        {% if job.deadline %}
+                                            {% set days = (job.deadline - today).days %}
+                                            {% if days < 0 %}
+                                                <span class="badge bg-secondary">Expired</span>
+                                            {% elif days <= 7 %}
+                                                <span class="badge bg-danger">{{ days }}d left</span>
+                                            {% else %}
+                                                <small>{{ job.deadline.strftime('%d/%m/%Y') }}</small>
+                                            {% endif %}
+                                        {% else %}
+                                            <small class="text-muted">&mdash;</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-1">
+                                            <a href="{{ url_for('admin.review_job', job_id=job.id) }}"
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye me-1"></i>View
+                                            </a>
+                                            <a href="{{ url_for('admin.edit_job', job_id=job.id) }}"
+                                               class="btn btn-warning btn-sm"
+                                               title="Edit this job">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
                                 {% if approved_jobs|length > 10 %}
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted">
-                                        <small>Showing latest 10 approved jobs</small>
+                                    <td colspan="7" class="text-center text-muted py-2">
+                                        <small>Showing latest 10 of {{ approved_jobs|length }} approved jobs</small>
                                     </td>
                                 </tr>
                                 {% endif %}
@@ -236,9 +273,10 @@
     </div>
     {% endif %}
 
-    <!-- Rejected and Flagged Jobs -->
+    <!-- ── Rejected and Flagged Jobs ── -->
     {% if rejected_jobs or flagged_jobs %}
     <div class="row">
+
         {% if rejected_jobs %}
         <div class="col-md-6">
             <div class="card shadow mb-4">
@@ -255,7 +293,7 @@
                                     <th>Job Title</th>
                                     <th>Company</th>
                                     <th>Date</th>
-                                    <th>Action</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -263,12 +301,21 @@
                                 <tr>
                                     <td>{{ job.job_title|truncate(30) }}</td>
                                     <td>{{ job.company_name|truncate(20) }}</td>
-                                    <td><small>{{ job.moderated_at.strftime('%m/%d') if job.moderated_at else 'N/A' }}</small></td>
                                     <td>
-                                        <a href="{{ url_for('admin.review_job', job_id=job.id) }}" 
-                                           class="btn btn-outline-danger btn-sm">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
+                                        <small>{{ job.moderated_at.strftime('%d/%m') if job.moderated_at else 'N/A' }}</small>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-1">
+                                            <a href="{{ url_for('admin.review_job', job_id=job.id) }}"
+                                               class="btn btn-outline-danger btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('admin.edit_job', job_id=job.id) }}"
+                                               class="btn btn-warning btn-sm"
+                                               title="Edit this job">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -296,7 +343,7 @@
                                     <th>Job Title</th>
                                     <th>Company</th>
                                     <th>Date</th>
-                                    <th>Action</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -304,12 +351,21 @@
                                 <tr>
                                     <td>{{ job.job_title|truncate(30) }}</td>
                                     <td>{{ job.company_name|truncate(20) }}</td>
-                                    <td><small>{{ job.moderated_at.strftime('%m/%d') if job.moderated_at else 'N/A' }}</small></td>
                                     <td>
-                                        <a href="{{ url_for('admin.review_job', job_id=job.id) }}" 
-                                           class="btn btn-outline-secondary btn-sm">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
+                                        <small>{{ job.moderated_at.strftime('%d/%m') if job.moderated_at else 'N/A' }}</small>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-1">
+                                            <a href="{{ url_for('admin.review_job', job_id=job.id) }}"
+                                               class="btn btn-outline-secondary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('admin.edit_job', job_id=job.id) }}"
+                                               class="btn btn-warning btn-sm"
+                                               title="Edit this job">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -320,7 +376,9 @@
             </div>
         </div>
         {% endif %}
+
     </div>
     {% endif %}
+
 </div>
 {% endblock %}
