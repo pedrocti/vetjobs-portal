@@ -32,3 +32,8 @@ python-dotenv==1.0.1
 # qrcode==8.2
 # reportlab==4.4.4
 # PyJWT==2.10.1
+markupsafe
+requests
+apscheduler
+twilio
+reportlab
