@@ -2,13 +2,12 @@ import os
 import logging
 from flask import Flask, render_template
 from markupsafe import Markup
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
-from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_mail import Mail
 from config import config
+from extensions import db, Base
 
 
 # ===============================
@@ -19,10 +18,6 @@ logging.basicConfig(
     format='%(asctime)s %(levelname)s %(name)s %(message)s'
 )
 
-class Base(DeclarativeBase):
-    pass
-
-db = SQLAlchemy(model_class=Base)
 login_manager = LoginManager()
 migrate = Migrate()
 mail = Mail()
