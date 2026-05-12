@@ -1,0 +1,118 @@
+{% extends "layouts/dashboard_base.html" %}
+{% block title %}Offer Your Services — Veteran Marketplace{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid p-0">
+
+  <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
+    <div>
+      <p class="section-label mb-1">Verified Workforce</p>
+      <h1 style="font-family:var(--font-display);font-size:clamp(22px,4vw,32px);font-weight:700;color:#ffffff;margin:0;">
+        Offer <em style="color:var(--gold);font-style:italic;">Your Services</em>
+      </h1>
+    </div>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- Form -->
+    <div class="col-lg-7">
+      <div class="vp-dash-card">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-hands-helping me-2"></i>Register a Service Offer</span>
+        </div>
+        <div class="vp-dash-card-body">
+          <form method="POST" action="{{ url_for('marketplace.submit_offer') }}">
+            <div class="mb-4">
+              <label style="font-family:var(--font-cond);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;display:block;">Service Category *</label>
+              <select name="category" required style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:12px 16px;color:#ffffff;font-size:14px;">
+                <option value="">Select a category...</option>
+                {% for slug, label in categories %}
+                <option value="{{ slug }}">{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-4">
+              <label style="font-family:var(--font-cond);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;display:block;">Service Title *</label>
+              <input type="text" name="title" required placeholder="e.g. Experienced Armoured Vehicle Driver"
+                     style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:12px 16px;color:#ffffff;font-size:14px;">
+            </div>
+            <div class="mb-4">
+              <label style="font-family:var(--font-cond);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;display:block;">Description</label>
+              <textarea name="description" rows="4" placeholder="Describe your experience, skills, and what you can offer..."
+                        style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:12px 16px;color:#ffffff;font-size:14px;resize:vertical;"></textarea>
+            </div>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label style="font-family:var(--font-cond);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;display:block;">Location</label>
+                <input type="text" name="location" placeholder="e.g. Lagos, Abuja, Remote"
+                       style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:12px 16px;color:#ffffff;font-size:14px;">
+              </div>
+              <div class="col-md-6">
+                <label style="font-family:var(--font-cond);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;display:block;">Availability</label>
+                <input type="text" name="availability" placeholder="e.g. Full-time, Weekdays only"
+                       style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:12px 16px;color:#ffffff;font-size:14px;">
+              </div>
+            </div>
+            <div class="mb-4">
+              <label style="font-family:var(--font-cond);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;display:block;">Rate / Compensation Info</label>
+              <input type="text" name="rate_info" placeholder="e.g. ₦80,000/month, negotiable"
+                     style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:12px 16px;color:#ffffff;font-size:14px;">
+            </div>
+            <button type="submit"
+                    style="display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:var(--gold);color:#0a1628;border:none;border-radius:4px;font-family:var(--font-cond);font-size:14px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;width:100%;justify-content:center;">
+              <i class="fas fa-plus-circle"></i> List My Service Offer
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Existing offers + info -->
+    <div class="col-lg-5">
+      <div class="vp-dash-card mb-4">
+        <div class="vp-dash-card-header"><span><i class="fas fa-info-circle me-2"></i>How It Works</span></div>
+        <div class="vp-dash-card-body">
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:14px;">
+            <li style="display:flex;gap:12px;align-items:flex-start;">
+              <span style="width:24px;height:24px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-cond);font-size:11px;color:var(--gold);font-weight:700;">1</span>
+              <p style="font-size:13px;color:rgba(255,255,255,0.65);margin:0;line-height:1.6;">List your services with your category, skills, and location.</p>
+            </li>
+            <li style="display:flex;gap:12px;align-items:flex-start;">
+              <span style="width:24px;height:24px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-cond);font-size:11px;color:var(--gold);font-weight:700;">2</span>
+              <p style="font-size:13px;color:rgba(255,255,255,0.65);margin:0;line-height:1.6;">Clients submit requests for the type of personnel they need.</p>
+            </li>
+            <li style="display:flex;gap:12px;align-items:flex-start;">
+              <span style="width:24px;height:24px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-cond);font-size:11px;color:var(--gold);font-weight:700;">3</span>
+              <p style="font-size:13px;color:rgba(255,255,255,0.65);margin:0;line-height:1.6;">Our team matches and introduces you to the right client.</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {% if existing %}
+      <div class="vp-dash-card">
+        <div class="vp-dash-card-header"><span><i class="fas fa-list me-2"></i>Your Active Offers</span></div>
+        <div class="vp-dash-card-body" style="padding:0;">
+          {% for offer in existing %}
+          <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+            <div>
+              <p style="font-size:13px;font-weight:700;color:#ffffff;margin:0 0 4px;">{{ offer.title }}</p>
+              <p style="font-size:11px;color:rgba(255,255,255,0.4);margin:0;">{{ offer.category_label }} {% if offer.location %} · {{ offer.location }}{% endif %}</p>
+            </div>
+            <form method="POST" action="{{ url_for('marketplace.delete_offer', offer_id=offer.id) }}"
+                  onsubmit="return confirm('Remove this offer?')">
+              <button type="submit" style="background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.2);color:#f87171;border-radius:4px;padding:6px 10px;cursor:pointer;font-size:11px;">
+                <i class="fas fa-trash"></i>
+              </button>
+            </form>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

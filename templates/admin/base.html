@@ -81,6 +81,20 @@
           </a>
         </div>
 
+        <!-- MARKETPLACE -->
+        <div class="vp-sidebar-group">
+          <p class="vp-group-label">Workforce</p>
+
+          <a class="vp-sidebar-link {% if request.endpoint == 'admin.marketplace_admin' or request.endpoint == 'admin.marketplace_match_form' %}active{% endif %}"
+             href="{{ url_for('admin.marketplace_admin') }}">
+            <i class="fas fa-handshake"></i>
+            <span>Marketplace</span>
+            {% if stats and stats.get('open_requests', 0) > 0 %}
+            <span class="vp-badge">{{ stats.open_requests }}</span>
+            {% endif %}
+          </a>
+        </div>
+
         <!-- JOB SYSTEM -->
         <div class="vp-sidebar-group">
           <p class="vp-group-label">Jobs</p>

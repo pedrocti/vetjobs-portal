@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}{{ cat_label }} — Verified Workforce{% endblock %}
+
+{% block content %}
+<div style="background:#0a1628;min-height:100vh;padding:60px 20px;">
+  <div class="container">
+
+    <div class="mb-4">
+      <a href="{{ url_for('marketplace.index') }}" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;">
+        <i class="fas fa-arrow-left me-1"></i> Verified Workforce
+      </a>
+    </div>
+
+    <p style="font-family:var(--font-cond);font-size:11px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:8px;">Verified Veterans</p>
+    <h1 style="font-family:var(--font-display);font-size:clamp(28px,5vw,44px);color:#ffffff;margin-bottom:8px;">{{ cat_label }}</h1>
+    <p style="color:rgba(255,255,255,0.4);font-size:14px;margin-bottom:40px;">
+      {{ offers|length }} veteran{{ 's' if offers|length != 1 else '' }} available for this role.
+    </p>
+
+    {% if offers %}
+    <div class="row g-4 mb-5">
+      {% for offer in offers %}
+      <div class="col-md-6 col-lg-4">
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:24px;height:100%;display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="width:44px;height:44px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="fas fa-user" style="color:var(--gold);font-size:18px;"></i>
+            </div>
+            <div>
+              <p style="font-family:var(--font-cond);font-size:15px;font-weight:700;color:#ffffff;margin:0;">{{ offer.user.first_name }} {{ offer.user.last_name[0] }}.</p>
+              {% if offer.user.veteran_profile and offer.user.veteran_profile.veteran_tier == 'verified' %}
+              <span style="font-size:10px;background:rgba(212,175,55,0.12);color:var(--gold);border:1px solid rgba(212,175,55,0.25);padding:2px 8px;border-radius:2px;font-family:var(--font-cond);letter-spacing:1px;">VERIFIED</span>
+              {% endif %}
+            </div>
+          </div>
+          <p style="font-weight:700;color:#ffffff;font-size:14px;margin:0;">{{ offer.title }}</p>
+          {% if offer.description %}
+          <p style="color:rgba(255,255,255,0.5);font-size:13px;line-height:1.6;margin:0;">{{ offer.description[:160] }}{% if offer.description|length > 160 %}…{% endif %}</p>
+          {% endif %}
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;">
+            {% if offer.location %}
+            <span style="font-size:11px;color:rgba(255,255,255,0.45);display:flex;align-items:center;gap:4px;">
+              <i class="fas fa-map-marker-alt" style="color:var(--gold);font-size:9px;"></i> {{ offer.location }}
+            </span>
+            {% endif %}
+            {% if offer.availability %}
+            <span style="font-size:11px;color:rgba(255,255,255,0.45);display:flex;align-items:center;gap:4px;">
+              <i class="fas fa-clock" style="color:var(--gold);font-size:9px;"></i> {{ offer.availability }}
+            </span>
+            {% endif %}
+            {% if offer.rate_info %}
+            <span style="font-size:11px;color:rgba(74,222,128,0.7);display:flex;align-items:center;gap:4px;">
+              <i class="fas fa-tag" style="font-size:9px;"></i> {{ offer.rate_info }}
+            </span>
+            {% endif %}
+          </div>
+          <a href="{{ url_for('marketplace.request_personnel') }}?category={{ offer.category }}"
+             style="display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);color:var(--gold);border-radius:4px;font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-decoration:none;width:100%;">
+            <i class="fas fa-paper-plane"></i> Request This Role
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:60px 20px;">
+      <i class="fas fa-users" style="font-size:40px;color:rgba(212,175,55,0.2);margin-bottom:16px;display:block;"></i>
+      <p style="color:rgba(255,255,255,0.4);font-size:15px;margin-bottom:20px;">No veterans have listed offers in this category yet.</p>
+      <a href="{{ url_for('marketplace.request_personnel') }}?category={{ category }}"
+         style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:var(--gold);color:#0a1628;border-radius:4px;font-family:var(--font-cond);font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase;text-decoration:none;">
+        <i class="fas fa-paper-plane"></i> Submit Request Anyway
+      </a>
+    </div>
+    {% endif %}
+
+    <div style="text-align:center;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06);">
+      <p style="color:rgba(255,255,255,0.4);font-size:13px;margin-bottom:16px;">Can't find the right profile? Submit a request and our team will find the match for you.</p>
+      <a href="{{ url_for('marketplace.request_personnel') }}"
+         style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:var(--gold);color:#0a1628;border-radius:4px;font-family:var(--font-cond);font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;text-decoration:none;">
+        <i class="fas fa-paper-plane"></i> Request Verified Personnel
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

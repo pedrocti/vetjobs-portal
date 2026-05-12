@@ -86,6 +86,7 @@ def update_payment_settings():
         # =============================
         update_setting('verification_fee', 'verification fee', 'Fee charged for veteran account verification')
         update_setting('boost_fee', 'boost fee', 'Fee charged for 7-day profile boost')
+        update_setting('job_ready_package_fee', 'Job-Ready Package fee', 'Bundled Job-Ready upgrade fee (CV + badge + boost + priority)')
 
 
         # =============================

@@ -87,6 +87,22 @@
                                 Fee charged for professional CV optimization service
                             </small>
                         </div>
+
+                        <div class="mb-3" style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.25);border-radius:8px;padding:14px;">
+                            <label for="job_ready_package_fee" class="form-label fw-bold" style="color:#D4AF37;">
+                                <i class="fas fa-rocket me-1"></i> Job-Ready Package Fee (₦)
+                            </label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="job_ready_package_fee" 
+                                   name="job_ready_package_fee" 
+                                   value="{{ settings.job_ready_package_fee.value if settings.job_ready_package_fee else '4500' }}"
+                                   min="0" 
+                                   step="500">
+                            <small class="form-text text-muted">
+                                All-in-one bundle: CV optimization + Verified badge + 7-day boost + Priority matching
+                            </small>
+                        </div>
                         
                     <!-- Employer Subscription Plans -->
                     <div class="col-md-6">

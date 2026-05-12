@@ -80,6 +80,15 @@
         </li>
 
         <li>
+          <a class="vp-sidebar-link {% if 'marketplace' in request.endpoint %}active{% endif %}"
+             href="{{ url_for('marketplace.offer_service') }}"
+             style="color:rgba(212,175,55,0.85);">
+            <i class="fas fa-hands-helping fa-fw" style="color:var(--gold);"></i>
+            <span>Offer Services</span>
+          </a>
+        </li>
+
+        <li>
           <a class="vp-sidebar-link vp-sidebar-community"
              href="https://chat.whatsapp.com/FiXN7lzXYi6IvxjhXMcx2E"
              target="_blank" rel="noopener noreferrer">

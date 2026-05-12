@@ -1,0 +1,182 @@
+{% extends "admin/base.html" %}
+{% block title %}Marketplace Requests — Admin Panel{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid p-0">
+
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+      <p class="section-label mb-1">Verified Workforce</p>
+      <h1 style="font-family:var(--font-display);font-size:clamp(24px,4vw,36px);font-weight:700;color:#ffffff;margin:0;">
+        Marketplace <em style="color:var(--gold);font-style:italic;">Matching</em>
+      </h1>
+      <p style="color:rgba(255,255,255,0.4);font-size:13px;margin-top:4px;">
+        Review client requests and match with verified veterans
+      </p>
+    </div>
+    <a href="{{ url_for('marketplace.index') }}" target="_blank"
+       style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);color:var(--gold);border-radius:4px;font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-decoration:none;">
+      <i class="fas fa-external-link-alt"></i> View Public Page
+    </a>
+  </div>
+
+  <!-- Stats -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number">{{ stats.open_requests }}</div>
+          <div class="vp-dash-stat-label">Open Requests</div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24;">
+          <i class="fas fa-inbox"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number">{{ stats.matched_requests }}</div>
+          <div class="vp-dash-stat-label">Matched</div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(74,222,128,0.1);color:#4ade80;">
+          <i class="fas fa-handshake"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number">{{ stats.active_offers }}</div>
+          <div class="vp-dash-stat-label">Veteran Offers</div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(212,175,55,0.1);color:var(--gold);">
+          <i class="fas fa-users"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="vp-dash-stat">
+        <div>
+          <div class="vp-dash-stat-number">{{ stats.closed_requests }}</div>
+          <div class="vp-dash-stat-label">Closed</div>
+        </div>
+        <div class="vp-dash-stat-icon" style="background:rgba(96,165,250,0.1);color:#60a5fa;">
+          <i class="fas fa-check-circle"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="vp-dash-card mb-4">
+    <div class="vp-dash-card-body">
+      <form method="GET" class="d-flex flex-wrap gap-3 align-items-end">
+        <div>
+          <label class="form-label">Status</label>
+          <select name="status" class="form-select" onchange="this.form.submit()">
+            <option value="">All</option>
+            <option value="open"    {{ 'selected' if status_filter == 'open' }}>Open</option>
+            <option value="matched" {{ 'selected' if status_filter == 'matched' }}>Matched</option>
+            <option value="closed"  {{ 'selected' if status_filter == 'closed' }}>Closed</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Category</label>
+          <select name="category" class="form-select" onchange="this.form.submit()">
+            <option value="">All Categories</option>
+            {% for slug, label in categories %}
+            <option value="{{ slug }}" {{ 'selected' if category_filter == slug }}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Requests Table -->
+  <div class="vp-dash-card">
+    <div class="vp-dash-card-header">
+      <span><i class="fas fa-clipboard-list me-2"></i>Client Requests</span>
+    </div>
+    <div class="vp-dash-card-body" style="padding:0;">
+      {% if requests_list %}
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Role Needed</th>
+              <th>Category</th>
+              <th>Location</th>
+              <th>Budget</th>
+              <th>Status</th>
+              <th>Submitted</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for sr in requests_list %}
+            <tr>
+              <td>
+                <div style="font-weight:700;color:#ffffff;font-size:13px;">{{ sr.client_name }}</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.4);">{{ sr.client_email }}</div>
+                {% if sr.client_phone %}<div style="font-size:11px;color:rgba(255,255,255,0.3);">{{ sr.client_phone }}</div>{% endif %}
+              </td>
+              <td style="color:rgba(255,255,255,0.8);font-size:13px;max-width:200px;">{{ sr.role_needed }}</td>
+              <td>
+                <span style="background:rgba(212,175,55,0.1);color:var(--gold);border:1px solid rgba(212,175,55,0.25);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:2px;white-space:nowrap;">
+                  {{ sr.category_label }}
+                </span>
+              </td>
+              <td style="color:rgba(255,255,255,0.5);font-size:12px;">{{ sr.location or '—' }}</td>
+              <td style="color:rgba(255,255,255,0.5);font-size:12px;">{{ sr.budget or '—' }}</td>
+              <td>
+                {% if sr.status == 'open' %}
+                <span style="background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.25);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:2px;">Open</span>
+                {% elif sr.status == 'matched' %}
+                <span style="background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:2px;">Matched</span>
+                {% else %}
+                <span style="background:rgba(96,165,250,0.12);color:#60a5fa;border:1px solid rgba(96,165,250,0.25);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:2px;">Closed</span>
+                {% endif %}
+              </td>
+              <td style="color:rgba(255,255,255,0.4);font-size:11px;">{{ sr.created_at.strftime('%b %d, %Y') }}</td>
+              <td>
+                <div style="display:flex;gap:6px;">
+                  {% if sr.status == 'open' %}
+                  <a href="{{ url_for('admin.marketplace_match_form', request_id=sr.id) }}"
+                     class="btn btn-outline-warning btn-sm" title="Match with a Veteran">
+                    <i class="fas fa-link"></i>
+                  </a>
+                  {% endif %}
+                  {% if sr.matched_veteran %}
+                  <span style="font-size:11px;color:#4ade80;display:flex;align-items:center;gap:4px;">
+                    <i class="fas fa-user-check"></i> {{ sr.matched_veteran.first_name }}
+                  </span>
+                  {% endif %}
+                  <form method="POST" action="{{ url_for('admin.marketplace_update_status', request_id=sr.id) }}" style="display:inline;">
+                    <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" style="font-size:11px;padding:3px 6px;">
+                      <option value="open"    {{ 'selected' if sr.status == 'open' }}>Open</option>
+                      <option value="matched" {{ 'selected' if sr.status == 'matched' }}>Matched</option>
+                      <option value="closed"  {{ 'selected' if sr.status == 'closed' }}>Closed</option>
+                    </select>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="vp-empty-state py-5">
+        <i class="fas fa-inbox fa-3x mb-3" style="color:rgba(255,255,255,0.1);"></i>
+        <p class="section-label mb-2">No Requests Yet</p>
+        <p style="color:rgba(255,255,255,0.35);font-size:13px;">Client service requests will appear here once submitted.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

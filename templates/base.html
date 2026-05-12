@@ -228,6 +228,40 @@
             </div>
           </li>
 
+          <!-- Verified Workforce Dropdown -->
+          <li class="vp-dropdown">
+            <a class="vp-nav-link vp-dropdown-toggle" href="#">
+              Verified Workforce <i class="fas fa-chevron-down vp-chevron"></i>
+            </a>
+            <div class="vp-dropdown-menu">
+              <div class="vp-dropdown-inner">
+                <a class="vp-dropdown-item" href="{{ url_for('marketplace.index') }}">
+                  <span class="vp-di-icon"><i class="fas fa-shield-alt"></i></span>
+                  <span class="vp-di-text">
+                    <strong>Browse Workforce</strong>
+                    <small>Drivers, security, technicians & more</small>
+                  </span>
+                </a>
+                <a class="vp-dropdown-item" href="{{ url_for('marketplace.request_personnel') }}">
+                  <span class="vp-di-icon"><i class="fas fa-paper-plane"></i></span>
+                  <span class="vp-di-text">
+                    <strong>Request Personnel</strong>
+                    <small>Submit a hiring request to our team</small>
+                  </span>
+                </a>
+                {% if current_user.is_authenticated and current_user.is_veteran() %}
+                <a class="vp-dropdown-item" href="{{ url_for('marketplace.offer_service') }}">
+                  <span class="vp-di-icon"><i class="fas fa-hands-helping"></i></span>
+                  <span class="vp-di-text">
+                    <strong>Offer Your Services</strong>
+                    <small>List your skills for clients</small>
+                  </span>
+                </a>
+                {% endif %}
+              </div>
+            </div>
+          </li>
+
           <li><a class="vp-nav-link" href="{{ url_for('main.about') }}">About</a></li>
 
         </ul>
@@ -432,6 +466,21 @@
             <div class="vp-drawer-section-body" id="drawerEmployers">
               <a class="vp-drawer-sublink" href="{{ url_for('main.employers') }}">Hire Veterans</a>
               <a class="vp-drawer-sublink" href="{{ url_for('main.employers') }}">Partner With Us</a>
+            </div>
+          </div>
+
+          <!-- Verified Workforce Accordion -->
+          <div class="vp-drawer-section">
+            <button class="vp-drawer-section-toggle" data-target="drawerMarketplace">
+              <span><i class="fas fa-shield-alt"></i> Verified Workforce</span>
+              <i class="fas fa-chevron-down vp-drawer-chevron"></i>
+            </button>
+            <div class="vp-drawer-section-body" id="drawerMarketplace">
+              <a class="vp-drawer-sublink" href="{{ url_for('marketplace.index') }}">Browse Workforce</a>
+              <a class="vp-drawer-sublink" href="{{ url_for('marketplace.request_personnel') }}">Request Personnel</a>
+              {% if current_user.is_authenticated and current_user.is_veteran() %}
+              <a class="vp-drawer-sublink" href="{{ url_for('marketplace.offer_service') }}">Offer My Services</a>
+              {% endif %}
             </div>
           </div>
 

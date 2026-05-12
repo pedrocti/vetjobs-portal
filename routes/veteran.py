@@ -216,8 +216,8 @@ def complete_profile():
             except Exception as e:
                 current_app.logger.warning(f"Brevo update failed: {e}")
 
-            flash('Profile submitted successfully. Verification pending.', 'success')
-            return redirect(url_for('dashboard.veteran'))
+            flash('Profile submitted successfully! Upgrade to Job-Ready to get hired faster.', 'success')
+            return redirect(url_for('services.job_ready_package'))
 
         except Exception:
             db.session.rollback()

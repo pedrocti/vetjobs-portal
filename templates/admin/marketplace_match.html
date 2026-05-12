@@ -1,0 +1,118 @@
+{% extends "admin/base.html" %}
+{% block title %}Match Request — Admin Panel{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid p-0">
+
+  <div class="mb-4">
+    <a href="{{ url_for('admin.marketplace_admin') }}" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;">
+      <i class="fas fa-arrow-left me-1"></i> Back to Marketplace
+    </a>
+  </div>
+
+  <div class="mb-4">
+    <p class="section-label mb-1">Admin Matching Tool</p>
+    <h1 style="font-family:var(--font-display);font-size:clamp(22px,4vw,32px);font-weight:700;color:#ffffff;margin:0;">
+      Match Veteran to Request
+    </h1>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- Request Summary -->
+    <div class="col-lg-4">
+      <div class="vp-dash-card">
+        <div class="vp-dash-card-header"><span><i class="fas fa-clipboard me-2"></i>Client Request</span></div>
+        <div class="vp-dash-card-body">
+          <div style="margin-bottom:12px;">
+            <p style="font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Client</p>
+            <p style="font-size:14px;color:#ffffff;font-weight:700;margin:0;">{{ sr.client_name }}</p>
+            <p style="font-size:12px;color:rgba(255,255,255,0.4);margin:0;">{{ sr.client_email }}</p>
+            {% if sr.client_phone %}<p style="font-size:12px;color:rgba(255,255,255,0.4);margin:0;">{{ sr.client_phone }}</p>{% endif %}
+          </div>
+          <div style="margin-bottom:12px;">
+            <p style="font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Role Needed</p>
+            <p style="font-size:14px;color:var(--gold);font-weight:700;margin:0;">{{ sr.role_needed }}</p>
+          </div>
+          <div style="margin-bottom:12px;">
+            <p style="font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Category</p>
+            <p style="font-size:13px;color:#ffffff;margin:0;">{{ sr.category_label }}</p>
+          </div>
+          {% if sr.location %}<div style="margin-bottom:12px;">
+            <p style="font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Location</p>
+            <p style="font-size:13px;color:#ffffff;margin:0;">{{ sr.location }}</p>
+          </div>{% endif %}
+          {% if sr.duration %}<div style="margin-bottom:12px;">
+            <p style="font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Duration</p>
+            <p style="font-size:13px;color:#ffffff;margin:0;">{{ sr.duration }}</p>
+          </div>{% endif %}
+          {% if sr.budget %}<div style="margin-bottom:12px;">
+            <p style="font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Budget</p>
+            <p style="font-size:13px;color:rgba(74,222,128,0.8);font-weight:700;margin:0;">{{ sr.budget }}</p>
+          </div>{% endif %}
+          {% if sr.details %}
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px;margin-top:8px;">
+            <p style="font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Details</p>
+            <p style="font-size:13px;color:rgba(255,255,255,0.6);margin:0;line-height:1.6;">{{ sr.details }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Select Veteran -->
+    <div class="col-lg-8">
+      <div class="vp-dash-card">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-link me-2"></i>Select a Veteran to Match</span>
+          {% if offer_user_ids %}
+          <span style="background:rgba(212,175,55,0.1);color:var(--gold);border:1px solid rgba(212,175,55,0.2);font-size:10px;padding:3px 8px;border-radius:2px;font-family:var(--font-cond);letter-spacing:1px;">
+            <i class="fas fa-star me-1"></i>{{ offer_user_ids|length }} have listed offers for this category
+          </span>
+          {% endif %}
+        </div>
+        <div class="vp-dash-card-body">
+          <form method="POST" action="{{ url_for('admin.marketplace_match') }}">
+            <input type="hidden" name="request_id" value="{{ sr.id }}">
+
+            <div class="mb-4">
+              <label class="form-label">Admin Notes (sent to both parties)</label>
+              <textarea name="admin_notes" rows="3" class="form-control" placeholder="Add a personal introduction note..."></textarea>
+            </div>
+
+            <div style="max-height:480px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+              {% for user, profile in veterans %}
+              <label style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:rgba(255,255,255,0.03);border:1px solid {{ 'rgba(212,175,55,0.3)' if user.id in offer_user_ids else 'rgba(255,255,255,0.08)' }};border-radius:8px;cursor:pointer;transition:all 0.15s ease;">
+                <input type="radio" name="veteran_id" value="{{ user.id }}" style="flex-shrink:0;">
+                <div style="flex:1;">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                    <span style="font-family:var(--font-cond);font-size:14px;font-weight:700;color:#ffffff;">{{ user.full_name }}</span>
+                    {% if profile and profile.veteran_tier == 'verified' %}
+                    <span style="background:rgba(212,175,55,0.1);color:var(--gold);border:1px solid rgba(212,175,55,0.25);font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px;">JOB-READY</span>
+                    {% endif %}
+                    {% if user.id in offer_user_ids %}
+                    <span style="background:rgba(74,222,128,0.1);color:#4ade80;border:1px solid rgba(74,222,128,0.2);font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px;">LISTED OFFER</span>
+                    {% endif %}
+                  </div>
+                  <p style="font-size:12px;color:rgba(255,255,255,0.4);margin:0;">{{ user.email }}
+                    {% if profile and profile.location %} · {{ profile.location }}{% endif %}
+                    {% if profile and profile.service_branch %} · {{ profile.service_branch }}{% endif %}
+                  </p>
+                </div>
+              </label>
+              {% endfor %}
+            </div>
+
+            <button type="submit"
+                    style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px;background:var(--gold);color:#0a1628;border:none;border-radius:4px;font-family:var(--font-cond);font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer;"
+                    onclick="return confirm('Match this veteran with the client request? Both parties will be notified.')">
+              <i class="fas fa-handshake"></i> Confirm Match & Notify Both Parties
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

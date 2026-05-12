@@ -122,6 +122,8 @@ def create_app():
     from routes.resources import resources_bp
     from routes.training_programs import training_bp
     from routes.services import services_bp
+    from routes.marketplace import marketplace_bp
+    import routes.admin.marketplace_admin  # registers admin marketplace routes
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix="/auth")
@@ -139,6 +141,7 @@ def create_app():
     app.register_blueprint(resources_bp)
     app.register_blueprint(training_bp)
     app.register_blueprint(services_bp)
+    app.register_blueprint(marketplace_bp, url_prefix='/marketplace')
 
     # ===============================
     # Error handlers

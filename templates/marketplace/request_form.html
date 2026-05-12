@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Request Verified Personnel — VetJobPortal{% endblock %}
+
+{% block content %}
+<div style="background:#0a1628;min-height:100vh;padding:60px 20px;">
+  <div style="max-width:700px;margin:0 auto;">
+
+    <div class="mb-4">
+      <a href="{{ url_for('marketplace.index') }}" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;">
+        <i class="fas fa-arrow-left me-1"></i> Verified Workforce
+      </a>
+    </div>
+
+    <div style="text-align:center;margin-bottom:48px;">
+      <p style="font-family:var(--font-cond);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">
+        <i class="fas fa-paper-plane me-2"></i>Submit a Request
+      </p>
+      <h1 style="font-family:var(--font-display);font-size:clamp(28px,5vw,44px);font-weight:700;color:#ffffff;margin-bottom:12px;">
+        Request <em style="color:var(--gold);font-style:italic;">Verified Personnel</em>
+      </h1>
+      <p style="color:rgba(255,255,255,0.5);font-size:15px;line-height:1.7;">
+        Fill out the form below. Our team will match you with a verified veteran within 24 hours.
+      </p>
+    </div>
+
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.09);border-radius:12px;padding:40px 36px;">
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for cat, msg in messages %}
+        <div style="background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);border-radius:6px;padding:14px 18px;margin-bottom:20px;color:#4ade80;font-size:13px;">
+          <i class="fas fa-check-circle me-2"></i>{{ msg }}
+        </div>
+        {% endfor %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('marketplace.submit_request') }}">
+
+        <div class="row g-4 mb-4">
+          <div class="col-md-6">
+            <label style="font-family:var(--font-cond);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;display:block;">Your Name *</label>
+            <input type="text" name="client_name" required placeholder="Full name or company"
+                   style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:12px 16px;color:#ffffff;font-size:14px;">
+          </div>
+          <div class="col-md-6">
+            <label style="font-family:var(--font-cond);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;display:block;">Email Address *</label>
+            <input type="email" name="client_email" required placeholder="you@company.com"
+                   style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:12px 16px;color:#ffffff;font-size:14px;">
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label style="font-family:var(--font-cond);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;display:block;">Phone Number</label>
+          <input type="tel" name="client_phone" placeholder="+234..."
+                 style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:12px 16px;color:#ffffff;font-size:14px;">
+        </div>
+
+        <div class="row g-4 mb-4">
+          <div class="col-md-6">
+            <label style="font-family:var(--font-cond);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;display:block;">Category Needed *</label>
+            <select name="category" required style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:12px 16px;color:#ffffff;font-size:14px;">
+              <option value="">Select a role category...</option>
+              {% for slug, label in categories %}
+              <option value="{{ slug }}" {{ 'selected' if request.args.get('category') == slug }}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label style="font-family:var(--font-cond);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;display:block;">Role / Position Needed *</label>
+            <input type="text" name="role_needed" required placeholder="e.g. Corporate driver, Security officer"
+                   style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:12px 16px;color:#ffffff;font-size:14px;">
+          </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+          <div class="col-md-4">
+            <label style="font-family:var(--font-cond);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;display:block;">Location</label>
+            <input type="text" name="location" placeholder="City / State"
+                   style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:12px 16px;color:#ffffff;font-size:14px;">
+          </div>
+          <div class="col-md-4">
+            <label style="font-family:var(--font-cond);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;display:block;">Duration / Timeline</label>
+            <input type="text" name="duration" placeholder="e.g. 3 months, permanent"
+                   style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:12px 16px;color:#ffffff;font-size:14px;">
+          </div>
+          <div class="col-md-4">
+            <label style="font-family:var(--font-cond);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;display:block;">Budget</label>
+            <input type="text" name="budget" placeholder="e.g. ₦80,000/month"
+                   style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:12px 16px;color:#ffffff;font-size:14px;">
+          </div>
+        </div>
+
+        <div class="mb-5">
+          <label style="font-family:var(--font-cond);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;display:block;">Additional Details</label>
+          <textarea name="details" rows="4" placeholder="Any specific requirements, skills needed, experience level, etc."
+                    style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:12px 16px;color:#ffffff;font-size:14px;resize:vertical;"></textarea>
+        </div>
+
+        <button type="submit"
+                style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px 32px;background:var(--gold);color:#0a1628;border:none;border-radius:4px;font-family:var(--font-cond);font-size:15px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;">
+          <i class="fas fa-paper-plane"></i> Submit Request — We'll Match You Within 24 Hours
+        </button>
+
+        <p style="text-align:center;color:rgba(255,255,255,0.25);font-size:11px;margin-top:14px;">
+          No payment required to submit. Our team handles the matching manually.
+        </p>
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
