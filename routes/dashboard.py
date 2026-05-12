@@ -95,16 +95,22 @@ def veteran():
         "profile_completion": get_profile_completion(current_user),
     }
 
-    verification_fee = PaymentSetting.get_setting("verification_fee", 2000)
-    boost_fee        = PaymentSetting.get_setting("boost_fee", 1000)
+    verification_fee       = PaymentSetting.get_setting("verification_fee", 2000)
+    boost_fee              = PaymentSetting.get_setting("boost_fee", 1000)
+    job_ready_package_fee  = PaymentSetting.get_setting("job_ready_package_fee", 4500)
 
     profile = getattr(current_user, "veteran_profile", None)
 
     has_skills = False
+    is_job_ready = False
+    veteran_tier = "basic"
+
     if profile:
         has_skills = bool(
             (profile.skills or "").strip() or (profile.certifications or "").strip()
         )
+        is_job_ready = bool(getattr(profile, "job_ready_package_active", False))
+        veteran_tier = getattr(profile, "veteran_tier", "basic") or "basic"
 
     return render_template(
         "dashboards/veteran.html",
@@ -112,7 +118,10 @@ def veteran():
         stats=stats,
         verification_fee=verification_fee,
         boost_fee=boost_fee,
+        job_ready_package_fee=job_ready_package_fee,
         has_skills=has_skills,
+        is_job_ready=is_job_ready,
+        veteran_tier=veteran_tier,
     )
 
 

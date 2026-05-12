@@ -41,6 +41,7 @@ def init_payment():
             "review": "review_fee",
             "ai_flyer": "ai_flyer_fee",
             "cv_optimization": "cv_optimization_fee",
+            "job_ready_package": "job_ready_package_fee",
         }
 
         setting_key = feature_setting_map.get(feature, None)

@@ -35,6 +35,7 @@ externalPort = 80
 
 [agent]
 integrations = ["python_sendgrid:1.0.0"]
+expertMode = true
 
 [userenv]
 

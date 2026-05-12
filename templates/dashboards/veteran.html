@@ -14,22 +14,22 @@
         Explore jobs, programs, and resources tailored for you.
       </p>
     </div>
-    <span class="vp-sidebar-badge" style="padding:6px 16px;font-size:11px;">
-      <i class="fas fa-medal me-1"></i>Verified Veteran
+    {% if veteran_tier == 'verified' %}
+    <span class="vp-sidebar-badge" style="padding:6px 16px;font-size:11px;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.4);color:var(--gold);">
+      <i class="fas fa-star me-1"></i>Job-Ready &mdash; Verified
     </span>
+    {% else %}
+    <span style="padding:6px 16px;font-size:11px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:2px;color:rgba(255,255,255,0.4);font-family:var(--font-cond);letter-spacing:1px;">
+      <i class="fas fa-shield-alt me-1"></i>Basic Profile
+    </span>
+    {% endif %}
   </div>
  
- 
-  <!-- ── PROFILE ALERTS ────────────────────────────────────── -->
+  <!-- ── PROFILE STATUS ALERTS ────────────────────────────────── -->
   {% if current_user.veteran_profile %}
     {% set profile = current_user.veteran_profile %}
-    {% if profile.verification_status == 'pending' %}
-    <div class="vp-dash-alert vp-dash-alert-warning">
-      <i class="fas fa-clock"></i>
-      <span>Your profile is under review. You'll be notified once verified.</span>
-    </div>
-    {% elif profile.verification_status == 'approved' %}
-        <div class="vp-dash-alert vp-dash-alert-success auto-dismiss">
+    {% if profile.verification_status == 'approved' %}
+    <div class="vp-dash-alert vp-dash-alert-success auto-dismiss">
       <i class="fas fa-check-circle"></i>
       <span>Profile verified! You can now apply for jobs.</span>
       <a href="{{ url_for('jobs.job_board') }}" class="btn-vp-primary ms-auto"
@@ -44,15 +44,13 @@
     <span>Complete your profile to access jobs and all platform resources.</span>
     <a href="{{ url_for('veteran.complete_profile') }}" class="btn-vp-primary ms-auto"
        style="padding:8px 18px;font-size:11px;">
-      <i class="fas fa-user-plus"></i><span>Complete Profile</span>
+      <i class="fas fa-user-plus"></i><span>Build Profile</span>
     </a>
   </div>
   {% endif %}
  
- 
   <!-- ── STAT CARDS ────────────────────────────────────────── -->
   <div class="row g-3 mb-4">
- 
     <div class="col-6 col-lg-3">
       <div class="vp-dash-stat">
         <div>
@@ -64,7 +62,6 @@
         </div>
       </div>
     </div>
- 
     <div class="col-6 col-lg-3">
       <div class="vp-dash-stat">
         <div>
@@ -76,7 +73,6 @@
         </div>
       </div>
     </div>
- 
     <div class="col-6 col-lg-3">
       <div class="vp-dash-stat">
         <div>
@@ -88,7 +84,6 @@
         </div>
       </div>
     </div>
- 
     <div class="col-6 col-lg-3">
       <div class="vp-dash-stat">
         <div>
@@ -100,15 +95,82 @@
         </div>
       </div>
     </div>
- 
   </div>
  
- 
+  <!-- ── GET HIRED FASTER — JOB-READY CTA (FREE USERS ONLY) ── -->
+  {% if not is_job_ready %}
+  <div style="background:linear-gradient(135deg,rgba(212,175,55,0.12) 0%,rgba(10,22,40,0.6) 100%);border:1px solid rgba(212,175,55,0.3);border-radius:10px;padding:28px 32px;margin-bottom:28px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-30px;right:-30px;width:180px;height:180px;background:radial-gradient(circle,rgba(212,175,55,0.12) 0%,transparent 70%);pointer-events:none;"></div>
+    <div class="row align-items-center g-4">
+      <div class="col-lg-7">
+        <p style="font-family:var(--font-cond);font-size:11px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:8px;">
+          <i class="fas fa-rocket me-1"></i>Get Hired Faster
+        </p>
+        <h3 style="font-family:var(--font-display);font-size:clamp(20px,3vw,28px);font-weight:700;color:#ffffff;margin-bottom:10px;line-height:1.3;">
+          Unlock the <em style="color:var(--gold);font-style:italic;">Job-Ready Package</em>
+        </h3>
+        <p style="color:rgba(255,255,255,0.6);font-size:14px;line-height:1.7;margin-bottom:0;">
+          One bundled upgrade that gives you everything you need to stand out and get placed faster.
+        </p>
+      </div>
+      <div class="col-lg-5">
+        <ul style="list-style:none;padding:0;margin:0 0 20px 0;display:flex;flex-direction:column;gap:10px;">
+          <li style="display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,0.8);">
+            <span style="width:22px;height:22px;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="fas fa-file-alt" style="font-size:9px;color:var(--gold);"></i>
+            </span>
+            CV Optimization by our team
+          </li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,0.8);">
+            <span style="width:22px;height:22px;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="fas fa-star" style="font-size:9px;color:var(--gold);"></i>
+            </span>
+            Verified Badge on your profile
+          </li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,0.8);">
+            <span style="width:22px;height:22px;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="fas fa-rocket" style="font-size:9px;color:var(--gold);"></i>
+            </span>
+            7-Day Profile Boost (top of searches)
+          </li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,0.8);">
+            <span style="width:22px;height:22px;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="fas fa-trophy" style="font-size:9px;color:var(--gold);"></i>
+            </span>
+            Priority Matching with employers
+          </li>
+        </ul>
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+          <a href="{{ url_for('services.job_ready_package') }}"
+             style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:var(--gold);color:#0a1628;border-radius:4px;font-family:var(--font-cond);font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;text-decoration:none;transition:all 0.2s ease;">
+            <i class="fas fa-rocket"></i> Upgrade to Job-Ready &mdash; ₦{{ "{:,.0f}".format(job_ready_package_fee) }}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <!-- ── JOB-READY ACTIVE BANNER ── -->
+  <div style="background:linear-gradient(135deg,rgba(74,222,128,0.1) 0%,rgba(10,22,40,0.6) 100%);border:1px solid rgba(74,222,128,0.25);border-radius:10px;padding:20px 28px;margin-bottom:28px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+    <div style="width:48px;height:48px;background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <i class="fas fa-star" style="color:#4ade80;font-size:20px;"></i>
+    </div>
+    <div style="flex:1;">
+      <p style="font-family:var(--font-cond);font-size:11px;letter-spacing:2px;color:#4ade80;text-transform:uppercase;margin-bottom:4px;">Job-Ready Status Active</p>
+      <p style="color:rgba(255,255,255,0.7);font-size:13px;margin:0;">You are verified, boosted, and prioritised in employer matching. Our team is reviewing your CV.</p>
+    </div>
+    <a href="{{ url_for('jobs.job_board') }}"
+       style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.3);color:#4ade80;border-radius:4px;font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-decoration:none;">
+      <i class="fas fa-briefcase"></i> Browse Jobs
+    </a>
+  </div>
+  {% endif %}
+
   <div class="row g-4">
- 
+
     <!-- ── MAIN COLUMN ─────────────────────────────────────── -->
     <div class="col-lg-8">
- 
+
       <!-- Quick Actions -->
       <div class="vp-dash-card">
         <div class="vp-dash-card-header">
@@ -147,8 +209,8 @@
           </div>
         </div>
       </div>
- 
- 
+
+
       <!-- Recent Applications -->
       <div class="vp-dash-card">
         <div class="vp-dash-card-header">
@@ -189,8 +251,8 @@
           {% endif %}
         </div>
       </div>
- 
- 
+
+
       <!-- Recommended Jobs -->
       <div class="vp-dash-card">
         <div class="vp-dash-card-header">
@@ -202,17 +264,17 @@
           </div>
         </div>
       </div>
- 
+
     </div>
- 
- 
+
+
     <!-- ── SIDEBAR COLUMN ──────────────────────────────────── -->
     <div class="col-lg-4">
- 
-      <!-- Profile Completion -->
+
+      <!-- Profile Status -->
       <div class="vp-dash-card">
         <div class="vp-dash-card-header">
-          <span><i class="fas fa-tasks me-2"></i>Profile Status</span>
+          <span><i class="fas fa-tasks me-2"></i>Your Profile Status</span>
         </div>
         <div class="vp-dash-card-body">
           <div class="d-flex justify-content-between align-items-center mb-2">
@@ -224,28 +286,66 @@
           <div class="vp-progress-bar-wrapper mb-4">
             <div class="vp-progress-bar-fill" style="width:{{ stats.profile_completion }}%;"></div>
           </div>
- 
+
+          <!-- Status Checklist -->
           <div class="vp-checklist-item">
-            <i class="fas {% if current_user.first_name and current_user.last_name %}fa-check-circle vp-check-yes{% else %}fa-circle vp-check-no{% endif %}"></i>
-            <span>Basic Information</span>
+            <i class="fas fa-check-circle vp-check-yes"></i>
+            <span>Basic Profile</span>
+            <span style="margin-left:auto;font-size:10px;background:rgba(74,222,128,0.1);color:#4ade80;border:1px solid rgba(74,222,128,0.2);padding:2px 8px;border-radius:2px;">Done</span>
           </div>
           <div class="vp-checklist-item">
-            <i class="fas {% if current_user.veteran_profile and current_user.veteran_profile.service_branch and current_user.veteran_profile.rank %}fa-check-circle vp-check-yes{% else %}fa-circle vp-check-no{% endif %}"></i>
+            {% if current_user.veteran_profile and current_user.veteran_profile.service_branch and current_user.veteran_profile.rank %}
+            <i class="fas fa-check-circle vp-check-yes"></i>
+            {% else %}
+            <i class="fas fa-circle vp-check-no"></i>
+            {% endif %}
             <span>Military Experience</span>
           </div>
           <div class="vp-checklist-item">
-            <i class="fas {% if current_user.veteran_profile and ((current_user.veteran_profile.skills or '')|length > 0 or (current_user.veteran_profile.certifications or '')|length > 0) %}fa-check-circle vp-check-yes{% else %}fa-circle vp-check-no{% endif %}"></i>
-            <span>Skills & Certifications</span>
+            {% if current_user.veteran_profile and ((current_user.veteran_profile.skills or '')|length > 0 or (current_user.veteran_profile.certifications or '')|length > 0) %}
+            <i class="fas fa-check-circle vp-check-yes"></i>
+            {% else %}
+            <i class="fas fa-circle vp-check-no"></i>
+            {% endif %}
+            <span>Skills &amp; Certifications</span>
+          </div>
+          <div class="vp-checklist-item">
+            {% if current_user.veteran_profile and current_user.veteran_profile.resume_file %}
+            <i class="fas fa-check-circle vp-check-yes"></i>
+            {% else %}
+            <i class="fas fa-circle vp-check-no"></i>
+            {% endif %}
+            <span>CV Uploaded</span>
+          </div>
+
+          <!-- Under Review Status -->
+          <div style="margin-top:16px;padding:12px 14px;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.18);border-radius:6px;">
+            {% if current_user.veteran_profile and current_user.veteran_profile.verification_status == 'pending' %}
+            <p style="font-size:12px;color:rgba(255,255,255,0.5);margin:0 0 4px 0;font-family:var(--font-cond);letter-spacing:1px;text-transform:uppercase;">Under Review</p>
+            <p style="font-size:13px;color:rgba(255,255,255,0.75);margin:0;display:flex;align-items:center;gap:6px;">
+              <i class="fas fa-clock" style="color:#fbbf24;"></i> Our team is verifying your documents
+            </p>
+            {% elif veteran_tier == 'verified' %}
+            <p style="font-size:12px;color:rgba(74,222,128,0.6);margin:0 0 4px 0;font-family:var(--font-cond);letter-spacing:1px;text-transform:uppercase;">Verified</p>
+            <p style="font-size:13px;color:rgba(255,255,255,0.75);margin:0;display:flex;align-items:center;gap:6px;">
+              <i class="fas fa-star" style="color:#4ade80;"></i> Job-Ready &mdash; Priority access active
+            </p>
+            {% else %}
+            <p style="font-size:12px;color:rgba(255,255,255,0.3);margin:0 0 4px 0;font-family:var(--font-cond);letter-spacing:1px;text-transform:uppercase;">Not Yet Reviewed</p>
+            <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:0;">Complete your profile to begin review</p>
+            {% endif %}
           </div>
         </div>
       </div>
- 
- 
-      <!-- Boost Card -->
+
+
+      <!-- Boost / Visibility Card -->
+      {% if is_job_ready %}
+      <!-- JOB-READY: show Visibility Boost -->
       <div class="vp-dash-card {% if current_user.veteran_profile and current_user.veteran_profile.is_boosted() %}vp-boost-card-active{% endif %}">
         {% if current_user.veteran_profile and current_user.veteran_profile.is_boosted() %}
         <div class="vp-dash-card-header" style="color:#fbbf24;border-bottom-color:rgba(251,191,36,0.1);">
-          <span><i class="fas fa-fire me-2"></i>Profile Boosted</span>
+          <span><i class="fas fa-fire me-2"></i>Visibility Boost</span>
           <span style="background:rgba(251,191,36,0.15);color:#fbbf24;font-size:10px;padding:3px 8px;border-radius:2px;border:1px solid rgba(251,191,36,0.3);">ACTIVE</span>
         </div>
         <div class="vp-dash-card-body text-center">
@@ -261,38 +361,17 @@
             <i class="fas fa-plus"></i> Extend Boost (₦{{ "{:,.0f}".format(boost_fee) }})
           </a>
         </div>
- 
         {% else %}
         <div class="vp-dash-card-header">
-          <span><i class="fas fa-rocket me-2" style="color:#fbbf24;"></i>Boost Your Profile</span>
+          <span><i class="fas fa-eye me-2" style="color:#fbbf24;"></i>Visibility Boost</span>
         </div>
         <div class="vp-dash-card-body">
           <p style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:16px;">
-            Appear at the top of employer searches and AI suggestions for <strong style="color:#ffffff;">7 days</strong>.
+            You're Job-Ready. Boost your visibility further for <strong style="color:#ffffff;">7 more days</strong>.
           </p>
-          <ul class="vp-employer-bullets mb-4" style="gap:10px;">
-            <li>
-              <span class="vp-bullet-icon" style="width:24px;height:24px;font-size:9px;background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.3);color:#fbbf24;">
-                <i class="fas fa-arrow-up"></i>
-              </span>
-              <span style="font-size:13px;">Top of all employer searches</span>
-            </li>
-            <li>
-              <span class="vp-bullet-icon" style="width:24px;height:24px;font-size:9px;background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.3);color:#fbbf24;">
-                <i class="fas fa-robot"></i>
-              </span>
-              <span style="font-size:13px;">First in AI matching results</span>
-            </li>
-            <li>
-              <span class="vp-bullet-icon" style="width:24px;height:24px;font-size:9px;background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.3);color:#fbbf24;">
-                <i class="fas fa-star"></i>
-              </span>
-              <span style="font-size:13px;">Boosted badge on your profile</span>
-            </li>
-          </ul>
           <a href="{{ url_for('payments.veteran_boost_payment') }}"
              style="display:inline-flex;align-items:center;gap:8px;padding:13px 24px;background:#fbbf24;color:#0a1628;border-radius:2px;font-family:var(--font-cond);font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;text-decoration:none;width:100%;justify-content:center;transition:all 0.2s ease;">
-            <i class="fas fa-rocket"></i> Boost for ₦{{ "{:,.0f}".format(boost_fee) }}
+            <i class="fas fa-eye"></i> Boost Visibility (₦{{ "{:,.0f}".format(boost_fee) }})
           </a>
           <small style="display:block;text-align:center;margin-top:10px;color:rgba(255,255,255,0.25);font-size:11px;">
             7-day boost · Instant activation
@@ -300,8 +379,54 @@
         </div>
         {% endif %}
       </div>
- 
- 
+      {% else %}
+      <!-- FREE USER: show Job-Ready upsell -->
+      <div class="vp-dash-card" style="border-color:rgba(212,175,55,0.2);">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-rocket me-2" style="color:var(--gold);"></i>Get Hired Faster</span>
+        </div>
+        <div class="vp-dash-card-body">
+          <p style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:14px;">
+            One package to fast-track your civilian career:
+          </p>
+          <ul class="vp-employer-bullets mb-4" style="gap:10px;">
+            <li>
+              <span class="vp-bullet-icon" style="width:24px;height:24px;font-size:9px;background:rgba(212,175,55,0.1);border-color:rgba(212,175,55,0.3);color:var(--gold);">
+                <i class="fas fa-file-alt"></i>
+              </span>
+              <span style="font-size:13px;">CV Optimization</span>
+            </li>
+            <li>
+              <span class="vp-bullet-icon" style="width:24px;height:24px;font-size:9px;background:rgba(212,175,55,0.1);border-color:rgba(212,175,55,0.3);color:var(--gold);">
+                <i class="fas fa-star"></i>
+              </span>
+              <span style="font-size:13px;">Verified Badge</span>
+            </li>
+            <li>
+              <span class="vp-bullet-icon" style="width:24px;height:24px;font-size:9px;background:rgba(212,175,55,0.1);border-color:rgba(212,175,55,0.3);color:var(--gold);">
+                <i class="fas fa-rocket"></i>
+              </span>
+              <span style="font-size:13px;">7-Day Profile Boost</span>
+            </li>
+            <li>
+              <span class="vp-bullet-icon" style="width:24px;height:24px;font-size:9px;background:rgba(212,175,55,0.1);border-color:rgba(212,175,55,0.3);color:var(--gold);">
+                <i class="fas fa-trophy"></i>
+              </span>
+              <span style="font-size:13px;">Priority Matching</span>
+            </li>
+          </ul>
+          <a href="{{ url_for('services.job_ready_package') }}"
+             style="display:inline-flex;align-items:center;gap:8px;padding:13px 24px;background:var(--gold);color:#0a1628;border-radius:2px;font-family:var(--font-cond);font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;text-decoration:none;width:100%;justify-content:center;transition:all 0.2s ease;">
+            <i class="fas fa-rocket"></i> Upgrade to Job-Ready
+          </a>
+          <small style="display:block;text-align:center;margin-top:10px;color:rgba(255,255,255,0.25);font-size:11px;">
+            ₦{{ "{:,.0f}".format(job_ready_package_fee) }} &mdash; All-in-one package
+          </small>
+        </div>
+      </div>
+      {% endif %}
+
+
       <!-- Resources -->
       <div class="vp-dash-card">
         <div class="vp-dash-card-header">
@@ -327,8 +452,8 @@
           </a>
         </div>
       </div>
- 
- 
+
+
       <!-- Support -->
       <div class="vp-dash-card">
         <div class="vp-dash-card-header">
@@ -346,7 +471,7 @@
           </a>
         </div>
       </div>
- 
+
     </div>
   </div>
 </div>
@@ -371,7 +496,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <i class="fas fa-briefcase fa-2x mb-3" style="color:rgba(212,175,55,0.3);"></i>
             <p class="section-label mb-1">No Recommendations Yet</p>
             <p style="color:rgba(255,255,255,0.35);font-size:13px;">
-              Complete your profile or boost to unlock smarter matches.
+              Complete your profile or upgrade to Job-Ready to unlock smarter matches.
             </p>
           </div>`;
         return;
@@ -407,50 +532,15 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-
   const alerts = document.querySelectorAll('.auto-dismiss');
-
   alerts.forEach(alert => {
     setTimeout(() => {
       alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
       alert.style.opacity = '0';
       alert.style.transform = 'translateY(-10px)';
-
-      setTimeout(() => {
-        alert.remove();
-      }, 500);
-
-    }, 4000); // ⏱ 4 seconds (adjust if needed)
+      setTimeout(() => { alert.remove(); }, 500);
+    }, 4000);
   });
-
-});
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-
-  const alert = document.querySelector('.auto-dismiss');
-
-  if (!alert) return;
-
-  // prevent showing again
-  if (localStorage.getItem('profileAlertSeen')) {
-    alert.remove();
-    return;
-  }
-
-  setTimeout(() => {
-    alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-    alert.style.opacity = '0';
-    alert.style.transform = 'translateY(-10px)';
-
-    setTimeout(() => {
-      alert.remove();
-    }, 500);
-
-    localStorage.setItem('profileAlertSeen', 'true');
-
-  }, 4000);
-
 });
 </script>
 {% endblock %}

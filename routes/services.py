@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
-from models import db, CVOptimizationRequest
 from models import db, CVOptimizationRequest, PaymentSetting
 
 services_bp = Blueprint('services', __name__)
@@ -91,3 +90,34 @@ def create_cv_optimization_request(user):
     except Exception:
         db.session.rollback()
         return False
+
+
+# ==============================
+# 🚀 JOB-READY PACKAGE PAGE
+# ==============================
+@services_bp.route('/job-ready', methods=['GET'])
+def job_ready_package():
+    job_ready_fee = PaymentSetting.get_setting("job_ready_package_fee", 4500)
+    return render_template(
+        'services/job_ready_package.html',
+        job_ready_fee=job_ready_fee
+    )
+
+
+@services_bp.route('/job-ready/checkout', methods=['POST'])
+@login_required
+def job_ready_checkout():
+    if not current_user.is_veteran():
+        flash('This package is for veterans only.', 'danger')
+        return redirect(url_for('services.job_ready_package'))
+
+    profile = getattr(current_user, 'veteran_profile', None)
+    if not profile:
+        flash('Please complete your profile first.', 'warning')
+        return redirect(url_for('veteran.complete_profile'))
+
+    if getattr(profile, 'job_ready_package_active', False):
+        flash('You already have an active Job-Ready package!', 'info')
+        return redirect(url_for('dashboard.veteran'))
+
+    return redirect(url_for('payments.init_payment', feature='job_ready_package'))

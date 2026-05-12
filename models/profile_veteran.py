@@ -72,6 +72,11 @@ class VeteranProfile(db.Model):
     # Boost Feature
     profile_boosted_until = db.Column(db.DateTime, nullable=True)
 
+    # Job-Ready Package & Tier System
+    job_ready_package_active = db.Column(db.Boolean, default=False)
+    job_ready_until = db.Column(db.DateTime, nullable=True)
+    veteran_tier = db.Column(db.String(20), default='basic')  # 'basic' or 'verified'
+
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}Job-Ready Package — VetJobPortal{% endblock %}
+
+{% block content %}
+<div style="background:#0a1628;min-height:100vh;padding:60px 20px;">
+  <div style="max-width:900px;margin:0 auto;">
+
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:56px;">
+      <p style="font-family:var(--font-cond);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">
+        <i class="fas fa-rocket me-2"></i>Premium Career Service
+      </p>
+      <h1 style="font-family:var(--font-display);font-size:clamp(32px,5vw,52px);font-weight:700;color:#ffffff;line-height:1.15;margin-bottom:16px;">
+        The <em style="color:var(--gold);font-style:italic;">Job-Ready Package</em>
+      </h1>
+      <p style="color:rgba(255,255,255,0.55);font-size:16px;max-width:560px;margin:0 auto 0 auto;line-height:1.7;">
+        Everything you need to stand out, get noticed, and secure civilian employment faster.
+        Built exclusively for Nigerian military veterans.
+      </p>
+    </div>
+
+    <!-- Package Card -->
+    <div style="background:linear-gradient(135deg,rgba(212,175,55,0.1) 0%,rgba(10,22,40,0.8) 100%);border:1px solid rgba(212,175,55,0.3);border-radius:16px;padding:48px 40px;margin-bottom:40px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-60px;right:-60px;width:260px;height:260px;background:radial-gradient(circle,rgba(212,175,55,0.1) 0%,transparent 70%);pointer-events:none;"></div>
+
+      <!-- Price -->
+      <div style="text-align:center;margin-bottom:40px;">
+        <p style="color:rgba(255,255,255,0.4);font-size:13px;margin-bottom:8px;">One-time investment</p>
+        <div style="font-family:var(--font-display);font-size:clamp(48px,8vw,72px);font-weight:700;color:var(--gold);line-height:1;">
+          ₦{{ "{:,.0f}".format(job_ready_fee) }}
+        </div>
+        <p style="color:rgba(255,255,255,0.35);font-size:13px;margin-top:8px;">One package. Total transformation.</p>
+      </div>
+
+      <!-- What's Included -->
+      <div class="row g-4 mb-40">
+
+        <div class="col-md-6">
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:24px;">
+            <div style="width:44px;height:44px;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
+              <i class="fas fa-file-alt" style="color:var(--gold);font-size:18px;"></i>
+            </div>
+            <h5 style="color:#ffffff;font-family:var(--font-display);font-size:17px;margin-bottom:8px;">CV Optimization</h5>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px;line-height:1.7;margin:0;">
+              Our team professionally rewrites and formats your CV to meet civilian hiring standards and highlight your military value.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:24px;">
+            <div style="width:44px;height:44px;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
+              <i class="fas fa-star" style="color:var(--gold);font-size:18px;"></i>
+            </div>
+            <h5 style="color:#ffffff;font-family:var(--font-display);font-size:17px;margin-bottom:8px;">Verified Badge</h5>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px;line-height:1.7;margin:0;">
+              Your profile gets the "Verified" tag — a trust signal that makes employers take you more seriously from the first look.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:24px;">
+            <div style="width:44px;height:44px;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
+              <i class="fas fa-rocket" style="color:var(--gold);font-size:18px;"></i>
+            </div>
+            <h5 style="color:#ffffff;font-family:var(--font-display);font-size:17px;margin-bottom:8px;">7-Day Profile Boost</h5>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px;line-height:1.7;margin:0;">
+              Your profile goes to the top of employer searches and AI matching results for 7 days — maximum visibility when it matters.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:24px;">
+            <div style="width:44px;height:44px;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
+              <i class="fas fa-trophy" style="color:var(--gold);font-size:18px;"></i>
+            </div>
+            <h5 style="color:#ffffff;font-family:var(--font-display);font-size:17px;margin-bottom:8px;">Priority Matching</h5>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px;line-height:1.7;margin:0;">
+              Our admin team places you at the front of the pipeline when matching veterans to employer openings. You go first.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CTA -->
+      <div style="text-align:center;margin-top:40px;padding-top:36px;border-top:1px solid rgba(255,255,255,0.07);">
+        {% if current_user.is_authenticated and current_user.is_veteran() %}
+          {% set profile = current_user.veteran_profile %}
+          {% if profile and profile.job_ready_package_active %}
+          <div style="background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);border-radius:8px;padding:20px 28px;display:inline-block;margin-bottom:16px;">
+            <i class="fas fa-check-circle" style="color:#4ade80;font-size:20px;margin-bottom:8px;display:block;"></i>
+            <p style="color:#4ade80;font-weight:700;margin:0;">You already have an active Job-Ready package!</p>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px;margin:6px 0 0 0;">Check your dashboard for your current status.</p>
+          </div>
+          <br>
+          <a href="{{ url_for('dashboard.veteran') }}" class="btn-vp-primary" style="padding:14px 36px;font-size:15px;">
+            <i class="fas fa-tachometer-alt"></i><span>Go to Dashboard</span>
+          </a>
+          {% else %}
+          <p style="color:rgba(255,255,255,0.4);font-size:13px;margin-bottom:20px;">
+            Secure payment via Paystack &mdash; your data is fully protected.
+          </p>
+          <form method="POST" action="{{ url_for('services.job_ready_checkout') }}">
+            <button type="submit"
+                    style="display:inline-flex;align-items:center;gap:10px;padding:16px 48px;background:var(--gold);color:#0a1628;border:none;border-radius:4px;font-family:var(--font-cond);font-size:16px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all 0.2s ease;">
+              <i class="fas fa-rocket"></i> Upgrade to Job-Ready &mdash; ₦{{ "{:,.0f}".format(job_ready_fee) }}
+            </button>
+          </form>
+          {% endif %}
+        {% else %}
+        <p style="color:rgba(255,255,255,0.4);font-size:13px;margin-bottom:20px;">
+          You need to be registered and logged in as a veteran to access this package.
+        </p>
+        <div class="d-flex gap-3 flex-wrap justify-content-center">
+          <a href="{{ url_for('auth.login') }}" class="btn-vp-primary" style="padding:14px 32px;font-size:15px;">
+            <i class="fas fa-sign-in-alt"></i><span>Log In</span>
+          </a>
+          <a href="{{ url_for('auth.register') }}" class="btn-vp-ghost" style="padding:14px 32px;font-size:15px;">
+            <span>Register as Veteran</span><i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Free vs Job-Ready comparison -->
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:36px;margin-bottom:40px;">
+      <h4 style="font-family:var(--font-display);color:#ffffff;font-size:20px;margin-bottom:24px;text-align:center;">
+        Free vs Job-Ready
+      </h4>
+      <div class="row g-0">
+        <div class="col-6" style="border-right:1px solid rgba(255,255,255,0.08);padding-right:24px;">
+          <p style="font-family:var(--font-cond);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:16px;">Free</p>
+          {% set free_items = [
+            ('fa-check', 'rgba(74,222,128,0.6)', 'Register &amp; create profile'),
+            ('fa-check', 'rgba(74,222,128,0.6)', 'Apply to jobs'),
+            ('fa-check', 'rgba(74,222,128,0.6)', 'View job listings'),
+            ('fa-times', 'rgba(255,255,255,0.2)', 'CV optimization'),
+            ('fa-times', 'rgba(255,255,255,0.2)', 'Verified badge'),
+            ('fa-times', 'rgba(255,255,255,0.2)', 'Profile boost'),
+            ('fa-times', 'rgba(255,255,255,0.2)', 'Priority matching'),
+          ] %}
+          {% for icon, color, text in free_items %}
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <i class="fas {{ icon }}" style="color:{{ color }};font-size:12px;width:14px;text-align:center;"></i>
+            <span style="font-size:13px;color:{{ 'rgba(255,255,255,0.65)' if 'check' in icon else 'rgba(255,255,255,0.25)' }};">{{ text }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="col-6" style="padding-left:24px;">
+          <p style="font-family:var(--font-cond);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;">Job-Ready</p>
+          {% set jr_items = [
+            'Register &amp; create profile',
+            'Apply to jobs',
+            'View job listings',
+            'CV optimization',
+            'Verified badge',
+            '7-day profile boost',
+            'Priority matching',
+          ] %}
+          {% for text in jr_items %}
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <i class="fas fa-check" style="color:var(--gold);font-size:12px;width:14px;text-align:center;"></i>
+            <span style="font-size:13px;color:rgba(255,255,255,0.8);">{{ text }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Back link -->
+    <div style="text-align:center;">
+      <a href="{{ url_for('main.index') }}"
+         style="color:rgba(255,255,255,0.35);font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+        <i class="fas fa-arrow-left"></i> Back to Home
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

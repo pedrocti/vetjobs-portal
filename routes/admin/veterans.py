@@ -68,11 +68,59 @@ def veteran_management():
     admin_stats = get_admin_stats()
     stats.update(admin_stats)
 
-    return render_template('admin/veteran_management.html', 
-                         veterans=veterans, 
+    tier_filter = request.args.get('tier', '')
+    if tier_filter == 'verified':
+        query = query.filter(VeteranProfile.veteran_tier == 'verified')
+    elif tier_filter == 'basic':
+        query = query.filter(or_(VeteranProfile.veteran_tier == 'basic', VeteranProfile.veteran_tier == None))
+
+    veterans = query.order_by(
+        case((VeteranProfile.veteran_tier == 'verified', 0), else_=1),
+        desc(User.created_at)
+    ).all()
+
+    stats['job_ready'] = db.session.query(User).join(
+        VeteranProfile, User.id == VeteranProfile.user_id
+    ).filter(
+        User.user_type == 'veteran', VeteranProfile.veteran_tier == 'verified'
+    ).count()
+
+    return render_template('admin/veteran_management.html',
+                         veterans=veterans,
                          stats=stats,
                          current_filters={
                              'search': search,
                              'status': status_filter,
-                             'verification': verification_filter
+                             'verification': verification_filter,
+                             'tier': tier_filter,
                          })
+
+
+@admin_bp.route('/veterans/<int:veteran_id>/set-tier', methods=['POST'])
+@login_required
+def set_veteran_tier(veteran_id):
+    if not current_user.is_admin():
+        flash('Access denied.', 'error')
+        return redirect(url_for('admin.veteran_management'))
+
+    tier = request.form.get('tier', 'basic')
+    if tier not in ('basic', 'verified'):
+        flash('Invalid tier.', 'error')
+        return redirect(url_for('admin.veteran_management'))
+
+    profile = VeteranProfile.query.filter_by(user_id=veteran_id).first()
+    if not profile:
+        flash('Veteran profile not found.', 'error')
+        return redirect(url_for('admin.veteran_management'))
+
+    profile.veteran_tier = tier
+    if tier == 'verified':
+        profile.is_verified = True
+        profile.job_ready_package_active = True
+    else:
+        profile.is_verified = False
+        profile.job_ready_package_active = False
+
+    db.session.commit()
+    flash(f'Veteran tier updated to {tier.title()}.', 'success')
+    return redirect(url_for('admin.veteran_management'))

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Complete Your Profile - VetJobs Portal{% endblock %}
+{% block title %}Build Your Job Profile - VetJobs Portal{% endblock %}
 
 {% block content %}
 <div class="vp-auth-wrapper" style="align-items:flex-start;padding:40px 20px;">
@@ -10,13 +10,13 @@
       <div class="hero-top-accent" style="position:relative;height:2px;border-radius:0;"></div>
       <div class="vp-auth-header-inner">
         <div class="vp-auth-logo-ring">
-          <i class="fas fa-id-card"></i>
+          <i class="fas fa-rocket"></i>
         </div>
         <p class="section-label mb-1">VetJobPortal</p>
-        <h2 class="vp-auth-title">Complete Your Profile</h2>
+        <h2 class="vp-auth-title">Build Your Job Profile</h2>
         <p class="vp-auth-subtitle" style="max-width:640px;margin:0 auto;">
-          Share your military service or spouse background to connect with veteran-friendly
-          employers and unlock tailored career opportunities across Africa.
+          Add your skills, military experience, and upload your CV to get matched with
+          top employers and unlock career opportunities built for those who served.
         </p>
       </div>
     </div>
@@ -24,13 +24,29 @@
     <!-- Body -->
     <div class="vp-auth-body" style="padding:40px 48px;">
 
-      <!-- Verification Alert -->
+      <!-- Steps Banner -->
+      <div class="d-flex flex-wrap gap-3 mb-4">
+        <div style="flex:1;min-width:150px;padding:14px 18px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);border-radius:8px;text-align:center;">
+          <i class="fas fa-check-circle" style="color:#4ade80;font-size:18px;display:block;margin-bottom:6px;"></i>
+          <span style="color:rgba(255,255,255,0.8);font-size:13px;font-weight:600;">Step 1: Register</span>
+          <span style="display:block;color:rgba(74,222,128,0.8);font-size:11px;margin-top:2px;">Done</span>
+        </div>
+        <div style="flex:1;min-width:150px;padding:14px 18px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.35);border-radius:8px;text-align:center;">
+          <i class="fas fa-user-edit" style="color:var(--gold);font-size:18px;display:block;margin-bottom:6px;"></i>
+          <span style="color:#ffffff;font-size:13px;font-weight:700;">Step 2: Build Profile</span>
+          <span style="display:block;color:rgba(212,175,55,0.8);font-size:11px;margin-top:2px;">You are here</span>
+        </div>
+        <div style="flex:1;min-width:150px;padding:14px 18px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;text-align:center;">
+          <i class="fas fa-tachometer-alt" style="color:rgba(255,255,255,0.3);font-size:18px;display:block;margin-bottom:6px;"></i>
+          <span style="color:rgba(255,255,255,0.4);font-size:13px;font-weight:600;">Step 3: Dashboard</span>
+          <span style="display:block;color:rgba(255,255,255,0.25);font-size:11px;margin-top:2px;">Upcoming</span>
+        </div>
+      </div>
       <div class="alert alert-info mb-4" style="background:rgba(212,175,55,0.08);border-left:3px solid var(--gold);border-radius:8px;padding:16px 20px;">
         <i class="fas fa-shield-alt me-2" style="color:var(--gold);"></i>
-        <strong style="color:var(--gold);">Verification Required:</strong>
+        <strong style="color:var(--gold);">What to add here:</strong>
         <span style="color:rgba(255,255,255,0.65);font-size:14px;">
-          Accurate service details and documents allow employers to trust your profile.
-          All uploads are securely reviewed.
+          Your skills, military experience, and CV upload. Accurate information helps employers trust your profile and find you faster.
         </span>
       </div>
 

@@ -36,11 +36,11 @@
     <div class="col-6 col-lg-3">
       <div class="vp-dash-stat">
         <div>
-          <div class="vp-dash-stat-number">{{ stats.active }}</div>
-          <div class="vp-dash-stat-label">Active Accounts</div>
+          <div class="vp-dash-stat-number">{{ stats.get('job_ready', 0) }}</div>
+          <div class="vp-dash-stat-label">Job-Ready (Priority)</div>
         </div>
-        <div class="vp-dash-stat-icon" style="background:rgba(74,222,128,0.1);color:#4ade80;">
-          <i class="fas fa-check-circle"></i>
+        <div class="vp-dash-stat-icon" style="background:rgba(212,175,55,0.1);color:var(--gold);">
+          <i class="fas fa-star"></i>
         </div>
       </div>
     </div>
@@ -50,7 +50,7 @@
           <div class="vp-dash-stat-number">{{ stats.verified }}</div>
           <div class="vp-dash-stat-label">Verified</div>
         </div>
-        <div class="vp-dash-stat-icon" style="background:rgba(212,175,55,0.1);color:var(--gold);">
+        <div class="vp-dash-stat-icon" style="background:rgba(74,222,128,0.1);color:#4ade80;">
           <i class="fas fa-medal"></i>
         </div>
       </div>
@@ -59,13 +59,22 @@
       <div class="vp-dash-stat">
         <div>
           <div class="vp-dash-stat-number">{{ stats.pending }}</div>
-          <div class="vp-dash-stat-label">Pending Verification</div>
+          <div class="vp-dash-stat-label">Pending Review</div>
         </div>
         <div class="vp-dash-stat-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24;">
           <i class="fas fa-clock"></i>
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- ── PRIORITY LIST NOTICE ──────────────────────────────── -->
+  <div style="background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.2);border-radius:8px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:12px;">
+    <i class="fas fa-info-circle" style="color:var(--gold);font-size:16px;flex-shrink:0;"></i>
+    <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.65);">
+      <strong style="color:var(--gold);">Job-Ready (Verified)</strong> veterans appear first in all lists and receive priority placement with employers.
+      Use the Tier column below to manually promote or demote a veteran.
+    </p>
   </div>
 
   <!-- ── FILTERS ──────────────────────────────────────────── -->
@@ -90,13 +99,21 @@
               <option value="inactive" {{ 'selected' if current_filters.status == 'inactive' }}>Inactive</option>
             </select>
           </div>
-          <div class="col-md-3">
+          <div class="col-md-2">
             <label class="form-label">Verification</label>
             <select class="form-select" name="verification">
               <option value="">All</option>
               <option value="verified" {{ 'selected' if current_filters.verification == 'verified' }}>Verified</option>
               <option value="pending"  {{ 'selected' if current_filters.verification == 'pending' }}>Pending</option>
               <option value="rejected" {{ 'selected' if current_filters.verification == 'rejected' }}>Rejected</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Tier</label>
+            <select class="form-select" name="tier">
+              <option value="">All Tiers</option>
+              <option value="verified" {{ 'selected' if current_filters.get('tier') == 'verified' }}>Job-Ready</option>
+              <option value="basic"    {{ 'selected' if current_filters.get('tier') == 'basic' }}>Basic</option>
             </select>
           </div>
           <div class="col-md-2 d-flex align-items-end">
@@ -129,8 +146,8 @@
               <th>Veteran</th>
               <th>Contact</th>
               <th>Joined</th>
+              <th>Tier</th>
               <th>Verification</th>
-              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -143,20 +160,37 @@
                     <i class="fas fa-user"></i>
                   </div>
                   <div>
-                    <div style="font-family:var(--font-cond);font-size:14px;font-weight:700;color:#ffffff;">{{ user.full_name }}</div>
+                    <div style="font-family:var(--font-cond);font-size:14px;font-weight:700;color:#ffffff;">
+                      {{ user.full_name }}
+                      {% if profile and profile.veteran_tier == 'verified' %}
+                      <i class="fas fa-star ms-1" style="color:var(--gold);font-size:10px;" title="Job-Ready"></i>
+                      {% endif %}
+                    </div>
                     <div style="font-size:12px;color:rgba(255,255,255,0.35);">@{{ user.username }}</div>
                   </div>
                 </div>
               </td>
               <td>
                 <div style="font-size:13px;color:rgba(255,255,255,0.7);">{{ user.email }}</div>
-                {% if profile and profile.phone %}
-                <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:2px;">{{ profile.phone }}</div>
-                {% endif %}
               </td>
               <td>
                 <div style="font-family:var(--font-cond);font-size:12px;color:rgba(255,255,255,0.6);">{{ user.created_at.strftime('%b %d, %Y') }}</div>
-                <div style="font-size:11px;color:rgba(255,255,255,0.3);">{{ user.created_at.strftime('%I:%M %p') }}</div>
+              </td>
+              <td>
+                {% if profile %}
+                  {% set tier = profile.veteran_tier or 'basic' %}
+                  {% if tier == 'verified' %}
+                  <span style="background:rgba(212,175,55,0.15);color:var(--gold);border:1px solid rgba(212,175,55,0.3);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:2px;white-space:nowrap;">
+                    <i class="fas fa-star me-1"></i>Job-Ready
+                  </span>
+                  {% else %}
+                  <span style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.1);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:2px;white-space:nowrap;">
+                    <i class="fas fa-shield-alt me-1"></i>Basic
+                  </span>
+                  {% endif %}
+                {% else %}
+                <span style="color:rgba(255,255,255,0.25);font-size:11px;">—</span>
+                {% endif %}
               </td>
               <td>
                 {% if profile %}
@@ -170,7 +204,7 @@
                   </span>
                   {% else %}
                   <span style="background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.25);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:2px;white-space:nowrap;">
-                    <i class="fas fa-times-circle me-1"></i>{{ profile.verification_status.title() }}
+                    <i class="fas fa-times-circle me-1"></i>{{ profile.verification_status.title() if profile.verification_status else 'Not Set' }}
                   </span>
                   {% endif %}
                 {% else %}
@@ -180,23 +214,30 @@
                 {% endif %}
               </td>
               <td>
-                {% if user.is_active %}
-                <span style="background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:2px;white-space:nowrap;">
-                  <i class="fas fa-check me-1"></i>Active
-                </span>
-                {% else %}
-                <span style="background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.25);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:2px;white-space:nowrap;">
-                  <i class="fas fa-ban me-1"></i>Suspended
-                </span>
-                {% endif %}
-              </td>
-              <td>
-                <div style="display:flex;gap:6px;align-items:center;">
+                <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
                   {% if profile %}
                   <a href="{{ url_for('admin.review_profile', profile_id=profile.id) }}"
                      class="btn btn-outline-info btn-sm" title="View Profile">
                     <i class="fas fa-eye"></i>
                   </a>
+                  <!-- Tier control -->
+                  {% if profile.veteran_tier == 'verified' %}
+                  <form method="POST" action="{{ url_for('admin.set_veteran_tier', veteran_id=user.id) }}" style="display:inline;">
+                    <input type="hidden" name="tier" value="basic">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm" title="Set to Basic"
+                            onclick="return confirm('Set {{ user.first_name }} to Basic tier?')">
+                      <i class="fas fa-arrow-down"></i>
+                    </button>
+                  </form>
+                  {% else %}
+                  <form method="POST" action="{{ url_for('admin.set_veteran_tier', veteran_id=user.id) }}" style="display:inline;">
+                    <input type="hidden" name="tier" value="verified">
+                    <button type="submit" class="btn btn-outline-warning btn-sm" title="Set to Job-Ready"
+                            onclick="return confirm('Promote {{ user.first_name }} to Job-Ready?')">
+                      <i class="fas fa-star"></i>
+                    </button>
+                  </form>
+                  {% endif %}
                   {% endif %}
                   <button type="button"
                           class="btn btn-sm {{ 'btn-outline-warning' if user.is_active else 'btn-outline-success' }}"

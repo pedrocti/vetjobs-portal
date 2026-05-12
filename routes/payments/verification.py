@@ -160,6 +160,49 @@ Donation Type: {donation_type}
             except Exception as e:
                 current_app.logger.error(f"CV optimization error: {str(e)}")
 
+        # =========================================================
+        # 4. JOB-READY PACKAGE FLOW
+        # =========================================================
+        elif payment.payment_type == "feature" and feature == "job_ready_package":
+            try:
+                from routes.services import create_cv_optimization_request
+                from models import VeteranProfile
+
+                user = User.query.get(payment.user_id)
+
+                if user:
+                    profile = VeteranProfile.query.filter_by(user_id=user.id).first()
+                    if profile:
+                        profile.job_ready_package_active = True
+                        profile.veteran_tier = 'verified'
+                        profile.is_verified = True
+                        profile.boost_profile(days=7)
+
+                    create_cv_optimization_request(user)
+
+                flash("You are now Job-Ready! Your profile has been upgraded, boosted for 7 days, and your CV is queued for optimization.", "success")
+
+            except Exception as e:
+                current_app.logger.error(f"Job-Ready Package activation error: {str(e)}")
+
+        # =========================================================
+        # 5. BOOST FLOW
+        # =========================================================
+        elif payment.payment_type == "boost":
+            try:
+                from models import VeteranProfile
+
+                user = User.query.get(payment.user_id)
+                if user:
+                    profile = VeteranProfile.query.filter_by(user_id=user.id).first()
+                    if profile:
+                        profile.boost_profile(days=7)
+
+                flash("Profile boosted for 7 days!", "success")
+
+            except Exception as e:
+                current_app.logger.error(f"Boost activation error: {str(e)}")
+
         # ==========================
         # FINAL SAVE
         # ==========================
