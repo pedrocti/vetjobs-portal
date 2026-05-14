@@ -1,8 +1,74 @@
 {% extends "base.html" %}
 {% block title %}Employer Dashboard - VetJobs Portal{% endblock %}
 
+{% block extra_head %}
+<style>
+  #mainNavbar, .premium-navbar,
+  #vpDrawer, #vpDrawerOverlay, .vp-drawer, .vp-drawer-overlay { display: none !important; }
+  body { padding-top: 0 !important; }
+  :root { --navbar-height: 0px; }
+  #preloader { display: none !important; }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="emp-dashboard-wrap">
+
+  <!-- ── Mobile overlay ── -->
+  <div class="emp-mob-overlay" id="empMobOverlay"></div>
+
+  <!-- ── Mobile slide-out drawer ── -->
+  <aside class="emp-mob-drawer" id="empMobDrawer" aria-hidden="true">
+    <div class="emp-mob-drawer-top">
+      <div class="emp-mob-drawer-id">
+        <div class="emp-sidebar-avatar" style="width:42px;height:42px;font-size:15px;flex-shrink:0;">
+          {{ (current_user.company_name or current_user.first_name)[0] | upper }}
+        </div>
+        <div style="min-width:0;">
+          <div class="emp-sidebar-name" style="max-width:170px;font-size:13px;">{{ current_user.company_name or current_user.first_name }}</div>
+          <span class="emp-sidebar-badge">Employer Account</span>
+        </div>
+      </div>
+      <button class="emp-mob-close" id="empMobClose" aria-label="Close menu">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <nav class="emp-mob-nav">
+      <span class="emp-mob-nav-label">Hiring</span>
+      <a class="emp-mob-link {% if request.endpoint == 'dashboard.employer' %}active{% endif %}" href="{{ url_for('dashboard.employer') }}"><i class="fas fa-th-large"></i>Overview</a>
+      <a class="emp-mob-link {% if not can_post_job %}emp-mob-locked{% endif %}" href="{% if can_post_job %}{{ url_for('employer.post_job') }}{% else %}{{ url_for('payments.employer_subscription_plans') }}{% endif %}">
+        <i class="fas fa-plus-circle"></i>Post a Job{% if not can_post_job %}<i class="fas fa-lock" style="margin-left:auto;font-size:9px;opacity:0.4;"></i>{% endif %}
+      </a>
+      <a class="emp-mob-link {% if request.endpoint == 'employer.manage_jobs' %}active{% endif %}" href="{{ url_for('employer.manage_jobs') }}"><i class="fas fa-briefcase"></i>Manage Jobs</a>
+      <a class="emp-mob-link {% if request.endpoint == 'applications.manage_applications' %}active{% endif %}" href="{{ url_for('applications.manage_applications') }}"><i class="fas fa-layer-group"></i>Applications</a>
+      <a class="emp-mob-link {% if request.endpoint == 'search.search_veterans' %}active{% endif %}" href="{{ url_for('search.search_veterans') }}"><i class="fas fa-user-check"></i>Find Veterans</a>
+
+      <span class="emp-mob-nav-label">Account</span>
+      <a class="emp-mob-link {% if request.endpoint == 'messaging.inbox' %}active{% endif %}" href="{{ url_for('messaging.inbox') }}"><i class="fas fa-inbox"></i>Messages</a>
+      <a class="emp-mob-link {% if request.endpoint == 'payments.init_payment' %}active{% endif %}" href="{{ url_for('payments.init_payment') }}"><i class="fas fa-credit-card"></i>Billing</a>
+      <a class="emp-mob-link {% if request.endpoint == 'employer.edit_profile' %}active{% endif %}" href="{{ url_for('employer.edit_profile') }}"><i class="fas fa-building"></i>Company Profile</a>
+      <a class="emp-mob-link" href="{{ url_for('main.contact') }}"><i class="fas fa-life-ring"></i>Support</a>
+    </nav>
+
+    <div class="emp-mob-drawer-footer">
+      <a class="emp-mob-link" href="{{ url_for('main.index') }}" style="color:rgba(255,255,255,0.3);"><i class="fas fa-arrow-left"></i>Back to Site</a>
+      <a class="emp-mob-link emp-mob-logout" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i>Sign Out</a>
+    </div>
+  </aside>
+
+  <!-- ── Mobile top bar ── -->
+  <header class="emp-topbar d-md-none">
+    <a href="{{ url_for('main.index') }}" class="emp-topbar-logo">
+      <img src="{{ url_for('static', filename='images/vetjoblogo1.webp') }}" alt="VetJobPortal" style="height:26px;width:auto;">
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:800;letter-spacing:0.08em;white-space:nowrap;">
+        <span style="color:#fff;">VET</span><span style="color:var(--gold);">JOB</span><span style="color:#fff;">PORTAL</span>
+      </span>
+    </a>
+    <button class="emp-topbar-hamburger" id="empMobMenuBtn" aria-label="Open navigation">
+      <i class="fas fa-bars"></i>
+    </button>
+  </header>
 
   <!-- SIDEBAR -->
   <nav class="emp-sidebar d-none d-md-flex">
@@ -561,6 +627,25 @@
   </main>
 </div>
 
+<!-- ── Mobile bottom tab bar ── -->
+<nav class="vp-bottom-tabs d-md-none" aria-label="Primary navigation">
+  <a href="{{ url_for('dashboard.employer') }}" class="vp-tab {% if request.endpoint == 'dashboard.employer' %}active{% endif %}">
+    <i class="fas fa-th-large"></i><span>Overview</span>
+  </a>
+  <a href="{{ url_for('employer.manage_jobs') }}" class="vp-tab {% if request.endpoint == 'employer.manage_jobs' %}active{% endif %}">
+    <i class="fas fa-briefcase"></i><span>Jobs</span>
+  </a>
+  <a href="{{ url_for('applications.manage_applications') }}" class="vp-tab {% if request.endpoint == 'applications.manage_applications' %}active{% endif %}">
+    <i class="fas fa-layer-group"></i><span>Applicants</span>
+  </a>
+  <a href="{{ url_for('search.search_veterans') }}" class="vp-tab {% if request.endpoint == 'search.search_veterans' %}active{% endif %}">
+    <i class="fas fa-user-check"></i><span>Find Vets</span>
+  </a>
+  <a href="{{ url_for('messaging.inbox') }}" class="vp-tab {% if request.endpoint == 'messaging.inbox' %}active{% endif %}">
+    <i class="fas fa-inbox"></i><span>Messages</span>
+  </a>
+</nav>
+
 <style>
   /* ===================================
      EMPLOYER DASHBOARD
@@ -581,8 +666,8 @@
       background: #080f1e;
       border-right: 1px solid rgba(255,255,255,0.05);
       position: sticky;
-      top: var(--navbar-height);
-      height: calc(100vh - var(--navbar-height));
+      top: 0;
+      height: 100vh;
       overflow-y: auto;
       scrollbar-width: none;
   }
@@ -754,43 +839,164 @@
       gap: 0;
   }
 
-  /* ── Bottom tab bar (shared CSS in dashboard_base, repeated here for employer) ── */
+  /* ── Mobile top bar ── */
+  .emp-topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 54px;
+    background: #080f1e;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    z-index: 9995;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+  }
+  .emp-topbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .emp-topbar-hamburger {
+    width: 38px;
+    height: 38px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.7);
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.15s ease;
+  }
+  .emp-topbar-hamburger:hover { background: rgba(212,175,55,0.1); color: var(--gold); border-color: rgba(212,175,55,0.25); }
+
+  /* ── Mobile overlay ── */
+  .emp-mob-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(3px);
+    z-index: 9996;
+  }
+  .emp-mob-overlay.open { display: block; }
+
+  /* ── Mobile drawer ── */
+  .emp-mob-drawer {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: min(280px, 85vw);
+    background: #080f1e;
+    border-right: 1px solid rgba(255,255,255,0.06);
+    z-index: 9997;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .emp-mob-drawer::-webkit-scrollbar { display: none; }
+  .emp-mob-drawer.open { transform: translateX(0); }
+
+  .emp-mob-drawer-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 18px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+  }
+  .emp-mob-drawer-id { display: flex; align-items: center; gap: 12px; min-width: 0; }
+
+  .emp-mob-close {
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 2px;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+    transition: all 0.15s ease;
+  }
+  .emp-mob-close:hover { background: rgba(239,68,68,0.1); color: #f87171; border-color: rgba(239,68,68,0.2); }
+
+  .emp-mob-nav { flex: 1; padding: 6px 0; overflow-y: auto; }
+
+  .emp-mob-nav-label {
+    font-family: var(--font-cond);
+    font-size: 9px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(255,255,255,0.2);
+    padding: 10px 18px 3px; display: block;
+  }
+
+  .emp-mob-link {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 18px;
+    font-family: var(--font-cond); font-size: 13px;
+    font-weight: 700; letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: all 0.15s ease;
+  }
+  .emp-mob-link i { width: 16px; text-align: center; font-size: 13px; flex-shrink: 0; opacity: 0.6; }
+  .emp-mob-link:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.03); border-left-color: rgba(212,175,55,0.3); }
+  .emp-mob-link:hover i { opacity: 1; }
+  .emp-mob-link.active { color: var(--gold); background: rgba(212,175,55,0.06); border-left-color: var(--gold); }
+  .emp-mob-link.active i { opacity: 1; color: var(--gold); }
+  .emp-mob-locked { opacity: 0.4; cursor: not-allowed; }
+  .emp-mob-logout { color: rgba(248,113,113,0.65) !important; }
+  .emp-mob-logout:hover { color: #f87171 !important; background: rgba(239,68,68,0.06) !important; border-left-color: rgba(239,68,68,0.3) !important; }
+
+  .emp-mob-drawer-footer {
+    padding: 6px 0 12px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    flex-shrink: 0;
+  }
+
+  /* ── Bottom tab bar ── */
   .vp-bottom-tabs {
     position: fixed;
     bottom: 0; left: 0; right: 0;
-    height: 60px;
+    height: 62px;
     background: #080f1e;
-    border-top: 1px solid rgba(255,255,255,0.06);
+    border-top: 1px solid rgba(255,255,255,0.07);
     z-index: 9990;
     align-items: stretch;
   }
   .vp-tab {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    text-decoration: none;
-    color: rgba(255,255,255,0.35);
-    font-family: var(--font-cond);
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    transition: color 0.15s ease;
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 4px;
+    text-decoration: none; color: rgba(255,255,255,0.3);
+    font-family: var(--font-cond); font-size: 9px;
+    font-weight: 700; letter-spacing: 0.5px;
+    text-transform: uppercase; transition: color 0.15s ease;
     border-top: 2px solid transparent;
   }
-  .vp-tab i { font-size: 16px; }
-  .vp-tab:hover { color: rgba(255,255,255,0.7); }
+  .vp-tab i { font-size: 18px; }
+  .vp-tab:hover { color: rgba(255,255,255,0.65); }
   .vp-tab.active { color: var(--gold); border-top-color: var(--gold); }
 
   @media (max-width: 767px) {
       .emp-sidebar { display: none !important; }
-      .emp-main { padding: 16px 16px 76px; }
+      .emp-topbar { display: flex !important; }
+      .emp-main { padding: 72px 16px 80px !important; }
       .emp-dashboard-wrap { flex-direction: column; }
       .emp-page-header { margin-bottom: 16px; }
       .emp-page-title { font-size: 22px; }
+  }
+
+  @media (min-width: 768px) {
+      .emp-topbar { display: none !important; }
+      .vp-bottom-tabs { display: none !important; }
+      .emp-mob-drawer, .emp-mob-overlay { display: none !important; }
   }
 
   /* Page header */
@@ -1488,6 +1694,44 @@
       line-height: 1.6;
       margin: 0 0 14px;
   }
-  
+
 </style>
+
+<script>
+(function () {
+  var overlay  = document.getElementById('empMobOverlay');
+  var drawer   = document.getElementById('empMobDrawer');
+  var menuBtn  = document.getElementById('empMobMenuBtn');
+  var closeBtn = document.getElementById('empMobClose');
+
+  function openDrawer() {
+    if (!drawer) return;
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+    drawer.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDrawer() {
+    if (!drawer) return;
+    drawer.classList.remove('open');
+    overlay.classList.remove('open');
+    drawer.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  if (menuBtn)  menuBtn.addEventListener('click', openDrawer);
+  if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+  if (overlay)  overlay.addEventListener('click', closeDrawer);
+
+  // Swipe-to-close (left drawer: swipe left)
+  var startX = 0;
+  if (drawer) {
+    drawer.addEventListener('touchstart', function (e) { startX = e.touches[0].clientX; }, { passive: true });
+    drawer.addEventListener('touchend', function (e) {
+      if (startX - e.changedTouches[0].clientX > 60) closeDrawer();
+    }, { passive: true });
+  }
+})();
+</script>
+
 {% endblock %}
