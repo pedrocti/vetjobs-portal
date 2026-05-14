@@ -5,7 +5,8 @@ from sqlalchemy import func, desc, or_, case
 from datetime import datetime, timedelta
 import os
 from decimal import Decimal
-from . import admin_bp 
+from . import admin_bp
+from services.notification_service import notification_service 
 
 # Import shared database and models
 from .stats import get_admin_stats
@@ -84,6 +85,11 @@ def approve_profile(profile_id):
 
         db.session.commit()
 
+        try:
+            notification_service.notify_veteran_approved(profile.user)
+        except Exception as e:
+            current_app.logger.error(f"Veteran approval notification failed: {e}")
+
         flash(f'Profile for {profile.user.full_name} has been approved successfully.', 'success')
 
     except Exception as e:
@@ -116,6 +122,11 @@ def reject_profile(profile_id):
         profile.updated_at = datetime.utcnow()
 
         db.session.commit()
+
+        try:
+            notification_service.notify_veteran_rejected(profile.user, admin_notes)
+        except Exception as e:
+            current_app.logger.error(f"Veteran rejection notification failed: {e}")
 
         flash(f'Profile for {profile.user.full_name} has been rejected.', 'warning')
 
@@ -161,6 +172,11 @@ def approve_employer_profile(profile_id):
 
         db.session.commit()
 
+        try:
+            notification_service.notify_employer_approved(profile.user)
+        except Exception as e:
+            current_app.logger.error(f"Employer approval notification failed: {e}")
+
         flash(f'Employer profile for {profile.company_name} has been approved successfully.', 'success')
 
     except Exception as e:
@@ -194,6 +210,11 @@ def reject_employer_profile(profile_id):
         profile.updated_at = datetime.utcnow()
 
         db.session.commit()
+        try:
+            notification_service.notify_employer_rejected(profile.user, admin_notes)
+        except Exception as e:
+            current_app.logger.error(f"Employer rejection notification failed: {e}")
+
 
         flash(f'Employer profile for {profile.company_name} has been rejected.', 'warning')
 

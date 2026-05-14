@@ -539,28 +539,17 @@ footer a:hover {
   background: transparent !important;
 }
 
-/* ===== Admin Table Fix (GLOBAL) ===== */
-.table {
-  background: transparent !important;
-  color: inherit;
-}
+/* Global table/card overrides removed — scoped to admin only */
+/* ── Registration multi-step ── */
+.reg-step          { display: none; }
+.reg-step.active   { display: block; }
 
-.table thead,
-.table-light,
-.table-striped > tbody > tr:nth-of-type(odd) {
-  background: transparent !important;
-}
-
-.table th {
-  background: rgba(255,255,255,0.03) !important;
-  border-color: rgba(255,255,255,0.08) !important;
-}
-
-.table td {
-  border-color: rgba(255,255,255,0.05) !important;
-}
-
-.card {
-  background: transparent !important;
-  border: none !important;
+/* ── Dashboard section padding reset ── */
+/* Global section rule adds 80px padding — neutralise inside dashboards */
+.vp-dashboard-main > section,
+.emp-main > section,
+.vp-dashboard-main section:not(.mission-section),
+.emp-main section:not(.mission-section) {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }

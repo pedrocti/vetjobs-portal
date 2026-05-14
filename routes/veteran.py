@@ -76,6 +76,7 @@ def complete_profile():
         certifications = request.form.get('certifications', '').strip()
         discharge_type = request.form.get('discharge_type', '').strip()
         deployment_history = request.form.get('deployment_history', '').strip()
+        nin = request.form.get('nin', '').strip()
 
         # Veteran fields
         service_branch = request.form.get('service_branch', '').strip()
@@ -160,6 +161,7 @@ def complete_profile():
             profile.certifications = certifications
             profile.discharge_type = discharge_type
             profile.deployment_history = deployment_history
+            profile.nin = nin
             profile.is_military_spouse = is_spouse
 
             if not is_spouse:
@@ -196,32 +198,40 @@ def complete_profile():
 
             profile.verification_status = 'pending'
             profile.updated_at = datetime.utcnow()
-
             current_user.onboarding_completed = True
-
             db.session.commit()
 
-            # BREVO UPDATE (SAFE)
+            # Notify admins
+            try:
+                from services.notification_service import notification_service
+                notification_service.notify_admins_veteran_profile_submitted(
+                    veteran_name=current_user.full_name,
+                    profile_id=profile.id
+                )
+            except Exception as notify_err:
+                current_app.logger.error(f"Veteran profile notification failed: {notify_err}")
+
+            # Brevo update
             try:
                 from services.brevo_service import BrevoService
-
                 BrevoService().update_attributes(
-                    current_user,  
+                    current_user,
                     {
                         "PROFILE_COMPLETED": True,
-                        "ONBOARDING_STAGE": "profile_complete",  
-                        "USERTYPE": "veteran"  
+                        "ONBOARDING_STAGE": "profile_complete",
+                        "USERTYPE": "veteran"
                     }
                 )
-            except Exception as e:
-                current_app.logger.warning(f"Brevo update failed: {e}")
+            except Exception as brevo_err:
+                current_app.logger.warning(f"Brevo update failed: {brevo_err}")
 
             flash('Profile submitted successfully! Upgrade to Job-Ready to get hired faster.', 'success')
             return redirect(url_for('services.job_ready_package'))
 
-        except Exception:
+        except Exception as e:
             db.session.rollback()
-            flash('An error occurred while saving your profile.', 'error')
+            current_app.logger.error(f"Profile save error: {e}")
+            flash('An error occurred while saving your profile. Please try again.', 'error')
             return render_template('veteran/complete_profile.html', profile=profile)
 
     return render_template('veteran/complete_profile.html', profile=profile)

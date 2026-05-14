@@ -56,7 +56,7 @@
           </div>
           <a href="{{ url_for('marketplace.request_personnel') }}?category={{ offer.category }}"
              style="display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);color:var(--gold);border-radius:4px;font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-decoration:none;width:100%;">
-            <i class="fas fa-paper-plane"></i> Request This Role
+            <i class="fas fa-paper-plane"></i> Request This Personnel
           </a>
         </div>
       </div>
@@ -68,7 +68,7 @@
       <p style="color:rgba(255,255,255,0.4);font-size:15px;margin-bottom:20px;">No veterans have listed offers in this category yet.</p>
       <a href="{{ url_for('marketplace.request_personnel') }}?category={{ category }}"
          style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:var(--gold);color:#0a1628;border-radius:4px;font-family:var(--font-cond);font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase;text-decoration:none;">
-        <i class="fas fa-paper-plane"></i> Submit Request Anyway
+        <i class="fas fa-paper-plane"></i> Let Us Find the Right Fit
       </a>
     </div>
     {% endif %}

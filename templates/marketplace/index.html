@@ -5,7 +5,7 @@
 <div style="background:#0a1628;min-height:100vh;">
 
   <!-- ── HERO ── -->
-  <div style="background:linear-gradient(135deg,rgba(212,175,55,0.1) 0%,rgba(10,22,40,0.95) 100%);border-bottom:1px solid rgba(212,175,55,0.15);padding:80px 20px 60px;">
+  <div style="background:linear-gradient(135deg,rgba(212,175,55,0.1) 0%,rgba(10,22,40,0.95) 100%);border-bottom:1px solid rgba(212,175,55,0.15);padding:clamp(40px,8vw,80px) 20px clamp(32px,6vw,60px);">
     <div class="container text-center">
       <p style="font-family:var(--font-cond);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">
         <i class="fas fa-shield-alt me-2"></i>Verified Workforce
@@ -14,8 +14,7 @@
         Hire <em style="color:var(--gold);font-style:italic;">Verified Veterans</em><br>for Any Role
       </h1>
       <p style="color:rgba(255,255,255,0.55);font-size:17px;max-width:580px;margin:0 auto 36px;line-height:1.75;">
-        Disciplined, vetted, and ready to work. Find verified Nigerian military veterans for drivers, security, technicians, logistics, and more.
-      </p>
+      Every candidate is reviewed for discipline, reliability, and readiness before being recommended.      </p>
       <div class="d-flex gap-3 flex-wrap justify-content-center">
         <a href="{{ url_for('marketplace.request_personnel') }}"
            style="display:inline-flex;align-items:center;gap:10px;padding:16px 36px;background:var(--gold);color:#0a1628;border-radius:4px;font-family:var(--font-cond);font-size:14px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;">
@@ -54,7 +53,7 @@
           <div style="width:56px;height:56px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
             <i class="fas fa-search" style="color:var(--gold);font-size:22px;"></i>
           </div>
-          <h5 style="color:#ffffff;font-family:var(--font-display);font-size:17px;margin-bottom:8px;">2. We Find & Match</h5>
+          <h5 style="color:#ffffff;font-family:var(--font-display);font-size:17px;margin-bottom:8px;">2. We Select & Match</h5>
           <p style="color:rgba(255,255,255,0.5);font-size:13px;line-height:1.7;">Our team manually matches you with the best-fit verified veteran from our network.</p>
         </div>
         <div class="col-md-4">
@@ -62,7 +61,7 @@
             <i class="fas fa-handshake" style="color:var(--gold);font-size:22px;"></i>
           </div>
           <h5 style="color:#ffffff;font-family:var(--font-display);font-size:17px;margin-bottom:8px;">3. Get Introduced</h5>
-          <p style="color:rgba(255,255,255,0.5);font-size:13px;line-height:1.7;">We introduce both parties and facilitate the connection. You handle the rest.</p>
+          <p style="color:rgba(255,255,255,0.5);font-size:13px;line-height:1.7;">We facilitate the connection and ensure alignment.</p>
         </div>
       </div>
     </div>

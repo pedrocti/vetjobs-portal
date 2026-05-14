@@ -1,101 +1,114 @@
 {% extends "base.html" %}
-{% block title %}Enroll - VetJobs Portal{% endblock %}
- 
+{% block title %}{% if request.args.get("type") == "employer" %}Employer Registration{% else %}Veteran Enrollment{% endif %} - VetJobPortal{% endblock %}
+
 {% block extra_head %}
-<link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css"/>
 {% endblock %}
- 
+
 {% block content %}
+{% set is_employer = (request.args.get("type") == "employer") %}
+
 <div class="vp-auth-wrapper">
   <div class="vp-auth-card vp-auth-card-wide">
- 
-    <!-- Header -->
+
     <div class="vp-auth-header">
-      <div class="hero-top-accent" style="position:relative;height:2px;border-radius:0;"></div>
+      <div style="height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);"></div>
       <div class="vp-auth-header-inner">
         <div class="vp-auth-logo-ring">
-          <i class="fas fa-user-shield"></i>
+          <i class="fas {% if is_employer %}fa-building{% else %}fa-user-shield{% endif %}"></i>
         </div>
         <p class="section-label mb-1">VetJobPortal</p>
-        <h2 class="vp-auth-title">Secure Enrollment</h2>
-        <p class="vp-auth-subtitle">Access opportunities built for service members and strategic employers.</p>
+        <h2 class="vp-auth-title">{% if is_employer %}Employer Registration{% else %}Veteran Enrollment{% endif %}</h2>
+        <p class="vp-auth-subtitle">
+          {% if is_employer %}
+            Access Nigeria's premier pipeline of pre-vetted military professionals.
+          {% else %}
+            Begin your civilian career journey with a platform built for those who served.
+          {% endif %}
+        </p>
       </div>
     </div>
- 
-    <!-- Form Body -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="padding:0 28px;">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
     <div class="vp-auth-body">
- 
-      <!-- Step Progress -->
+
+      <!-- Progress bar -->
       <div class="vp-step-progress mb-5">
         <div class="vp-step-bar">
-          <div class="vp-step-fill" id="progressBar" style="width:25%;"></div>
+          <div class="vp-step-fill" id="progressBar" style="width:0%;"></div>
         </div>
-        <div class="vp-step-labels">
-          <span class="vp-step-label active" id="label-1">Identity</span>
-          <span class="vp-step-label" id="label-2">Contact</span>
-          <span class="vp-step-label" id="label-3">Role</span>
-          <span class="vp-step-label" id="label-4">Security</span>
+        <!-- Static labels — no JS injection -->
+        <div style="display:flex;justify-content:space-between;margin-top:8px;">
+          <span class="vp-step-label active" id="lbl-0">Identity</span>
+          <span class="vp-step-label" id="lbl-1">Contact</span>
+          {% if not is_employer %}<span class="vp-step-label" id="lbl-2">Role</span>{% endif %}
+          <span class="vp-step-label" id="lbl-{% if is_employer %}2{% else %}3{% endif %}">Security</span>
         </div>
       </div>
- 
-      <form method="POST" novalidate>
- 
-        <!-- ── STEP 1: Identity ─────────────────────────────── -->
-        <div class="form-step active" data-step="1">
-          <p class="section-label mb-3">Step 1 of 4</p>
-          <h4 class="vp-step-title">Identity Verification</h4>
- 
+
+      <form method="POST" novalidate id="regForm">
+        {% if is_employer %}
+          <input type="hidden" name="user_type" value="employer">
+        {% endif %}
+
+        <!-- STEP 1 — Identity -->
+        <div class="reg-step active">
+          <p class="section-label mb-1">Step 1 of {% if is_employer %}3{% else %}4{% endif %}</p>
+          <h4 class="vp-step-title">{% if is_employer %}Organisation Contact{% else %}Identity Verification{% endif %}</h4>
           <div class="row g-3 mb-3">
             <div class="col-md-6">
               <label class="form-label">First Name <span class="vp-required">*</span></label>
-              <input type="text" class="form-control" name="first_name"
-                     placeholder="First name" required>
+              <input type="text" class="form-control" name="first_name" placeholder="First name" required>
             </div>
             <div class="col-md-6">
               <label class="form-label">Last Name <span class="vp-required">*</span></label>
-              <input type="text" class="form-control" name="last_name"
-                     placeholder="Last name" required>
+              <input type="text" class="form-control" name="last_name" placeholder="Last name" required>
             </div>
           </div>
- 
           <div class="mb-4">
             <label class="form-label">Username <span class="vp-required">*</span></label>
             <div class="vp-input-group">
               <span class="vp-input-icon"><i class="fas fa-user"></i></span>
-              <input type="text" class="form-control vp-input-with-icon"
-                     name="username" placeholder="Choose a username" required>
+              <input type="text" class="form-control vp-input-with-icon" name="username" placeholder="Choose a username" required>
             </div>
-            <small class="vp-form-hint">Used for secure login</small>
+            <small class="vp-form-hint">Used for login — choose carefully</small>
           </div>
- 
-          <button type="button" class="btn-vp-primary w-100 justify-content-center next-btn">
-            <span>Proceed</span>
-            <i class="fas fa-arrow-right"></i>
+          <button type="button" class="btn-vp-primary w-100 justify-content-center step-next">
+            <span>Proceed</span><i class="fas fa-arrow-right"></i>
           </button>
         </div>
- 
- 
-        <!-- ── STEP 2: Contact ─────────────────────────────── -->
-        <div class="form-step" data-step="2">
-          <p class="section-label mb-3">Step 2 of 4</p>
+
+        <!-- STEP 2 — Contact -->
+        <div class="reg-step">
+          <p class="section-label mb-1">Step 2 of {% if is_employer %}3{% else %}4{% endif %}</p>
           <h4 class="vp-step-title">Contact Information</h4>
- 
           <div class="mb-3">
-            <label class="form-label">Email Address <span class="vp-required">*</span></label>
+            <label class="form-label">{% if is_employer %}Work Email{% else %}Email Address{% endif %} <span class="vp-required">*</span></label>
             <input type="email" class="form-control" name="email"
-                   placeholder="your@email.com" required>
+                   placeholder="{% if is_employer %}company@organisation.com{% else %}your@email.com{% endif %}" required>
           </div>
- 
           <div class="row g-3 mb-4">
             <div class="col-md-5">
               <label class="form-label">Country <span class="vp-required">*</span></label>
-              <input list="countries" class="form-control" id="country"
-                     name="country" placeholder="Select country" required>
+              <input list="countries" class="form-control" id="country" name="country" placeholder="Select country" required>
               <datalist id="countries">
                 <option value="Nigeria" data-code="+234">
                 <option value="Kenya" data-code="+254">
                 <option value="Ghana" data-code="+233">
+                <option value="South Africa" data-code="+27">
+                <option value="Uganda" data-code="+256">
               </datalist>
               <input type="hidden" id="country_code" name="country_code">
             </div>
@@ -103,36 +116,29 @@
               <label class="form-label">Phone Number <span class="vp-required">*</span></label>
               <div class="vp-input-group">
                 <span class="vp-input-icon vp-dial-code" id="dial-code">+234</span>
-                <input type="tel" class="form-control vp-input-with-icon"
-                       id="phone" name="phone"
-                       placeholder="Enter without leading zero"
-                       pattern="[0-9]{6,14}" required>
+                <input type="tel" class="form-control vp-input-with-icon" id="phone" name="phone"
+                       placeholder="Without leading zero" pattern="[0-9]{6,14}" required>
               </div>
-              <small class="vp-form-hint">Enter number without leading zero</small>
+              <small class="vp-form-hint">Enter without leading zero</small>
             </div>
           </div>
- 
           <div class="d-flex gap-3">
-            <button type="button" class="btn-vp-ghost w-100 justify-content-center prev-btn">
-              <i class="fas fa-arrow-left"></i>
-              <span>Return</span>
+            <button type="button" class="btn-vp-ghost w-100 justify-content-center step-prev">
+              <i class="fas fa-arrow-left"></i><span>Return</span>
             </button>
-            <button type="button" class="btn-vp-primary w-100 justify-content-center next-btn">
-              <span>Proceed</span>
-              <i class="fas fa-arrow-right"></i>
+            <button type="button" class="btn-vp-primary w-100 justify-content-center step-next">
+              <span>Proceed</span><i class="fas fa-arrow-right"></i>
             </button>
           </div>
         </div>
- 
- 
-        <!-- ── STEP 3: Role ────────────────────────────────── -->
-        <div class="form-step" data-step="3">
-          <p class="section-label mb-3">Step 3 of 4</p>
+
+        <!-- STEP 3 — Role (veteran flow only) -->
+        {% if not is_employer %}
+        <div class="reg-step">
+          <p class="section-label mb-1">Step 3 of 4</p>
           <h4 class="vp-step-title">Service Classification</h4>
- 
           <div class="mb-5">
-            <label class="form-label">Enrollment Type <span class="vp-required">*</span></label>
- 
+            <label class="form-label">I am enrolling as <span class="vp-required">*</span></label>
             <div class="vp-role-cards">
               <label class="vp-role-card">
                 <input type="radio" name="user_type" value="veteran" required>
@@ -143,7 +149,7 @@
                 </div>
               </label>
               <label class="vp-role-card">
-                <input type="radio" name="user_type" value="employer" required>
+                <input type="radio" name="user_type" value="employer">
                 <div class="vp-role-card-inner">
                   <div class="vp-role-icon"><i class="fas fa-building"></i></div>
                   <strong>Employer / Organisation</strong>
@@ -151,36 +157,53 @@
                 </div>
               </label>
             </div>
+            <small class="vp-form-hint mt-2 d-block">
+              Hiring veterans?
+              <a href="{{ url_for('auth.register') }}?type=employer" class="vp-auth-link">Use employer registration →</a>
+            </small>
           </div>
- 
           <div class="d-flex gap-3">
-            <button type="button" class="btn-vp-ghost w-100 justify-content-center prev-btn">
-              <i class="fas fa-arrow-left"></i>
-              <span>Return</span>
+            <button type="button" class="btn-vp-ghost w-100 justify-content-center step-prev">
+              <i class="fas fa-arrow-left"></i><span>Return</span>
             </button>
-            <button type="button" class="btn-vp-primary w-100 justify-content-center next-btn">
-              <span>Proceed</span>
-              <i class="fas fa-arrow-right"></i>
+            <button type="button" class="btn-vp-primary w-100 justify-content-center step-next">
+              <span>Proceed</span><i class="fas fa-arrow-right"></i>
             </button>
           </div>
         </div>
- 
- 
-        <!-- ── STEP 4: Password ───────────────────────────── -->
-        <div class="form-step" data-step="4">
-          <p class="section-label mb-3">Step 4 of 4</p>
+        {% endif %}
+
+        <!-- STEP — Security (last step, always) -->
+        <div class="reg-step">
+          <p class="section-label mb-1">Final Step</p>
           <h4 class="vp-step-title">Secure Access Setup</h4>
- 
+
+          {% if is_employer %}
+          <div class="mb-3">
+            <label class="form-label">Organisation Name</label>
+            <div class="vp-input-group">
+              <span class="vp-input-icon"><i class="fas fa-building"></i></span>
+              <input type="text" class="form-control vp-input-with-icon" name="company_name"
+                     placeholder="Your company or organisation name">
+            </div>
+            <small class="vp-form-hint">Optional — complete your company profile after registration</small>
+          </div>
+          {% endif %}
+
           <div class="mb-3">
             <label class="form-label">Password <span class="vp-required">*</span></label>
             <div class="vp-input-group">
               <span class="vp-input-icon"><i class="fas fa-lock"></i></span>
               <input type="password" class="form-control vp-input-with-icon"
-                     name="password" placeholder="Create a password" required>
+                     name="password" id="passwordField" placeholder="Create a strong password" required>
             </div>
-            <small class="vp-form-hint">Min 8 characters — include uppercase, number & special character</small>
+            <small class="vp-form-hint">Min 8 characters — uppercase, number &amp; special character</small>
+            <div style="margin-top:8px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;">
+              <div id="strengthBar" style="height:100%;width:0%;border-radius:2px;transition:all 0.3s ease;"></div>
+            </div>
+            <small id="strengthLabel" style="font-family:var(--font-cond);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-top:4px;display:block;"></small>
           </div>
- 
+
           <div class="mb-4">
             <label class="form-label">Confirm Password <span class="vp-required">*</span></label>
             <div class="vp-input-group">
@@ -189,106 +212,119 @@
                      name="confirm_password" placeholder="Repeat your password" required>
             </div>
           </div>
- 
+
           <label class="vp-consent-label mb-4">
             <input type="checkbox" name="terms" required class="vp-consent-check">
-            <span>
-              I accept the
-              <a href="#" class="vp-auth-link">Terms of Service</a> and
-              <a href="#" class="vp-auth-link">Privacy Policy</a>
-            </span>
+            <span>I accept the <a href="#" class="vp-auth-link">Terms of Service</a> and <a href="#" class="vp-auth-link">Privacy Policy</a></span>
           </label>
- 
+
           <div class="d-flex gap-3">
-            <button type="button" class="btn-vp-ghost w-100 justify-content-center prev-btn">
-              <i class="fas fa-arrow-left"></i>
-              <span>Return</span>
+            <button type="button" class="btn-vp-ghost w-100 justify-content-center step-prev">
+              <i class="fas fa-arrow-left"></i><span>Return</span>
             </button>
             <button type="submit" class="btn-vp-primary w-100 justify-content-center">
-              <i class="fas fa-check-circle"></i>
-              <span>Submit Application</span>
+              <i class="fas {% if is_employer %}fa-building{% else %}fa-check-circle{% endif %}"></i>
+              <span>{% if is_employer %}Create Employer Account{% else %}Submit Application{% endif %}</span>
             </button>
           </div>
         </div>
- 
+
       </form>
- 
+
       <div class="vp-auth-divider"><span>or</span></div>
- 
-      <p class="vp-auth-footer-text">
-        Already enrolled?
-        <a href="{{ url_for('auth.login') }}" class="vp-auth-link fw-bold">Sign In</a>
-      </p>
- 
+
+      {% if is_employer %}
+        <p class="vp-auth-footer-text">Are you a veteran? <a href="{{ url_for('auth.register') }}" class="vp-auth-link fw-bold">Enroll as Veteran →</a></p>
+      {% else %}
+        <p class="vp-auth-footer-text">Hiring veteran talent? <a href="{{ url_for('auth.register') }}?type=employer" class="vp-auth-link fw-bold">Register as Employer →</a></p>
+      {% endif %}
+      <p class="vp-auth-footer-text mt-2">Already enrolled? <a href="{{ url_for('auth.login') }}" class="vp-auth-link fw-bold">Sign In</a></p>
+
     </div>
   </div>
 </div>
- 
-<!-- intl-tel-input scripts -->
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"></script>
- 
+
 {% block extra_scripts %}
 <script>
 document.addEventListener("DOMContentLoaded", function () {
- 
-  /* ── Phone input ── */
+
+  const steps   = Array.from(document.querySelectorAll(".reg-step"));
+  const progBar = document.getElementById("progressBar");
+  const total   = steps.length;
+  let cur       = 0;
+
+  function render() {
+    steps.forEach((s, i) => s.classList.toggle("active", i === cur));
+    if (progBar) progBar.style.width = ((cur + 1) / total * 100) + "%";
+    /* labels */
+    for (let i = 0; i < total; i++) {
+      const el = document.getElementById("lbl-" + i);
+      if (!el) continue;
+      el.classList.toggle("active",    i === cur);
+      el.classList.toggle("completed", i < cur);
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  render(); /* set initial state */
+
+  document.querySelectorAll(".step-next").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const s = steps[cur];
+      const radios = s.querySelectorAll("input[type=radio]");
+      if (radios.length > 0 && !s.querySelector("input[type=radio]:checked")) {
+        radios[0].closest(".vp-role-cards").style.outline = "1px solid rgba(212,175,55,0.5)";
+        return;
+      }
+      const textInputs = s.querySelectorAll("input[required]:not([type=radio])");
+      for (const inp of textInputs) {
+        if (!inp.value.trim()) { inp.focus(); inp.style.borderColor = "rgba(239,68,68,0.6)"; return; }
+        inp.style.borderColor = "";
+      }
+      if (cur < total - 1) { cur++; render(); }
+    });
+  });
+
+  document.querySelectorAll(".step-prev").forEach(btn => {
+    btn.addEventListener("click", () => { if (cur > 0) { cur--; render(); } });
+  });
+
+  /* Phone */
   const phone = document.querySelector("#phone");
+  let iti;
   if (phone) {
-    const iti = window.intlTelInput(phone, {
+    iti = window.intlTelInput(phone, {
       initialCountry: "auto",
-      geoIpLookup: cb => {
-        fetch("https://ipapi.co/json")
-          .then(r => r.json())
-          .then(d => cb(d.country_code || "ng"))
-          .catch(() => cb("ng"));
-      },
+      geoIpLookup: cb => fetch("https://ipapi.co/json").then(r=>r.json()).then(d=>cb(d.country_code||"ng")).catch(()=>cb("ng")),
       utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
     });
-    document.getElementById("country")?.addEventListener("input", function () {
-      const val  = this.value.trim().toLowerCase();
-      const opt  = Array.from(document.getElementById("countries").options)
-                       .find(o => o.value.toLowerCase() === val);
-      if (opt?.dataset.code) {
-        document.getElementById("dial-code").textContent = opt.dataset.code;
-        document.getElementById("country_code").value    = opt.dataset.code;
-      }
+    document.getElementById("country")?.addEventListener("input", function() {
+      const opt = Array.from(document.getElementById("countries").options).find(o => o.value.toLowerCase() === this.value.trim().toLowerCase());
+      if (opt?.dataset.code) { document.getElementById("dial-code").textContent = opt.dataset.code; document.getElementById("country_code").value = opt.dataset.code; }
     });
-    document.querySelector("form")?.addEventListener("submit", () => {
-      phone.value = iti.getNumber();
+    document.getElementById("regForm")?.addEventListener("submit", () => { if (iti) phone.value = iti.getNumber(); });
+  }
+
+  /* Password strength */
+  const pw = document.getElementById("passwordField");
+  const sb = document.getElementById("strengthBar");
+  const sl = document.getElementById("strengthLabel");
+  if (pw && sb) {
+    pw.addEventListener("input", () => {
+      const v = pw.value;
+      if (!v) { sb.style.width="0%"; sl.textContent=""; return; }
+      let sc = 0;
+      if (v.length>=8) sc++; if (/[A-Z]/.test(v)) sc++; if (/[0-9]/.test(v)) sc++; if (/[^A-Za-z0-9]/.test(v)) sc++;
+      const lvl = [["25%","#ef4444","Weak"],["50%","#f97316","Fair"],["75%","#eab308","Good"],["100%","#22c55e","Strong"]][Math.min(sc-1,3)];
+      sb.style.width=lvl[0]; sb.style.background=lvl[1]; sl.textContent=lvl[2]; sl.style.color=lvl[1];
     });
   }
- 
-  /* ── Multi-step ── */
-  const steps    = document.querySelectorAll(".form-step");
-  const bar      = document.getElementById("progressBar");
-  let current    = 0;
- 
-  function updateStep() {
-    steps.forEach((s, i) => s.classList.toggle("active", i === current));
-    if (bar) bar.style.width = ((current + 1) / steps.length * 100) + "%";
- 
-    /* Update step labels */
-    document.querySelectorAll(".vp-step-label").forEach((l, i) => {
-      l.classList.toggle("active",    i === current);
-      l.classList.toggle("completed", i < current);
-    });
-  }
- 
-  document.querySelectorAll(".next-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      if (current < steps.length - 1) { current++; updateStep(); }
-    });
-  });
- 
-  document.querySelectorAll(".prev-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      if (current > 0) { current--; updateStep(); }
-    });
-  });
- 
+
 });
 </script>
 {% endblock %}
- 
+
 {% endblock %}

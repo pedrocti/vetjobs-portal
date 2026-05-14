@@ -307,6 +307,246 @@ class NotificationService:
             send_email=True
         )
     
+
+    # ── Admin helpers ──────────────────────────────────────────
+
+    def _get_admin_ids(self):
+        """Return list of all admin user IDs."""
+        admins = User.query.filter_by(user_type='admin').all()
+        return [a.id for a in admins]
+
+    def _get_admin_emails(self):
+        """Return list of all admin email addresses."""
+        admins = User.query.filter_by(user_type='admin').all()
+        return [(a.email, a.first_name) for a in admins]
+
+    def _alert_all_admins(self, category, title, message, priority='high',
+                          action_url=None, action_text=None, send_email=True):
+        """Create in-app notification + email for every admin."""
+        self._init_services()
+        admin_ids = self._get_admin_ids()
+        for admin_id in admin_ids:
+            self.send_notification(
+                user_id=admin_id,
+                category=category,
+                title=title,
+                message=message,
+                priority=priority,
+                send_email=False,  # handle email separately below
+                action_url=action_url,
+                action_text=action_text
+            )
+        if send_email:
+            for email, name in self._get_admin_emails():
+                try:
+                    self.email_service.send_admin_action_alert(
+                        admin_email=email,
+                        subject=title,
+                        body=message,
+                        action_url=action_url,
+                        action_text=action_text
+                    )
+                except Exception as e:
+                    current_app.logger.error(f"Admin alert email failed: {e}")
+
+    # ── New registration alerts ────────────────────────────────
+
+    def notify_admins_new_veteran(self, veteran_name, veteran_id):
+        """In-app alert to all admins when a veteran registers."""
+        self._alert_all_admins(
+            category='system',
+            title='New Veteran Registration',
+            message=f'{veteran_name} has registered as a veteran on VetJobPortal.',
+            priority='low',
+            action_url=url_for('admin.veteran_management'),
+            action_text='View Veterans',
+            send_email=False  # low priority — dashboard badge is enough
+        )
+
+    def notify_admins_new_employer(self, employer_name, employer_email):
+        """In-app + email alert to all admins when an employer registers."""
+        self._alert_all_admins(
+            category='system',
+            title='New Employer Registration — Review Required',
+            message=(
+                f'{employer_name} ({employer_email}) has registered as an employer. '
+                'Review and approve their account to grant platform access.'
+            ),
+            priority='high',
+            action_url=url_for('admin.employer_management'),
+            action_text='Review Employer',
+            send_email=True
+        )
+
+    def notify_admins_veteran_profile_submitted(self, veteran_name, profile_id):
+        """In-app + email alert when veteran submits profile for verification."""
+        self._alert_all_admins(
+            category='verification',
+            title='Veteran Profile Submitted for Verification',
+            message=(
+                f'{veteran_name} has submitted their profile and documents for verification. '
+                'Please review their service records and uploaded documents.'
+            ),
+            priority='high',
+            action_url=url_for('admin.review_profile', profile_id=profile_id),
+            action_text='Review Profile',
+            send_email=True
+        )
+
+    def notify_admins_employer_activated(self, employer_name, employer_email, profile_id):
+        """In-app + email alert when employer completes Phase 1 profile."""
+        self._alert_all_admins(
+            category='verification',
+            title='Employer Account Activation — Approval Required',
+            message=(
+                f'{employer_name} ({employer_email}) has completed their employer profile '
+                'and is awaiting account approval.'
+            ),
+            priority='high',
+            action_url=url_for('admin.employer_management'),
+            action_text='Review & Approve',
+            send_email=True
+        )
+
+    def notify_admins_marketplace_request(self, client_name, role_needed, request_id):
+        """In-app + email alert when a new marketplace request comes in."""
+        self._alert_all_admins(
+            category='system',
+            title='New Marketplace Request — Match Required',
+            message=(
+                f'{client_name} has submitted a request for a {role_needed}. '
+                'Please review and match a suitable veteran.'
+            ),
+            priority='high',
+            action_url=url_for('admin.marketplace_admin'),
+            action_text='View Request',
+            send_email=True
+        )
+
+    # ── Employer approval/rejection ────────────────────────────
+
+    def notify_employer_approved(self, employer_user):
+        """Notify employer their account has been approved."""
+        self._init_services()
+        # In-app
+        self.send_notification(
+            user_id=employer_user.id,
+            category='verification',
+            title='Employer Account Approved',
+            message=(
+                'Your VetJobPortal employer account has been approved. '
+                'You can now post jobs and access our verified veteran talent pool.'
+            ),
+            priority='high',
+            send_email=False,
+            action_url=url_for('dashboard.employer'),
+            action_text='Go to Dashboard'
+        )
+        # Email
+        try:
+            self.email_service.send_employer_verification_status_email(
+                user=employer_user,
+                status='approved'
+            )
+        except Exception as e:
+            current_app.logger.error(f"Employer approval email failed: {e}")
+
+    def notify_employer_rejected(self, employer_user, reason):
+        """Notify employer their account has been rejected."""
+        self._init_services()
+        # In-app
+        self.send_notification(
+            user_id=employer_user.id,
+            category='verification',
+            title='Employer Account — Action Required',
+            message=f'Your employer account could not be approved. Reason: {reason}',
+            priority='high',
+            send_email=False,
+            action_url=url_for('main.contact'),
+            action_text='Contact Support'
+        )
+        # Email
+        try:
+            self.email_service.send_employer_verification_status_email(
+                user=employer_user,
+                status='rejected',
+                admin_note=reason
+            )
+        except Exception as e:
+            current_app.logger.error(f"Employer rejection email failed: {e}")
+
+    def notify_veteran_rejected(self, veteran_user, reason):
+        """Notify veteran their profile was rejected with reason."""
+        self._init_services()
+        self.send_notification(
+            user_id=veteran_user.id,
+            category='verification',
+            title='Profile Verification — Action Required',
+            message=f'Your profile verification requires attention. Reason: {reason}',
+            priority='high',
+            send_email=False,
+            action_url=url_for('veteran.complete_profile'),
+            action_text='Update Profile'
+        )
+        try:
+            self.email_service.send_verification_status_email(
+                user=veteran_user,
+                status='rejected',
+                admin_note=reason
+            )
+        except Exception as e:
+            current_app.logger.error(f"Veteran rejection email failed: {e}")
+
+    def notify_veteran_approved(self, veteran_user):
+        """Notify veteran their profile was approved."""
+        self._init_services()
+        self.send_notification(
+            user_id=veteran_user.id,
+            category='verification',
+            title='Profile Verified Successfully',
+            message=(
+                'Your veteran profile has been verified. '
+                'You can now apply for jobs and appear in employer searches.'
+            ),
+            priority='high',
+            send_email=False,
+            action_url=url_for('jobs.job_board'),
+            action_text='Browse Jobs'
+        )
+        try:
+            self.email_service.send_verification_status_email(
+                user=veteran_user,
+                status='approved'
+            )
+        except Exception as e:
+            current_app.logger.error(f"Veteran approval email failed: {e}")
+
+    def notify_marketplace_match(self, veteran_user, role_needed, client_name, admin_notes=None):
+        """Notify veteran they have been matched to a marketplace request."""
+        self._init_services()
+        self.send_notification(
+            user_id=veteran_user.id,
+            category='job_match',
+            title=f'Assignment Match — {role_needed}',
+            message=(
+                f'You have been matched to a {role_needed} request from {client_name}. '
+                'Log in to view the full details.'
+            ),
+            priority='high',
+            send_email=False,
+            action_url=url_for('dashboard.veteran'),
+            action_text='View Assignment'
+        )
+        try:
+            self.email_service.send_marketplace_match_email(
+                veteran=veteran_user,
+                role_needed=role_needed,
+                client_name=client_name,
+                admin_notes=admin_notes
+            )
+        except Exception as e:
+            current_app.logger.error(f"Marketplace match email failed: {e}")
+
     def get_user_notifications(self, user_id, limit=50, include_read=True):
         """Get notifications for a user"""
         query = Notification.query.filter_by(user_id=user_id)

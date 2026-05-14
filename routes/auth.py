@@ -101,6 +101,22 @@ def register():
 
         db.session.commit()
 
+        # ── Notify admins of new registration ─────────────────
+        try:
+            from services.notification_service import notification_service
+            if user_type == 'employer':
+                notification_service.notify_admins_new_employer(
+                    employer_name=user.full_name,
+                    employer_email=user.email
+                )
+            else:
+                notification_service.notify_admins_new_veteran(
+                    veteran_name=user.full_name,
+                    veteran_id=user.id
+                )
+        except Exception as e:
+            current_app.logger.error(f"Admin registration notification failed: {e}")
+
         # ── Send verification email via Brevo ──────────────────
         # NOTE: Brevo contact sync happens AFTER verification (confirm user is real)
         try:

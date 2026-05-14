@@ -117,6 +117,17 @@ def complete_profile():
             profile.profile_completed = True
             profile.profile_completed_at = datetime.utcnow()
 
+            # Notify admins employer needs approval
+            try:
+                from services.notification_service import notification_service
+                notification_service.notify_admins_employer_activated(
+                    employer_name=profile.company_name or current_user.full_name,
+                    employer_email=current_user.email,
+                    profile_id=profile.id
+                )
+            except Exception as e:
+                current_app.logger.error(f"Employer activation notification failed: {e}")
+
             db.session.commit()
             # ✅ BREVO UPDATE (SAFE)
             try:
@@ -143,6 +154,48 @@ def complete_profile():
 
     return render_template('employer/complete_profile.html', profile=profile)
 
+
+# =========================================================
+# EDIT FULL PROFILE (Phase 2 — after activation)
+# =========================================================
+@employer_bp.route('/profile/edit', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    if not current_user.is_employer():
+        flash('Access denied.', 'error')
+        return redirect(url_for('main.index'))
+
+    profile = EmployerProfile.query.filter_by(user_id=current_user.id).first()
+    if not profile:
+        return redirect(url_for('employer.complete_profile'))
+
+    if request.method == 'POST':
+        updated = handle_employer_profile_form(profile, is_edit=True)
+        if not updated:
+            return render_template('employer/edit_profile.html', profile=profile)
+        try:
+            # Handle logo upload
+            logo_file = request.files.get('company_logo')
+            if logo_file and logo_file.filename:
+                from werkzeug.utils import secure_filename
+                import os
+                timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
+                filename  = secure_filename(logo_file.filename)
+                ext       = os.path.splitext(filename)[1]
+                unique    = f"logo_{current_user.id}_{timestamp}{ext}"
+                logo_path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique)
+                logo_file.save(logo_path)
+                profile.company_logo = unique
+
+            db.session.commit()
+            flash('Company profile updated successfully.', 'success')
+            return redirect(url_for('dashboard.employer'))
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(f"Profile edit error: {e}")
+            flash('Error saving profile. Please try again.', 'error')
+
+    return render_template('employer/edit_profile.html', profile=profile)
 
 # =========================================================
 # PROFILE HANDLER (SAFE)
@@ -182,6 +235,16 @@ def handle_employer_profile_form(profile, is_edit=False):
     profile.recruiter_position = recruiter_position
     profile.recruiter_email = recruiter_email
     profile.recruiter_phone = recruiter_phone
+    profile.company_email       = sanitize_input(request.form.get('company_email',       ''), 120).lower()
+    profile.company_website     = sanitize_input(request.form.get('company_website',     ''), 200)
+    profile.company_size        = sanitize_input(request.form.get('company_size',        ''), 50)
+    profile.company_address     = sanitize_input(request.form.get('company_address',     ''), 500)
+    profile.company_description = sanitize_input(request.form.get('company_description', ''), 2000)
+    profile.diversity_statement = sanitize_input(request.form.get('diversity_statement', ''), 2000)
+    profile.work_type           = sanitize_input(request.form.get('work_type',           ''), 100)
+    profile.benefits_offered    = sanitize_input(request.form.get('benefits',            ''), 2000)
+    profile.cac_number          = sanitize_input(request.form.get('cac_number',          ''), 50)
+    profile.hr_linkedin         = sanitize_input(request.form.get('hr_linkedin',         ''), 200)
     profile.updated_at = datetime.utcnow()
 
     return profile

@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import os
 from decimal import Decimal
 from . import admin_bp
+from services.notification_service import notification_service
 
 # Import shared database and models
 from app import db
@@ -117,11 +118,13 @@ def approve_employer(employer_id):
 
     if employer.approve_employer():
         db.session.commit()
+
+        try:
+            notification_service.notify_employer_approved(employer)
+        except Exception as e:
+            current_app.logger.error(f"Employer approval notification failed: {e}")
+
         flash(f'Employer {employer.full_name} has been approved successfully.', 'success')
-
-        # TODO: Send approval email notification here
-        # send_employer_approval_email(employer)
-
     else:
         flash('Failed to approve employer.', 'error')
 
@@ -141,15 +144,25 @@ def reject_employer(employer_id):
         flash('User is not an employer.', 'error')
         return redirect(url_for('admin.employer_management'))
 
-    rejection_reason = request.form.get('rejection_reason', 'No reason provided')
+    rejection_reason = request.form.get('rejection_reason', 'No reason provided').strip()
+    if not rejection_reason:
+        flash('Please provide a reason for rejection.', 'error')
+        return redirect(url_for('admin.employer_management'))
 
     if employer.reject_employer():
-        db.session.commit()
+        # Save reason to profile
+        profile = EmployerProfile.query.filter_by(user_id=employer.id).first()
+        if profile:
+            profile.rejection_reason = rejection_reason
+            profile.admin_notes      = rejection_reason
+            db.session.commit()
+
+        try:
+            notification_service.notify_employer_rejected(employer, rejection_reason)
+        except Exception as e:
+            current_app.logger.error(f"Employer rejection notification failed: {e}")
+
         flash(f'Employer {employer.full_name} has been rejected.', 'warning')
-
-        # TODO: Send rejection email notification here
-        # send_employer_rejection_email(employer, rejection_reason)
-
     else:
         flash('Failed to reject employer.', 'error')
 

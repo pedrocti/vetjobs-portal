@@ -168,10 +168,10 @@
                     <small>CV, mentorship, career support</small>
                   </span>
                 </a>
-                <a class="vp-dropdown-item" href="{{ url_for('training.list_programs') }}">
+                <a class="vp-dropdown-item" href="{{ url_for('main.jobs') }}"> 
                   <span class="vp-di-icon"><i class="fas fa-calendar-alt"></i></span>
                   <span class="vp-di-text">
-                    <strong>Career Events</strong>
+                    <strong>Hiring Events</strong>
                     <small>Upcoming hiring events</small>
                   </span>
                 </a>
@@ -208,7 +208,7 @@
                 <a class="vp-dropdown-item" href="{{ url_for('main.employers') }}">
                   <span class="vp-di-icon"><i class="fas fa-briefcase"></i></span>
                   <span class="vp-di-text">
-                    <strong>Hire Veterans</strong>
+                    <strong>Hire Professionals</strong>
                     <small>Post jobs & find talent</small>
                   </span>
                 </a>
@@ -231,15 +231,15 @@
           <!-- Verified Workforce Dropdown -->
           <li class="vp-dropdown">
             <a class="vp-nav-link vp-dropdown-toggle" href="#">
-              Verified Workforce <i class="fas fa-chevron-down vp-chevron"></i>
+              Hire Talents<i class="fas fa-chevron-down vp-chevron"></i>
             </a>
             <div class="vp-dropdown-menu">
               <div class="vp-dropdown-inner">
                 <a class="vp-dropdown-item" href="{{ url_for('marketplace.index') }}">
                   <span class="vp-di-icon"><i class="fas fa-shield-alt"></i></span>
                   <span class="vp-di-text">
-                    <strong>Browse Workforce</strong>
-                    <small>Drivers, security, technicians & more</small>
+                    <strong>View Available Talent</strong>
+                    <small>Drivers, personal security detail, technicians & more</small>
                   </span>
                 </a>
                 <a class="vp-dropdown-item" href="{{ url_for('marketplace.request_personnel') }}">
@@ -348,11 +348,6 @@
             <a class="btn-vp-ghost btn-vp-ghost-sm" href="{{ url_for('auth.register') }}">Register</a>
 
           {% endif %}
-
-          <a class="donate-cta btn btn-sm px-3" href="{{ url_for('payments.donate_page') }}">
-            <i class="fas fa-donate me-1"></i> Donate
-          </a>
-
         </div>
 
         <!-- Mobile Right: Notification + Hamburger -->
@@ -476,7 +471,7 @@
               <i class="fas fa-chevron-down vp-drawer-chevron"></i>
             </button>
             <div class="vp-drawer-section-body" id="drawerMarketplace">
-              <a class="vp-drawer-sublink" href="{{ url_for('marketplace.index') }}">Browse Workforce</a>
+              <a class="vp-drawer-sublink" href="{{ url_for('marketplace.index') }}">View Available Talent</a>
               <a class="vp-drawer-sublink" href="{{ url_for('marketplace.request_personnel') }}">Request Personnel</a>
               {% if current_user.is_authenticated and current_user.is_veteran() %}
               <a class="vp-drawer-sublink" href="{{ url_for('marketplace.offer_service') }}">Offer My Services</a>
@@ -531,13 +526,7 @@
             <i class="fas fa-user-shield"></i> <span>Register as Veteran</span>
           </a>
         {% endif %}
-
-        <a class="donate-cta btn w-100 mt-2 text-center" href="{{ url_for('payments.donate_page') }}">
-          <i class="fas fa-donate me-1"></i> Donate
-        </a>
-
       </div>
-
     </div>
 
 

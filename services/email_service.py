@@ -334,6 +334,123 @@ class EmailService:
         text = self._build_text(body, action_url, action_text)
         return self.send_email(user.email, subject, html, text)
 
+
+    # ─────────────────────────────────────────────────────────
+    # EMPLOYER VERIFICATION STATUS EMAIL
+    # ─────────────────────────────────────────────────────────
+    def send_employer_verification_status_email(self, user, status, admin_note=None):
+        """Send approval or rejection email to employer."""
+        if status == 'approved':
+            subject = "Employer Account Approved — VetJobPortal"
+            body = (
+                f"Congratulations {user.first_name},\n\n"
+                "Your employer account on VetJobPortal has been reviewed and approved.\n\n"
+                "You can now post jobs, search our verified veteran talent pool, "
+                "and begin building your military-trained workforce.\n\n"
+                "If you have not already done so, complete your company profile "
+                "to increase visibility with veterans."
+            )
+            action_url  = self._full_url("/dashboard/employer")
+            action_text = "Go to Dashboard"
+        else:
+            subject = "Employer Account — Verification Update"
+            body = (
+                f"Dear {user.first_name},\n\n"
+                "Your VetJobPortal employer account could not be approved at this time.\n\n"
+                f"Reason: {admin_note or 'Please contact support for more information.'}\n\n"
+                "If you believe this is an error or have additional documents to submit, "
+                "please contact our support team."
+            )
+            action_url  = self._full_url("/contact")
+            action_text = "Contact Support"
+
+        return self.send_notification_email(
+            user=user,
+            subject=subject,
+            body=body,
+            action_url=action_url,
+            action_text=action_text
+        )
+
+    # ─────────────────────────────────────────────────────────
+    # ADMIN ALERT EMAIL (generic — for actions requiring review)
+    # ─────────────────────────────────────────────────────────
+    def send_admin_action_alert(self, admin_email, subject, body, action_url=None, action_text=None):
+        """Send an alert email directly to admin email address."""
+        html = self._build_html("Admin", subject, body, action_url, action_text)
+        text = self._build_text(body, action_url, action_text)
+        return self.send_email(admin_email, subject, html, text)
+
+
+    # ─────────────────────────────────────────────────────────
+    # MARKETPLACE REQUEST CONFIRMATION (to client)
+    # ─────────────────────────────────────────────────────────
+    def send_marketplace_request_confirmation(self, client_email, client_name,
+                                               role_needed, reference_id):
+        """Confirm to client that their request was received."""
+        subject = f"Request Received — {role_needed} | VetJobPortal"
+        body = (
+            f"Dear {client_name},\n\n"
+            f"Your request for a verified {role_needed} has been received successfully.\n\n"
+            f"Reference: VJP-{reference_id}\n\n"
+            "Our team will review your request and match you with a suitable veteran "
+            "within 24 hours. You will receive a follow-up email once a match is confirmed.\n\n"
+            "What happens next:\n"
+            "1. Our team reviews your requirements\n"
+            "2. We select the best-fit verified veteran\n"
+            "3. We introduce you via email within 24 hours\n\n"
+            "If you have urgent requirements, reply to this email or contact us directly."
+        )
+        html = self._build_html(client_name, subject, body,
+                                action_url=self._full_url("/marketplace"),
+                                action_text="View Verified Workforce")
+        text = self._build_text(body)
+        return self.send_email(client_email, subject, html, text)
+
+    # ─────────────────────────────────────────────────────────
+    # MARKETPLACE CLIENT MATCH EMAIL (to client when paired)
+    # ─────────────────────────────────────────────────────────
+    def send_marketplace_client_match_email(self, client_email, client_name,
+                                             role_needed, veteran_name, admin_notes=None):
+        """Notify client they have been matched with a veteran."""
+        subject = f"Match Confirmed — {role_needed} | VetJobPortal"
+        body = (
+            f"Dear {client_name},\n\n"
+            f"Great news — we have matched a verified veteran to your {role_needed} request.\n\n"
+            f"Matched Professional: {veteran_name}\n"
+            f"{('Notes from our team: ' + admin_notes) if admin_notes else ''}\n\n"
+            "Our team will be in touch shortly to facilitate the introduction and "
+            "confirm the engagement details.\n\n"
+            "All our veterans are background-checked, identity-verified and service-record "
+            "confirmed before placement."
+        )
+        html = self._build_html(client_name, subject, body,
+                                action_url=self._full_url("/contact"),
+                                action_text="Contact Our Team")
+        text = self._build_text(body)
+        return self.send_email(client_email, subject, html, text)
+
+    # ─────────────────────────────────────────────────────────
+    # MARKETPLACE MATCH EMAIL
+    # ─────────────────────────────────────────────────────────
+    def send_marketplace_match_email(self, veteran, role_needed, client_name, admin_notes=None):
+        """Notify veteran they have been matched to a service request."""
+        subject = f"Assignment Match — {role_needed}"
+        body = (
+            f"Dear {veteran.first_name},\n\n"
+            f"You have been matched to a service request for a {role_needed} role "
+            f"from {client_name}.\n\n"
+            f"{('Additional notes: ' + admin_notes) if admin_notes else ''}\n\n"
+            "Please log in to your dashboard to view the full details and confirm your availability."
+        )
+        return self.send_notification_email(
+            user=veteran,
+            subject=subject,
+            body=body,
+            action_url=self._full_url("/dashboard"),
+            action_text="View Assignment"
+        )
+
     # ─────────────────────────────────────────────────────────
     # EMAIL VERIFICATION (NEW)
     # ─────────────────────────────────────────────────────────

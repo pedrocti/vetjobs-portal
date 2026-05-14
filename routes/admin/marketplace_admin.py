@@ -4,6 +4,8 @@ from extensions import db
 from models import User, VeteranProfile
 from models.marketplace import ServiceOffer, ServiceRequest, SERVICE_CATEGORIES
 from . import admin_bp
+from services.email_service import EmailService
+from services.notification_service import notification_service
 from .stats import get_admin_stats
 
 
@@ -66,6 +68,46 @@ def marketplace_match():
     sr.status = 'matched'
     sr.admin_notes = admin_notes
     db.session.commit()
+
+    # Notify matched veteran
+    try:
+        notification_service.notify_marketplace_match(
+            veteran_user=veteran,
+            role_needed=sr.role_needed,
+            client_name=sr.client_name,
+            admin_notes=admin_notes or None
+        )
+    except Exception as e:
+        from flask import current_app
+        current_app.logger.error(f"Marketplace match notification failed: {e}")
+
+    # Notify client by email
+    try:
+        if sr.client_email:
+            EmailService().send_marketplace_client_match_email(
+                client_email=sr.client_email,
+                client_name=sr.client_name,
+                role_needed=sr.role_needed,
+                veteran_name=veteran.full_name,
+                admin_notes=admin_notes or None
+            )
+    except Exception as e:
+        from flask import current_app
+        current_app.logger.error(f"Client match email failed: {e}")
+
+    # Notify client by email
+    try:
+        if sr.client_email:
+            EmailService().send_marketplace_client_match_email(
+                client_email=sr.client_email,
+                client_name=sr.client_name,
+                role_needed=sr.role_needed,
+                veteran_name=veteran.full_name,
+                admin_notes=admin_notes or None
+            )
+    except Exception as e:
+        from flask import current_app
+        current_app.logger.error(f"Client match email failed: {e}")
 
     flash(
         f'Successfully matched {veteran.full_name} with "{sr.role_needed}" request from {sr.client_name}.',

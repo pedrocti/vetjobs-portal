@@ -167,6 +167,18 @@
                        placeholder="Your service number" required>
               </div>
               <div class="col-md-6">
+                <label class="form-label">NIN (National ID Number) <span class="vp-required">*</span></label>
+                <div class="vp-input-group">
+                  <span class="vp-input-icon"><i class="fas fa-id-card"></i></span>
+                  <input type="text" class="form-control vp-input-with-icon" name="nin"
+                         value="{{ profile.nin if profile and profile.nin else '' }}"
+                         placeholder="11-digit NIN" maxlength="20"
+                         pattern="[0-9]{11}" title="Enter your 11-digit NIN">
+                </div>
+                <small class="vp-form-hint">Your National Identification Number — used for cross-verification</small>
+              </div>
+
+              <div class="col-md-6">
                 <label class="form-label">Years of Service <span class="vp-required">*</span></label>
                 <input type="number" class="form-control" name="years_of_service" id="years_of_service"
                        min="0" max="50"

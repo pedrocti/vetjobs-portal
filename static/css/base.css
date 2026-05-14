@@ -533,16 +533,27 @@ footer a:hover {
 }
 
 @media (max-width: 768px) {
-    .hero-inner       { padding: 20px 20px 60px; }
+    .hero-inner       { padding: 16px 16px 50px; }
     .hero-scroll-hint { display: none; }
-    .hero-trust       { gap: 16px; }
-    .hero-trust-num   { font-size: 16px; }
+    .hero-trust       { gap: 12px; flex-wrap: wrap; }
+    .hero-trust-num   { font-size: 15px; }
+    .hero-trust-label { font-size: 10px; }
+    .hero-ctas        { gap: 10px; }
+    .hero-eyebrow     { font-size: 9px; letter-spacing: 2px; }
 
     .services-hero {
-        min-height: 60vh;
-        padding-top: calc(var(--navbar-height) + 2rem);
-        padding-bottom: 3rem;
+        min-height: 50vh;
+        padding-top: calc(var(--navbar-height) + 1.5rem);
+        padding-bottom: 2.5rem;
     }
+}
+
+@media (max-width: 480px) {
+    .hero-inner     { padding: 12px 14px 44px; }
+    .hero-trust     { gap: 10px; }
+    .hero-trust-num { font-size: 14px; }
+    .hero-ctas .btn-vp-primary,
+    .hero-ctas .btn-vp-ghost { padding: 11px 20px; font-size: 12px; }
 }
 
 .hero-particles {

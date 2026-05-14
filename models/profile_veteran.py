@@ -51,6 +51,7 @@ class VeteranProfile(db.Model):
     # Documents
     discharge_document = db.Column(db.String(255))
     id_document = db.Column(db.String(255))
+    nin = db.Column(db.String(20), nullable=True)
     resume_file = db.Column(db.String(255), nullable=True)
     resume_last_updated = db.Column(db.DateTime, nullable=True)
 
@@ -155,6 +156,7 @@ class VeteranProfile(db.Model):
             self.discharge_type,
             self.discharge_document,
             self.id_document,
+            self.nin,
             self.resume_file,
         ]
 

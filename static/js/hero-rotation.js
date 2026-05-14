@@ -17,7 +17,7 @@
   setInterval(() => goToSlide(current + 1), 6000);
 
   // Rotating words
-  const words  = ['Career Portal', 'Transition Portal', 'Talent Network', 'Opportunity Hub'];
+  const words  = ['Built for Discipline', 'Trained for Leadership', 'Ready for Execution', 'Proven Under Pressure'];
   const wordEl = document.getElementById('heroRotatingWord');
   let wordIdx  = 0;
 

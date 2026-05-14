@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from extensions import db
+from services.email_service import EmailService
 from models.marketplace import ServiceOffer, ServiceRequest, SERVICE_CATEGORIES
 
 marketplace_bp = Blueprint('marketplace', __name__)
@@ -159,5 +160,42 @@ def submit_request():
     )
     db.session.add(req)
     db.session.commit()
+
+    # Notify all admins a new request needs matching
+    try:
+        from services.notification_service import notification_service
+        notification_service.notify_admins_marketplace_request(
+            client_name=client_name,
+            role_needed=role_needed,
+            request_id=req.id
+        )
+    except Exception as e:
+        from flask import current_app
+        current_app.logger.error(f"Marketplace request notification failed: {e}")
+
+    # Confirmation email to client
+    try:
+        EmailService().send_marketplace_request_confirmation(
+            client_email=client_email,
+            client_name=client_name,
+            role_needed=role_needed,
+            reference_id=req.id
+        )
+    except Exception as e:
+        from flask import current_app
+        current_app.logger.error(f"Marketplace confirmation email failed: {e}")
+
+    # Confirmation email to client
+    try:
+        EmailService().send_marketplace_request_confirmation(
+            client_email=client_email,
+            client_name=client_name,
+            role_needed=role_needed,
+            reference_id=req.id
+        )
+    except Exception as e:
+        from flask import current_app
+        current_app.logger.error(f"Marketplace confirmation email failed: {e}")
+
     flash('Request submitted! Our team will reach out within 24 hours with a matched veteran.', 'success')
     return redirect(url_for('marketplace.index'))

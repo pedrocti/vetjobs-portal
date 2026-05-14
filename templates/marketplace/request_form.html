@@ -2,7 +2,7 @@
 {% block title %}Request Verified Personnel — VetJobPortal{% endblock %}
 
 {% block content %}
-<div style="background:#0a1628;min-height:100vh;padding:60px 20px;">
+<div style="background:#0a1628;min-height:100vh;padding:clamp(24px,5vw,60px) 20px;">
   <div style="max-width:700px;margin:0 auto;">
 
     <div class="mb-4">
@@ -23,7 +23,7 @@
       </p>
     </div>
 
-    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.09);border-radius:12px;padding:40px 36px;">
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.09);border-radius:12px;padding:clamp(20px,4vw,40px) clamp(16px,4vw,36px);">
 
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% for cat, msg in messages %}
