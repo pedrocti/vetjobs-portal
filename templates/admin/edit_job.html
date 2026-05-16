@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% block title %}Edit Job - Admin | Veteran-Employer Job Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-9 mx-auto">
+
+            <!-- Header -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h1 class="fw-bold mb-1">Edit Job</h1>
+                    <p class="text-muted mb-0">
+                        Editing: <strong>{{ job.title }}</strong> &mdash; {{ job.company_name }}
+                    </p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('admin.review_job', job_id=job.id) }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Review
+                    </a>
+                    <!-- Delete button -->
+                    <button type="button" class="btn btn-danger"
+                            data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="fas fa-trash me-2"></i>Delete Job
+                    </button>
+                </div>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+
+                <!-- ── Job Information ── -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h5 class="mb-0"><i class="fas fa-briefcase me-2"></i>Job Information</h5>
+                    </div>
+                    <div class="card-body p-4">
+
+                        <div class="mb-3">
+                            <label for="job_title" class="form-label fw-semibold">Job Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="job_title" name="job_title"
+                                   value="{{ request.form.get('job_title', job.title) }}" required>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="company_name" class="form-label fw-semibold">Company Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="company_name" name="company_name"
+                                       value="{{ request.form.get('company_name', job.company_name) }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="location" class="form-label fw-semibold">Location <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="location" name="location"
+                                       value="{{ request.form.get('location', job.location) }}" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="job_type" class="form-label fw-semibold">Job Type</label>
+                                <select class="form-select" id="job_type" name="job_type">
+                                    <option value="full-time" {{ 'selected' if job.job_type == 'full-time' }}>Full-time</option>
+                                    <option value="part-time" {{ 'selected' if job.job_type == 'part-time' }}>Part-time</option>
+                                    <option value="contract" {{ 'selected' if job.job_type == 'contract' }}>Contract</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="industry" class="form-label fw-semibold">Industry</label>
+                                <input type="text" class="form-control" id="industry" name="industry"
+                                       value="{{ request.form.get('industry', job.industry or '') }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="experience_level" class="form-label fw-semibold">Experience Level</label>
+                                <select class="form-select" id="experience_level" name="experience_level">
+                                    <option value="">Select level</option>
+                                    <option value="entry" {{ 'selected' if job.experience_level == 'entry' }}>Entry Level</option>
+                                    <option value="mid" {{ 'selected' if job.experience_level == 'mid' }}>Mid Level</option>
+                                    <option value="senior" {{ 'selected' if job.experience_level == 'senior' }}>Senior Level</option>
+                                    <option value="executive" {{ 'selected' if job.experience_level == 'executive' }}>Executive</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="salary_min" class="form-label fw-semibold">Salary Min (₦)</label>
+                                <input type="number" class="form-control" id="salary_min" name="salary_min"
+                                       value="{{ request.form.get('salary_min', job.salary_min or '') }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="salary_max" class="form-label fw-semibold">Salary Max (₦)</label>
+                                <input type="number" class="form-control" id="salary_max" name="salary_max"
+                                       value="{{ request.form.get('salary_max', job.salary_max or '') }}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="status" class="form-label fw-semibold">Status</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="approved" {{ 'selected' if job.status == 'approved' }}>Approved</option>
+                                    <option value="pending" {{ 'selected' if job.status == 'pending' }}>Pending</option>
+                                    <option value="rejected" {{ 'selected' if job.status == 'rejected' }}>Rejected</option>
+                                    <option value="flagged" {{ 'selected' if job.status == 'flagged' }}>Flagged</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="is_active"
+                                           name="is_active" {{ 'checked' if job.is_active }}>
+                                    <label class="form-check-label fw-semibold" for="is_active">Active (visible on job board)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ── Admin Options ── -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header py-3" style="background:#1a1a2e; color:#fff;">
+                        <h5 class="mb-0"><i class="fas fa-user-shield me-2"></i>Admin Options</h5>
+                    </div>
+                    <div class="card-body p-4">
+
+                        <!-- Current logo preview -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Company Logo</label>
+                            {% if job.company_logo %}
+                            <div class="mb-2 d-flex align-items-center gap-3">
+                                <img src="{{ url_for('static', filename=job.company_logo) }}"
+                                     alt="Current Logo"
+                                     style="width:80px; height:80px; object-fit:contain; border:1px solid #dee2e6; border-radius:6px; padding:4px; background:#fff;">
+                                <div>
+                                    <p class="mb-1 small text-muted">Current logo</p>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="clear_logo"
+                                               name="clear_logo" value="yes">
+                                        <label class="form-check-label text-danger small" for="clear_logo">
+                                            Remove this logo (will fall back to platform logo)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <p class="text-muted small mb-2">No logo uploaded — platform logo will be used.</p>
+                            {% endif %}
+                            <input type="file" class="form-control" id="company_logo" name="company_logo"
+                                   accept=".png,.jpg,.jpeg,.webp,.gif">
+                            <div class="form-text">Upload a new logo to replace the current one. PNG, JPG, WEBP or GIF.</div>
+                        </div>
+
+                        <!-- External Apply URL -->
+                        <div class="mb-4">
+                            <label for="external_apply_url" class="form-label fw-semibold">
+                                External Apply Link
+                                <small class="text-muted fw-normal ms-1">(optional)</small>
+                            </label>
+                            <input type="url" class="form-control" id="external_apply_url" name="external_apply_url"
+                                   placeholder="https://company.com/careers/apply"
+                                   value="{{ request.form.get('external_apply_url', job.external_apply_url or '') }}">
+                            <div class="form-text">
+                                When set, veterans will see an "Apply on Company Website" button.
+                            </div>
+                        </div>
+
+                        <!-- Deadline -->
+                        <div class="mb-2">
+                            <label for="deadline" class="form-label fw-semibold">
+                                Application Deadline
+                                <small class="text-muted fw-normal ms-1">(optional)</small>
+                            </label>
+                            <input type="date" class="form-control" id="deadline" name="deadline"
+                                   value="{{ request.form.get('deadline', job.deadline.strftime('%Y-%m-%d') if job.deadline else '') }}"
+                                   style="max-width: 220px;">
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ── Description ── -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white py-3">
+                        <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Job Description</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <textarea class="form-control" id="job_description" name="job_description" rows="10" required>{{ request.form.get('job_description', job.description) }}</textarea>
+                    </div>
+                </div>
+
+                <!-- ── Requirements ── -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-warning text-white py-3">
+                        <h5 class="mb-0"><i class="fas fa-list-check me-2"></i>Requirements</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <textarea class="form-control" id="requirements" name="requirements" rows="7" required>{{ request.form.get('requirements', job.requirements) }}</textarea>
+                    </div>
+                </div>
+
+                <!-- ── Benefits ── -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-info text-white py-3">
+                        <h5 class="mb-0"><i class="fas fa-gift me-2"></i>What We Offer <small class="fw-normal">(optional)</small></h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <textarea class="form-control" id="benefits" name="benefits" rows="5">{{ request.form.get('benefits', job.benefits or '') }}</textarea>
+                    </div>
+                </div>
+
+                <!-- ── Actions ── -->
+                <div class="d-flex gap-3 mb-5">
+                    <button type="submit" class="btn btn-success btn-lg px-5">
+                        <i class="fas fa-save me-2"></i>Save Changes
+                    </button>
+                    <a href="{{ url_for('admin.review_job', job_id=job.id) }}" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ── Delete Confirmation Modal ── -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-trash me-2"></i>Confirm Delete</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>You are about to permanently delete:</p>
+                <p class="fw-bold">{{ job.title }} &mdash; {{ job.company_name }}</p>
+                <p class="text-danger mb-0">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    This will also delete all applications for this job. This cannot be undone.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="POST" action="{{ url_for('admin.delete_job', job_id=job.id) }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Yes, Delete Permanently
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
