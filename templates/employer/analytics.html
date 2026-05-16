@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block title %}Hiring Analytics — VetJobPortal{% endblock %}
+
+{% block extra_head %}
+<style>
+  #mainNavbar, .premium-navbar,
+  #vpDrawer, #vpDrawerOverlay, .vp-drawer, .vp-drawer-overlay { display: none !important; }
+  body { padding-top: 0 !important; }
+  :root { --navbar-height: 0px; }
+  #preloader { display: none !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="display:flex;min-height:100vh;background:#04080f;">
+
+  <!-- Sidebar (reuse employer sidebar via include workaround) -->
+  <nav class="emp-sidebar d-none d-md-flex">
+    <div class="emp-sidebar-brand">
+      <div class="emp-sidebar-avatar">{{ (current_user.company_name or current_user.first_name)[0] | upper }}</div>
+      <div style="min-width:0;">
+        <div class="emp-sidebar-name">{{ current_user.company_name or current_user.first_name }}</div>
+        <span class="emp-sidebar-badge">Employer Account</span>
+      </div>
+    </div>
+    <span class="emp-sidebar-section-label">Hiring</span>
+    <ul class="emp-sidebar-nav">
+      <li><a href="{{ url_for('dashboard.employer') }}" class="emp-nav-link"><i class="fas fa-th-large"></i><span>Overview</span></a></li>
+      <li><a href="{{ url_for('employer.manage_jobs') }}" class="emp-nav-link"><i class="fas fa-briefcase"></i><span>Manage Jobs</span></a></li>
+      <li><a href="{{ url_for('applications.manage_applications') }}" class="emp-nav-link"><i class="fas fa-layer-group"></i><span>Applications</span></a></li>
+      <li><a href="{{ url_for('search.search_veterans') }}" class="emp-nav-link"><i class="fas fa-user-check"></i><span>Find Veterans</span></a></li>
+    </ul>
+    <span class="emp-sidebar-section-label">Account</span>
+    <ul class="emp-sidebar-nav">
+      <li><a href="{{ url_for('employer.analytics') }}" class="emp-nav-link active"><i class="fas fa-chart-bar"></i><span>Analytics</span></a></li>
+      <li><a href="{{ url_for('messaging.inbox') }}" class="emp-nav-link"><i class="fas fa-inbox"></i><span>Messages</span></a></li>
+      <li><a href="{{ url_for('employer.edit_profile') }}" class="emp-nav-link"><i class="fas fa-building"></i><span>Company Profile</span></a></li>
+      <li><a href="{{ url_for('main.contact') }}" class="emp-nav-link"><i class="fas fa-life-ring"></i><span>Support</span></a></li>
+      <li><a href="{{ url_for('auth.logout') }}" class="emp-nav-link emp-nav-logout"><i class="fas fa-sign-out-alt"></i><span>Sign Out</span></a></li>
+    </ul>
+  </nav>
+
+  <!-- Main -->
+  <main style="flex:1;min-width:0;padding:32px 28px 60px;background:#04080f;">
+
+    <div style="margin-bottom:32px;">
+      <p class="section-label mb-1">Employer Tools</p>
+      <h1 style="font-family:var(--font-display);font-size:clamp(22px,3vw,30px);font-weight:700;color:#fff;margin:0;">
+        Hiring <em style="color:var(--gold);font-style:italic;">Analytics</em>
+      </h1>
+      <p style="font-size:13px;color:rgba(255,255,255,0.4);margin-top:4px;">Overview of your job postings and applications.</p>
+    </div>
+
+    <!-- Stat cards -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;margin-bottom:32px;">
+      {% for label, value, color in [
+        ("Total Jobs Posted",   total_jobs,    "var(--gold)"),
+        ("Active Jobs",         active_jobs,   "#4ade80"),
+        ("Pending Approval",    pending_jobs,  "#fbbf24"),
+        ("Total Applications",  total_apps,    "#60a5fa"),
+        ("Interviews",          interview_apps,"#a78bfa"),
+        ("Accepted",            accepted_apps, "#4ade80"),
+        ("Rejected",            rejected_apps, "#f87171"),
+        ("Pending Review",      pending_apps,  "rgba(255,255,255,0.4)"),
+      ] %}
+      <div style="background:#080f1e;border:1px solid rgba(255,255,255,0.05);border-top:2px solid {{ color }};padding:20px 18px;">
+        <div style="font-family:var(--font-cond);font-size:28px;font-weight:800;color:{{ color }};line-height:1;margin-bottom:6px;">{{ value }}</div>
+        <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.35);">{{ label }}</div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Application status breakdown bar -->
+    {% if total_apps > 0 %}
+    <div style="background:#080f1e;border:1px solid rgba(255,255,255,0.05);padding:24px 28px;margin-bottom:20px;">
+      <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:16px;">Application Pipeline</div>
+      <div style="display:flex;height:12px;border-radius:2px;overflow:hidden;margin-bottom:14px;">
+        {% if pending_apps %}<div style="width:{{ (pending_apps/total_apps*100)|round }}%;background:rgba(255,255,255,0.2);" title="Pending"></div>{% endif %}
+        {% if reviewed_apps %}<div style="width:{{ (reviewed_apps/total_apps*100)|round }}%;background:#60a5fa;" title="Reviewed"></div>{% endif %}
+        {% if interview_apps %}<div style="width:{{ (interview_apps/total_apps*100)|round }}%;background:#a78bfa;" title="Interview"></div>{% endif %}
+        {% if accepted_apps %}<div style="width:{{ (accepted_apps/total_apps*100)|round }}%;background:#4ade80;" title="Accepted"></div>{% endif %}
+        {% if rejected_apps %}<div style="width:{{ (rejected_apps/total_apps*100)|round }}%;background:#f87171;" title="Rejected"></div>{% endif %}
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:16px;">
+        {% for label, value, color in [
+          ("Pending",  pending_apps,  "rgba(255,255,255,0.3)"),
+          ("Reviewed", reviewed_apps, "#60a5fa"),
+          ("Interview",interview_apps,"#a78bfa"),
+          ("Accepted", accepted_apps, "#4ade80"),
+          ("Rejected", rejected_apps, "#f87171"),
+        ] %}
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="width:8px;height:8px;background:{{ color }};border-radius:50%;flex-shrink:0;"></div>
+          <span style="font-family:var(--font-cond);font-size:11px;color:rgba(255,255,255,0.5);">{{ label }}: <strong style="color:rgba(255,255,255,0.8);">{{ value }}</strong></span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Per-job breakdown table -->
+    <div style="background:#080f1e;border:1px solid rgba(255,255,255,0.05);overflow:hidden;">
+      <div style="padding:20px 28px;border-bottom:1px solid rgba(255,255,255,0.05);">
+        <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);">Performance by Job Posting</div>
+      </div>
+      {% if job_breakdown %}
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(212,175,55,0.1);">
+              {% for col in ["Job Title", "Status", "Applications", "Interviews", "Accepted", "Rejected"] %}
+              <th style="padding:12px 20px;font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:left;white-space:nowrap;">{{ col }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in job_breakdown %}
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+              <td style="padding:14px 20px;font-family:var(--font-cond);font-size:12px;font-weight:700;color:rgba(255,255,255,0.8);max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                <a href="{{ url_for('employer.view_job', job_id=row.job.id) }}" style="color:rgba(255,255,255,0.8);text-decoration:none;">{{ row.job.title }}</a>
+              </td>
+              <td style="padding:14px 20px;">
+                <span style="font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:2px;
+                  {% if row.job.status == 'approved' and row.job.is_active %}background:rgba(74,222,128,0.1);color:#4ade80;border:1px solid rgba(74,222,128,0.2);
+                  {% elif row.job.status == 'pending' %}background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.2);
+                  {% else %}background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.08);{% endif %}">
+                  {{ row.job.status | title }}
+                </span>
+              </td>
+              <td style="padding:14px 20px;font-family:var(--font-cond);font-size:13px;font-weight:700;color:{% if row.total > 0 %}#60a5fa{% else %}rgba(255,255,255,0.2){% endif %};">{{ row.total }}</td>
+              <td style="padding:14px 20px;font-family:var(--font-cond);font-size:13px;color:{% if row.interview > 0 %}#a78bfa{% else %}rgba(255,255,255,0.2){% endif %};">{{ row.interview }}</td>
+              <td style="padding:14px 20px;font-family:var(--font-cond);font-size:13px;color:{% if row.accepted > 0 %}#4ade80{% else %}rgba(255,255,255,0.2){% endif %};">{{ row.accepted }}</td>
+              <td style="padding:14px 20px;font-family:var(--font-cond);font-size:13px;color:{% if row.rejected > 0 %}#f87171{% else %}rgba(255,255,255,0.2){% endif %};">{{ row.rejected }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div style="padding:60px;text-align:center;">
+        <i class="fas fa-chart-bar" style="font-size:36px;color:rgba(255,255,255,0.08);display:block;margin-bottom:16px;"></i>
+        <div style="font-family:var(--font-cond);font-size:13px;color:rgba(255,255,255,0.3);">No job postings yet. Post your first job to see analytics here.</div>
+        <a href="{{ url_for('employer.post_job') }}" class="btn-vp-primary" style="display:inline-flex;margin-top:16px;padding:10px 20px;font-size:11px;">
+          <i class="fas fa-plus"></i><span>Post a Job</span>
+        </a>
+      </div>
+      {% endif %}
+    </div>
+
+  </main>
+</div>
+
+<style>
+/* Reuse employer sidebar styles */
+.emp-sidebar {
+  width:220px;flex-shrink:0;flex-direction:column;gap:0;padding:24px 0;
+  background:#080f1e;border-right:1px solid rgba(255,255,255,0.05);
+  position:sticky;top:0;height:100vh;overflow-y:auto;scrollbar-width:none;
+}
+.emp-sidebar::-webkit-scrollbar{display:none}
+.emp-sidebar-brand{display:flex;align-items:center;gap:10px;padding:0 20px 20px;border-bottom:1px solid rgba(255,255,255,0.05);margin-bottom:8px;}
+.emp-sidebar-avatar{width:36px;height:36px;flex-shrink:0;background:rgba(212,175,55,0.1);border-left:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:var(--font-cond);font-size:13px;font-weight:800;color:var(--gold);}
+.emp-sidebar-name{font-family:var(--font-cond);font-size:12px;font-weight:700;color:rgba(255,255,255,0.85);letter-spacing:0.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;}
+.emp-sidebar-badge{font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-top:2px;display:block;}
+.emp-sidebar-section-label{font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);padding:8px 20px 4px;display:block;}
+.emp-sidebar-nav{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0;}
+.emp-nav-link{display:flex;align-items:center;gap:10px;padding:8px 20px;font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:0.5px;color:rgba(255,255,255,0.5);text-decoration:none;transition:all 0.15s ease;border-left:2px solid transparent;}
+.emp-nav-link i:first-child{width:14px;text-align:center;font-size:12px;flex-shrink:0;opacity:0.6;}
+.emp-nav-link:hover{color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.03);border-left-color:rgba(212,175,55,0.3);}
+.emp-nav-link.active{color:var(--gold);background:rgba(212,175,55,0.06);border-left-color:var(--gold);}
+.emp-nav-link.active i:first-child{opacity:1;color:var(--gold);}
+.emp-nav-logout{color:rgba(248,113,113,0.6);}
+.emp-nav-logout:hover{color:#f87171;background:rgba(239,68,68,0.06);border-left-color:rgba(239,68,68,0.3);}
+@media(max-width:767px){.emp-sidebar{display:none!important;}main{padding:16px 16px 60px!important;}}
+</style>
+{% endblock %}

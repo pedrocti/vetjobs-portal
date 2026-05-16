@@ -4,6 +4,17 @@ from models import db, User, Message, Notification
 
 messaging_bp = Blueprint('messaging', __name__)
 
+
+@messaging_bp.route('/api/unread-count')
+@login_required
+def unread_message_count():
+    from models import Message
+    count = Message.query.filter_by(
+        recipient_id=current_user.id,
+        is_read=False
+    ).count()
+    return jsonify({'unread_count': count})
+
 @messaging_bp.route('/')
 @login_required
 def inbox():
@@ -52,6 +63,14 @@ def view_message(message_id):
 def start_conversation(recipient_id):
     """Start or send a message to another user."""
     recipient = User.query.get_or_404(recipient_id)
+
+    # Gate: employers need Professional or Enterprise Plus to message veterans
+    if current_user.is_employer() and recipient.is_veteran():
+        from models.subscription import Subscription
+        sub = Subscription.get_for_user(current_user)
+        if not sub or sub.plan_type not in ('professional', 'enterprise_plus') or not sub.is_active():
+            flash('Direct messaging with veterans requires a Professional or Enterprise Plus plan.', 'warning')
+            return redirect(url_for('payments.employer_subscription_plans'))
 
     if request.method == 'POST':
         subject = request.form.get('subject')

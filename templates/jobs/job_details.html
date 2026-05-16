@@ -1,136 +1,521 @@
 {% extends "base.html" %}
-{% block title %}{{ job.title }} - {{ job.company_name }} | Veteran-Employer Job Portal{% endblock %}
+{% block title %}{{ job.title }} — {{ job.company_name }} | VetJobs Portal{% endblock %}
 
 {% block content %}
-<div class="container py-5">
 
-    <!-- Job Header with Company Logo -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body d-flex align-items-center">
+<div class="container py-5 body-mobile-pad">
+
+  <!-- ── Breadcrumb ─────────────────────────────────────── -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb" style="background:transparent;padding:0;margin:0;gap:6px;">
+      <li class="breadcrumb-item">
+        <a href="{{ url_for('main.index') }}"
+           style="color:rgba(255,255,255,0.45);font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;">
+          Home
+        </a>
+      </li>
+      <li style="color:rgba(255,255,255,0.25);font-size:11px;">/</li>
+      <li class="breadcrumb-item">
+        <a href="{{ url_for('jobs.job_board') }}"
+           style="color:rgba(255,255,255,0.45);font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;">
+          Jobs
+        </a>
+      </li>
+      <li style="color:rgba(255,255,255,0.25);font-size:11px;">/</li>
+      <li style="color:rgba(255,255,255,0.6);font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">
+        {{ job.title }}
+      </li>
+    </ol>
+  </nav>
+
+
+  <div class="row g-5">
+
+    <!-- ══════════════════════════════════════════════
+         MAIN CONTENT COLUMN
+    ══════════════════════════════════════════════ -->
+    <div class="col-lg-8">
+
+      <!-- ── JOB HEADER CARD ─────────────────────── -->
+      <div class="vp-dash-card mb-4">
+        <div class="vp-dash-card-body">
+
+          <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;">
+
             <!-- Company Logo -->
-            <!-- Company Logo -->
-            <div class="me-3">
-                {% if job.company_logo %}
-                    <img src="{{ url_for('static', filename=job.company_logo) }}"
-                         alt="Company Logo"
-                         class="border rounded shadow-sm"
-                         style="width:150px; height:auto; max-height:80px; object-fit:contain; background-color:white; padding:5px;">
-
-                {% elif job.employer and job.employer.employer_profile and job.employer.employer_profile.company_logo %}
-                    <img src="{{ url_for('static', filename='uploads/' + job.employer.employer_profile.company_logo) }}"
-                         alt="{{ job.company_name }} Logo"
-                         class="border rounded shadow-sm"
-                         style="width:150px; height:auto; max-height:80px; object-fit:contain; background-color:white; padding:5px;">
-
-                {% else %}
-                    <img src="{{ url_for('static', filename='images/vetjoblogo1.webp') }}"
-                         alt="Default Logo"
-                         class="border rounded shadow-sm"
-                         style="width:150px; height:auto; max-height:80px; object-fit:contain; background-color:white; padding:5px;">
-                {% endif %}  
+            <div style="flex-shrink:0;">
+              {% if job.company_logo %}
+                <img src="{{ url_for('static', filename=job.company_logo) }}"
+                     alt="{{ job.company_name }}"
+                     style="width:80px;height:80px;object-fit:contain;background:rgba(255,255,255,0.05);border:1px solid rgba(212,175,55,0.2);border-radius:10px;padding:8px;">
+              {% elif job.employer and job.employer.employer_profile and job.employer.employer_profile.company_logo %}
+                <img src="{{ url_for('static', filename='uploads/' + job.employer.employer_profile.company_logo) }}"
+                     alt="{{ job.company_name }}"
+                     style="width:80px;height:80px;object-fit:contain;background:rgba(255,255,255,0.05);border:1px solid rgba(212,175,55,0.2);border-radius:10px;padding:8px;">
+              {% else %}
+                <div style="width:80px;height:80px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.25);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--gold);">
+                  <i class="fas fa-building"></i>
+                </div>
+              {% endif %}
             </div>
 
+            <!-- Title + Company + Meta -->
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
+                <div>
+                  <h1 style="font-family:var(--font-display);font-size:clamp(22px,3.5vw,32px);font-weight:700;color:#ffffff;margin:0 0 4px;line-height:1.2;">
+                    {{ job.title }}
+                  </h1>
+                  <div style="font-family:var(--font-cond);font-size:16px;font-weight:700;color:var(--gold);letter-spacing:0.5px;">
+                    {{ job.company_name }}
+                  </div>
+                </div>
 
-            <!-- Job Title and Company -->
-            <div>
-                <h2 class="fw-bold mb-1">{{ job.title }}</h2>
-                <h5 class="text-primary mb-0">{{ job.company_name }}</h5>
+                <!-- Urgency badge -->
+                {% if job.deadline is defined and job.deadline and now is defined %}
+                  {% set days_left = (job.deadline - now).days %}
+                  {% if days_left <= 7 and days_left >= 0 %}
+                  <span style="background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.3);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:2px;white-space:nowrap;align-self:flex-start;">
+                    <i class="fas fa-fire me-1"></i>Closes in {{ days_left }} day{{ 's' if days_left != 1 }}
+                  </span>
+                  {% elif days_left < 0 %}
+                  <span style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.1);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:2px;align-self:flex-start;">
+                    Closed
+                  </span>
+                  {% endif %}
+                {% endif %}
+              </div>
+
+              <!-- Meta pills -->
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
+
+                <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:50px;padding:5px 14px;font-size:13px;color:rgba(255,255,255,0.7);">
+                  <i class="fas fa-map-marker-alt" style="color:#f87171;font-size:11px;"></i>
+                  {{ job.location or "Location not specified" }}
+                </span>
+
+                {% if job.job_type %}
+                <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:50px;padding:5px 14px;font-size:13px;color:rgba(255,255,255,0.7);">
+                  <i class="fas fa-briefcase" style="color:#60a5fa;font-size:11px;"></i>
+                  {{ job.job_type|capitalize }}
+                </span>
+                {% endif %}
+
+                {% if job.salary_min and job.salary_max %}
+                <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:50px;padding:5px 14px;font-size:13px;color:rgba(255,255,255,0.7);">
+                  <i class="fas fa-money-bill-wave" style="color:#4ade80;font-size:11px;"></i>
+                  &#8358;{{ "{:,}".format(job.salary_min) }} &ndash; &#8358;{{ "{:,}".format(job.salary_max) }}
+                </span>
+                {% elif job.salary_min %}
+                <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:50px;padding:5px 14px;font-size:13px;color:rgba(255,255,255,0.7);">
+                  <i class="fas fa-money-bill-wave" style="color:#4ade80;font-size:11px;"></i>
+                  &#8358;{{ "{:,}".format(job.salary_min) }}+
+                </span>
+                {% endif %}
+
+                {% if job.created_at %}
+                <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:50px;padding:5px 14px;font-size:13px;color:rgba(255,255,255,0.7);">
+                  <i class="fas fa-calendar-alt" style="color:rgba(255,255,255,0.4);font-size:11px;"></i>
+                  Posted {{ job.created_at.strftime('%d %b %Y') }}
+                </span>
+                {% endif %}
+
+                {% if job.deadline is defined and job.deadline %}
+                <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:50px;padding:5px 14px;font-size:13px;color:rgba(255,255,255,0.7);">
+                  <i class="fas fa-hourglass-end" style="color:#fbbf24;font-size:11px;"></i>
+                  Deadline {{ job.deadline.strftime('%d %b %Y') }}
+                </span>
+                {% endif %}
+
+              </div>
             </div>
+          </div>
+
+          <!-- Apply + Share row -->
+          <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(212,175,55,0.12);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+
+            <!-- ── APPLY BUTTON — auth-gated ── -->
+            {% if not current_user.is_authenticated %}
+              <!-- Not logged in — always redirect to login regardless of apply type -->
+              <a href="{{ url_for('auth.login', next=request.url) }}" class="btn-vp-primary">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Login to Apply</span>
+              </a>
+
+            {% elif not current_user.is_veteran() %}
+              <!-- Logged in but not a veteran -->
+              <span style="display:inline-flex;align-items:center;gap:8px;padding:12px 22px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:2px;font-family:var(--font-cond);font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);">
+                <i class="fas fa-lock"></i>Veterans Only
+              </span>
+
+            {% elif job.external_apply_url %}
+              <!-- Authenticated veteran — external apply -->
+              <a href="{{ job.external_apply_url }}"
+                 target="_blank" rel="noopener noreferrer"
+                 class="btn-vp-primary">
+                <i class="fas fa-external-link-alt"></i>
+                <span>Apply on Company Website</span>
+              </a>
+
+            {% else %}
+              <!-- Authenticated veteran — internal apply -->
+              <a href="{{ url_for('applications.apply_to_job', job_id=job.id) }}"
+                 class="btn-vp-primary">
+                <i class="fas fa-paper-plane"></i>
+                <span>Apply Now</span>
+              </a>
+            {% endif %}
+
+            <!-- Share buttons -->
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);">Share</span>
+
+              <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url | urlencode }}"
+                 target="_blank" rel="noopener noreferrer"
+                 style="width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#0077b5;color:#fff;font-size:13px;transition:opacity 0.2s;"
+                 title="Share on LinkedIn">
+                <i class="fab fa-linkedin-in"></i>
+              </a>
+
+              <a href="https://wa.me/?text={{ (job.title ~ ' at ' ~ job.company_name ~ ' — ' ~ request.url) | urlencode }}"
+                 target="_blank" rel="noopener noreferrer"
+                 style="width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#25d366;color:#fff;font-size:13px;transition:opacity 0.2s;"
+                 title="Share on WhatsApp">
+                <i class="fab fa-whatsapp"></i>
+              </a>
+
+              <button onclick="copyJobLink(this)"
+                      style="width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);font-size:13px;cursor:pointer;transition:all 0.2s;"
+                      title="Copy link">
+                <i class="fas fa-link"></i>
+              </button>
+            </div>
+
+          </div>
         </div>
-    </div>
+      </div>
+      <!-- /Job Header Card -->
 
-    <!-- Job Info (Location & Salary) -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body d-flex flex-wrap justify-content-between align-items-center">
-            <div class="mb-2">
-                <i class="fas fa-map-marker-alt text-danger me-2"></i>
-                <strong>Location:</strong> {{ job.location or "Not specified" }}
-            </div>
 
-            {% if job.salary_min and job.salary_max %}
-            <div class="mb-2">
-                <i class="fas fa-money-bill text-success me-2"></i>
-                <strong>Salary Range:</strong> ₦{{ "{:,}".format(job.salary_min) }} - ₦{{ "{:,}".format(job.salary_max) }}
+      <!-- ── JOB DESCRIPTION CARD ────────────────── -->
+      <div class="vp-dash-card mb-4">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-file-alt me-2"></i>Job Description</span>
+        </div>
+        <div class="vp-dash-card-body">
+
+          <div style="white-space:pre-line;line-height:1.9;color:rgba(255,255,255,0.72);font-size:15px;">
+            {{ job.description | safe }}
+          </div>
+
+          {% if job.requirements %}
+          <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(212,175,55,0.1);">
+            <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;">
+              Requirements
             </div>
-            {% elif job.salary_min %}
-            <div class="mb-2">
-                <i class="fas fa-money-bill text-success me-2"></i>
-                <strong>Salary:</strong> ₦{{ "{:,}".format(job.salary_min) }}+
+            <div style="white-space:pre-line;line-height:1.9;color:rgba(255,255,255,0.72);font-size:15px;">
+              {{ job.requirements | safe }}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if job.benefits %}
+          <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(212,175,55,0.1);">
+            <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;">
+              What We Offer
+            </div>
+            <div style="white-space:pre-line;line-height:1.9;color:rgba(255,255,255,0.72);font-size:15px;">
+              {{ job.benefits | safe }}
+            </div>
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+      <!-- /Description Card -->
+
+
+      <!-- ── ABOUT THE COMPANY CARD ──────────────── -->
+      {% if job.employer and job.employer.employer_profile %}
+      <div class="vp-dash-card mb-4">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-building me-2"></i>About {{ job.employer.employer_profile.company_name }}</span>
+        </div>
+        <div class="vp-dash-card-body">
+
+          {% if job.employer.employer_profile.company_description %}
+          <div style="white-space:pre-line;line-height:1.85;color:rgba(255,255,255,0.65);font-size:14px;margin-bottom:20px;">
+            {{ job.employer.employer_profile.company_description }}
+          </div>
+          {% endif %}
+
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            {% if job.employer.employer_profile.company_website %}
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+              <i class="fas fa-globe" style="color:#60a5fa;width:16px;text-align:center;"></i>
+              <a href="{{ job.employer.employer_profile.company_website }}"
+                 target="_blank" rel="noopener noreferrer"
+                 style="color:var(--gold);font-size:14px;text-decoration:none;">
+                {{ job.employer.employer_profile.company_website }}
+              </a>
             </div>
             {% endif %}
+            {% if job.employer.employer_profile.recruiter_email %}
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+              <i class="fas fa-envelope" style="color:#60a5fa;width:16px;text-align:center;"></i>
+              <span style="font-size:14px;color:rgba(255,255,255,0.65);">{{ job.employer.employer_profile.recruiter_email }}</span>
+            </div>
+            {% endif %}
+            {% if job.employer.employer_profile.recruiter_phone %}
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;">
+              <i class="fas fa-phone" style="color:#60a5fa;width:16px;text-align:center;"></i>
+              <span style="font-size:14px;color:rgba(255,255,255,0.65);">{{ job.employer.employer_profile.recruiter_phone }}</span>
+            </div>
+            {% endif %}
+          </div>
+
+        </div>
+      </div>
+      {% endif %}
+      <!-- /About Company -->
+
+
+      <!-- ── RELATED JOBS ────────────────────────── -->
+      {% if related_jobs %}
+      <div class="vp-dash-card mb-4">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-th-list me-2"></i>Similar Jobs</span>
+        </div>
+        <div class="vp-dash-card-body">
+          <div class="row g-3">
+            {% for rjob in related_jobs %}
+            <div class="col-md-6">
+              <a href="{{ url_for('jobs.job_details', job_id=rjob.id) }}"
+                 style="text-decoration:none;display:block;">
+                <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(212,175,55,0.1);border-radius:10px;padding:16px;transition:all 0.25s ease;"
+                     onmouseover="this.style.borderColor='rgba(212,175,55,0.3)';this.style.background='rgba(212,175,55,0.04)'"
+                     onmouseout="this.style.borderColor='rgba(212,175,55,0.1)';this.style.background='rgba(255,255,255,0.02)'">
+                  <div style="font-family:var(--font-cond);font-size:14px;font-weight:700;color:#ffffff;margin-bottom:4px;">{{ rjob.title }}</div>
+                  <div style="font-size:13px;color:var(--gold);margin-bottom:8px;">{{ rjob.company_name }}</div>
+                  <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:rgba(255,255,255,0.45);">
+                    <i class="fas fa-map-marker-alt" style="color:#f87171;font-size:10px;"></i>
+                    {{ rjob.location or "N/A" }}
+                  </span>
+                </div>
+              </a>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      <!-- /Related Jobs -->
+
+    </div>
+    <!-- /Main Column -->
+
+
+    <!-- ══════════════════════════════════════════════
+         STICKY SIDEBAR (desktop)
+    ══════════════════════════════════════════════ -->
+    <div class="col-lg-4 d-none d-lg-block">
+      <div style="position:sticky;top:90px;">
+
+        <!-- Apply CTA Card -->
+        <div class="vp-dash-card mb-4">
+          <div class="vp-dash-card-body" style="text-align:center;">
+
+            <!-- ── SIDEBAR APPLY — same auth gate ── -->
+            {% if not current_user.is_authenticated %}
+              <a href="{{ url_for('auth.login', next=request.url) }}"
+                 class="btn-vp-primary w-100" style="justify-content:center;margin-bottom:12px;">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Login to Apply</span>
+              </a>
+              <p style="font-size:12px;color:rgba(255,255,255,0.35);margin:0;">
+                Create a free veteran account to apply
+              </p>
+
+            {% elif not current_user.is_veteran() %}
+              <div style="padding:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;margin-bottom:12px;">
+                <i class="fas fa-lock" style="color:rgba(255,255,255,0.3);font-size:20px;margin-bottom:8px;display:block;"></i>
+                <div style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);">
+                  Veterans Only
+                </div>
+                <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:4px;">
+                  This portal is for verified veterans
+                </div>
+              </div>
+
+            {% elif job.external_apply_url %}
+              <a href="{{ job.external_apply_url }}"
+                 target="_blank" rel="noopener noreferrer"
+                 class="btn-vp-primary w-100" style="justify-content:center;margin-bottom:12px;">
+                <i class="fas fa-external-link-alt"></i>
+                <span>Apply on Company Website</span>
+              </a>
+
+            {% else %}
+              <a href="{{ url_for('applications.apply_to_job', job_id=job.id) }}"
+                 class="btn-vp-primary w-100" style="justify-content:center;margin-bottom:12px;">
+                <i class="fas fa-paper-plane"></i>
+                <span>Apply for this Job</span>
+              </a>
+            {% endif %}
+
+            <!-- Deadline notice -->
+            {% if job.deadline is defined and job.deadline and now is defined %}
+              {% set days_left = (job.deadline - now).days %}
+              {% if days_left >= 0 %}
+              <p style="font-size:12px;color:rgba(255,255,255,0.4);margin:0;">
+                <i class="fas fa-hourglass-half me-1" style="color:#fbbf24;"></i>
+                {{ days_left }} day{{ 's' if days_left != 1 }} left to apply
+              </p>
+              {% else %}
+              <p style="font-size:12px;color:#f87171;margin:0;">
+                <i class="fas fa-times-circle me-1"></i>Application period has closed
+              </p>
+              {% endif %}
+            {% endif %}
+
+          </div>
+        </div>
+
+        <!-- Job Summary Card -->
+        <div class="vp-dash-card mb-4">
+          <div class="vp-dash-card-header">
+            <span>Job Summary</span>
+          </div>
+          <div class="vp-dash-card-body" style="padding:0;">
+
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 20px;border-bottom:1px solid rgba(255,255,255,0.05);">
+              <span style="font-size:13px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:8px;">
+                <i class="fas fa-map-marker-alt" style="color:#f87171;width:14px;text-align:center;"></i>Location
+              </span>
+              <span style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500;text-align:right;max-width:55%;">{{ job.location or "Not specified" }}</span>
+            </div>
 
             {% if job.job_type %}
-            <div class="mb-2">
-                <i class="fas fa-briefcase text-primary me-2"></i>
-                <strong>Job Type:</strong> {{ job.job_type|capitalize }}
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 20px;border-bottom:1px solid rgba(255,255,255,0.05);">
+              <span style="font-size:13px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:8px;">
+                <i class="fas fa-briefcase" style="color:#60a5fa;width:14px;text-align:center;"></i>Job Type
+              </span>
+              <span style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500;">{{ job.job_type|capitalize }}</span>
             </div>
             {% endif %}
-        </div>
-    </div>
 
-
-    <!-- Job Details -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="fw-bold mb-3">Job Description</h5>
-            <p class="text-muted">{{ job.description | safe }}</p>
-
-            {% if job.requirements %}
-            <h6 class="fw-bold mt-4">Requirements</h6>
-            <p class="text-muted">{{ job.requirements | safe }}</p>
+            {% if job.salary_min or job.salary_max %}
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 20px;border-bottom:1px solid rgba(255,255,255,0.05);">
+              <span style="font-size:13px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:8px;">
+                <i class="fas fa-money-bill-wave" style="color:#4ade80;width:14px;text-align:center;"></i>Salary
+              </span>
+              <span style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500;text-align:right;">
+                {% if job.salary_min and job.salary_max %}
+                  &#8358;{{ "{:,}".format(job.salary_min) }} &ndash; &#8358;{{ "{:,}".format(job.salary_max) }}
+                {% elif job.salary_min %}
+                  &#8358;{{ "{:,}".format(job.salary_min) }}+
+                {% endif %}
+              </span>
+            </div>
             {% endif %}
 
-            {% if job.benefits %}
-            <h6 class="fw-bold mt-4">Benefits</h6>
-            <p class="text-muted">{{ job.benefits | safe }}</p>
+            {% if job.created_at %}
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 20px;border-bottom:1px solid rgba(255,255,255,0.05);">
+              <span style="font-size:13px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:8px;">
+                <i class="fas fa-calendar-alt" style="color:rgba(255,255,255,0.3);width:14px;text-align:center;"></i>Posted
+              </span>
+              <span style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500;">{{ job.created_at.strftime('%d %b %Y') }}</span>
+            </div>
             {% endif %}
-        </div>
-    </div>
 
-    <!-- Company Info -->
-    {% if job.employer and job.employer.employer_profile %}
-    <div class="card mb-4">
-        <div class="card-header bg-light">
-            <h5 class="mb-0"><i class="fas fa-building me-2"></i>About {{ job.employer.employer_profile.company_name }}</h5>
-        </div>
-        <div class="card-body">
-            <p>{{ job.employer.employer_profile.company_description }}</p>
+            {% if job.deadline is defined and job.deadline %}
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 20px;">
+              <span style="font-size:13px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:8px;">
+                <i class="fas fa-hourglass-end" style="color:#fbbf24;width:14px;text-align:center;"></i>Deadline
+              </span>
+              <span style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500;">{{ job.deadline.strftime('%d %b %Y') }}</span>
+            </div>
+            {% endif %}
 
-            <ul class="list-unstyled mb-0">
-                {% if job.employer.employer_profile.company_website %}
-                <li><i class="fas fa-globe me-2 text-primary"></i>
-                    <a href="{{ job.employer.employer_profile.company_website }}" target="_blank">
-                        {{ job.employer.employer_profile.company_website }}
-                    </a>
-                </li>
-                {% endif %}
-                {% if job.employer.employer_profile.recruiter_email %}
-                <li><i class="fas fa-envelope me-2 text-primary"></i>
-                    {{ job.employer.employer_profile.recruiter_email }}
-                </li>
-                {% endif %}
-                {% if job.employer.employer_profile.recruiter_phone %}
-                <li><i class="fas fa-phone me-2 text-primary"></i>
-                    {{ job.employer.employer_profile.recruiter_phone }}
-                </li>
-                {% endif %}
-            </ul>
+          </div>
         </div>
+
+        <!-- Back to Jobs -->
+        <a href="{{ url_for('jobs.job_board') }}" class="btn-vp-ghost w-100" style="justify-content:center;">
+          <i class="fas fa-arrow-left"></i>
+          <span>Back to All Jobs</span>
+        </a>
+
+      </div>
     </div>
+    <!-- /Sidebar -->
+
+  </div>
+</div>
+
+
+<!-- ── MOBILE STICKY APPLY BAR ───────────────────────────── -->
+<div style="position:fixed;bottom:0;left:0;right:0;z-index:1030;background:rgba(7,21,41,0.97);border-top:1px solid rgba(212,175,55,0.2);padding:12px 16px;backdrop-filter:blur(12px);"
+     class="d-lg-none">
+  <div style="display:flex;align-items:center;gap:10px;max-width:600px;margin:0 auto;">
+
+    {% if not current_user.is_authenticated %}
+      <a href="{{ url_for('auth.login', next=request.url) }}"
+         class="btn-vp-primary" style="flex:1;justify-content:center;">
+        <i class="fas fa-sign-in-alt"></i><span>Login to Apply</span>
+      </a>
+
+    {% elif not current_user.is_veteran() %}
+      <span style="flex:1;text-align:center;font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.35);">
+        <i class="fas fa-lock me-1"></i>Veterans Only
+      </span>
+
+    {% elif job.external_apply_url %}
+      <a href="{{ job.external_apply_url }}"
+         target="_blank" rel="noopener noreferrer"
+         class="btn-vp-primary" style="flex:1;justify-content:center;">
+        <i class="fas fa-external-link-alt"></i><span>Apply on Company Website</span>
+      </a>
+
+    {% else %}
+      <a href="{{ url_for('applications.apply_to_job', job_id=job.id) }}"
+         class="btn-vp-primary" style="flex:1;justify-content:center;">
+        <i class="fas fa-paper-plane"></i><span>Apply Now</span>
+      </a>
     {% endif %}
 
-    <!-- Apply Button -->
-    <div class="text-center">
-        {% if current_user.is_authenticated and current_user.is_veteran() %}
-            <a href="{{ url_for('applications.apply_to_job', job_id=job.id) }}" class="btn btn-success btn-lg">
-                <i class="fas fa-paper-plane me-2"></i>Apply for this Job
-            </a>
-        {% else %}
-            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg">
-                <i class="fas fa-sign-in-alt me-2"></i>Login to Apply
-            </a>
-        {% endif %}
-    </div>
+    <a href="{{ url_for('jobs.job_board') }}"
+       class="btn-vp-ghost" style="padding:14px 16px;">
+      <i class="fas fa-arrow-left"></i>
+    </a>
 
+  </div>
 </div>
+
+
+<script>
+function copyJobLink(btn) {
+  navigator.clipboard.writeText(window.location.href).then(function () {
+    var icon = btn.querySelector('i');
+    icon.className = 'fas fa-check';
+    btn.style.background = 'rgba(74,222,128,0.2)';
+    btn.style.borderColor = 'rgba(74,222,128,0.4)';
+    btn.style.color = '#4ade80';
+    setTimeout(function () {
+      icon.className = 'fas fa-link';
+      btn.style.background = 'rgba(255,255,255,0.1)';
+      btn.style.borderColor = 'rgba(255,255,255,0.15)';
+      btn.style.color = 'rgba(255,255,255,0.6)';
+    }, 2000);
+  }).catch(function () {
+    var temp = document.createElement('input');
+    temp.value = window.location.href;
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand('copy');
+    document.body.removeChild(temp);
+  });
+}
+</script>
+
 {% endblock %}

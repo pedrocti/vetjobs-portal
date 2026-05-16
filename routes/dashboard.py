@@ -112,9 +112,16 @@ def veteran():
         is_job_ready = bool(getattr(profile, "job_ready_package_active", False))
         veteran_tier = getattr(profile, "veteran_tier", "basic") or "basic"
 
+    # Unread message count
+    from models import Message
+    unread_messages = Message.query.filter_by(
+        recipient_id=current_user.id, is_read=False
+    ).count()
+
     return render_template(
         "dashboards/veteran.html",
         recent_applications=recent_applications,
+        unread_messages=unread_messages,
         stats=stats,
         verification_fee=verification_fee,
         boost_fee=boost_fee,
@@ -168,8 +175,9 @@ def employer():
     can_contact       = subscription.can_contact()
     can_export        = bool(subscription.can_export_resumes) and subscription.is_active()
     can_use_analytics = subscription.can_use_feature("analytics_access")
-    can_use_ai        = subscription.can_use_feature("ai_talent_suggestions")
+    can_use_ai        = subscription.can_use_feature("smart_candidate_matching")
     can_access_cv     = subscription.is_cv_access_granted()
+    can_view_cv       = subscription.is_cv_view_granted()
 
     plan_features = (
         Subscription.get_plan_features(subscription.plan_type) if subscription else {}
@@ -224,6 +232,12 @@ def employer():
     professional_plan_amount = PaymentSetting.get_setting("professional_plan_amount", 40000)
     enterprise_plan_amount   = PaymentSetting.get_setting("enterprise_plus_plan_amount", 120000)
 
+    # Unread message count
+    from models import Message as Msg
+    unread_messages = Msg.query.filter_by(
+        recipient_id=current_user.id, is_read=False
+    ).count()
+
     return render_template(
         "dashboards/employer.html",
         employer_profile=employer_profile,
@@ -236,10 +250,12 @@ def employer():
         can_use_analytics=can_use_analytics,
         can_use_ai=can_use_ai,
         can_access_cv=can_access_cv,
+        can_view_cv=can_view_cv,
         job_boosts=subscription.job_boosts if subscription else 0,
         starter_plan_amount=starter_plan_amount,
         professional_plan_amount=professional_plan_amount,
         enterprise_plan_amount=enterprise_plan_amount,
+        unread_messages=unread_messages,
         recent_jobs=recent_jobs,
         recent_applications=recent_applications,
         suggested_veterans=suggested_veterans,

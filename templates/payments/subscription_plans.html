@@ -1,286 +1,234 @@
 {% extends "base.html" %}
-{% block title %}Employer Subscription Plans | VetConnect{% endblock %}
+{% block title %}Employer Plans — VetJobPortal{% endblock %}
 
 {% block content %}
-<section class="py-5">
+<section style="background:#04080f;min-height:100vh;padding:60px 20px 80px;">
   <div class="container">
-    <h2 class="fw-bold text-center mb-4">Choose Your Employer Subscription Plan</h2>
-    <p class="text-center text-muted mb-5">
-      Unlock more veteran talent, better visibility, and powerful hiring tools designed for Nigerian businesses.
-    </p>
-    <!-- Billing Toggle -->
+
+    <!-- Header -->
     <div class="text-center mb-5">
-      <label class="me-3 fw-semibold">Billing:</label>
-
-      <select id="billingCycle" class="form-select d-inline-block w-auto">
-        <option value="monthly">Monthly</option>
-        <option value="6_months">6 Months (10% OFF)</option>
-        <option value="yearly">Yearly (20% OFF)</option>
-      </select>
-    </div>
-    <!-- Pricing Cards -->
-    <div class="row justify-content-center g-4">
-
-      <!-- Starter Plan -->
-      {% set starter_active = current_subscription and current_subscription.plan_type == 'starter' and current_subscription.is_active() %}
-      <div class="col-lg-4 col-md-6">
-        <div class="card shadow-sm h-100 position-relative {% if starter_active %}border-primary border-2{% else %}border-0{% endif %}">
-          {% if starter_active %}
-          <span class="badge bg-primary position-absolute top-0 start-50 translate-middle px-3 py-2">
-            <i class="fas fa-check-circle me-1"></i>Your Current Plan
-          </span>
-          {% endif %}
-          <div class="card-header text-center {% if starter_active %}bg-primary text-white{% else %}bg-light{% endif %} py-4">
-            <h4 class="fw-bold mb-0">Starter</h4>
-            <div class="display-5 fw-bold mt-3" id="price-starter">
-              ₦{{ plans['starter'].price | int }}
-            </div>
-            <small class="{% if starter_active %}text-white-50{% else %}text-muted{% endif %}">per month</small>
-          </div>
-          <div class="card-body">
-            <ul class="list-unstyled">
-              <li><i class="fas fa-check text-success me-2"></i>Up to 3 Job Postings</li>
-              <li><i class="fas fa-check text-success me-2"></i>Email notifications for applications</li>
-              <li><i class="fas fa-check text-success me-2"></i>Standard support (Email + Chat)</li>
-              <li><i class="fas fa-times text-danger me-2"></i>AI Veteran Matching</li>
-              <li><i class="fas fa-times text-danger me-2"></i>CV/Resume Downloads</li>
-              <li><i class="fas fa-times text-danger me-2"></i>Direct Messaging</li>
-            </ul>
-          </div>
-          <div class="card-footer text-center bg-transparent border-0 py-4">
-            {% if starter_active %}
-              <button class="btn btn-primary w-100" disabled><i class="fas fa-check me-1"></i>Current Plan</button>
-            {% else %}
-              <button class="btn btn-outline-primary w-100" onclick="subscribeToPlan('starter')">
-                Choose Starter
-              </button>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-
-      <!-- Professional Plan (Most Popular) -->
-      {% set pro_active = current_subscription and current_subscription.plan_type == 'professional' and current_subscription.is_active() %}
-      <div class="col-lg-4 col-md-6">
-        <div class="card shadow h-100 position-relative {% if pro_active %}border-warning border-2{% else %}border-warning{% endif %}">
-          {% if pro_active %}
-          <span class="badge bg-warning text-dark position-absolute top-0 start-50 translate-middle px-3 py-2">
-            <i class="fas fa-check-circle me-1"></i>Your Current Plan
-          </span>
-          {% else %}
-          <span class="badge bg-warning text-dark position-absolute top-0 start-50 translate-middle px-3 py-2">Most Popular</span>
-          {% endif %}
-
-          <div class="card-header text-center bg-warning text-dark py-4">
-            <h4 class="fw-bold mb-0">Professional</h4>
-            <div class="display-5 fw-bold mt-3" id="price-professional">
-              ₦{{ plans['professional'].price | int }}
-            </div>
-            <small class="text-dark">per month</small>
-          </div>
-          <div class="card-body">
-            <ul class="list-unstyled">
-              <li><i class="fas fa-check text-success me-2"></i>Unlimited Job Postings</li>
-              <li><i class="fas fa-check text-success me-2"></i>AI Veteran Matching & Search</li>
-              <li><i class="fas fa-check text-success me-2"></i>Unlimited CV/Resume downloads</li>
-              <li><i class="fas fa-check text-success me-2"></i>Direct messaging with veterans</li>
-              <li><i class="fas fa-check text-success me-2"></i>Advanced analytics dashboard</li>
-              <li><i class="fas fa-check text-success me-2"></i>Priority support (Email + WhatsApp)</li>
-            </ul>
-          </div>
-          <div class="card-footer text-center bg-transparent border-0 py-4">
-            {% if pro_active %}
-              <button class="btn btn-warning w-100 text-dark" disabled><i class="fas fa-check me-1"></i>Current Plan</button>
-            {% else %}
-              <button class="btn btn-warning w-100 text-dark" onclick="subscribeToPlan('professional')">
-                Choose Professional
-              </button>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-
-      <!-- Enterprise Plus Plan -->
-      {% set ent_active = current_subscription and current_subscription.plan_type == 'enterprise_plus' and current_subscription.is_active() %}
-      <div class="col-lg-4 col-md-6">
-        <div class="card shadow-sm h-100 position-relative {% if ent_active %}border-success border-2{% else %}border-success{% endif %}">
-          {% if ent_active %}
-          <span class="badge bg-success position-absolute top-0 start-50 translate-middle px-3 py-2">
-            <i class="fas fa-check-circle me-1"></i>Your Current Plan
-          </span>
-          {% endif %}
-          <div class="card-header text-center bg-success text-white py-4">
-            <h4 class="fw-bold mb-0">Enterprise Plus</h4>
-            <div class="display-5 fw-bold mt-3" id="price-enterprise">
-              ₦{{ plans['enterprise_plus'].price | int }}
-            </div>
-            <small class="text-white">per month</small>
-          </div>
-          <div class="card-body">
-            <ul class="list-unstyled">
-              <li><i class="fas fa-check me-2"></i>Everything in Professional</li>
-              <li><i class="fas fa-check me-2"></i>Dedicated Account Manager</li>
-              <li><i class="fas fa-check me-2"></i>Custom branding & white-label options</li>
-              <li><i class="fas fa-check me-2"></i>API access</li>
-              <li><i class="fas fa-check me-2"></i>5 Job Boosts & premium placement</li>
-              <li><i class="fas fa-check me-2"></i>Team accounts & advanced reports</li>
-            </ul>
-          </div>
-          <div class="card-footer text-center bg-transparent border-0 py-4">
-            {% if ent_active %}
-              <button class="btn btn-success w-100" disabled><i class="fas fa-check me-1"></i>Current Plan</button>
-            {% else %}
-              <button class="btn btn-success w-100" onclick="subscribeToPlan('enterprise_plus')">
-                Choose Enterprise Plus
-              </button>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Simple Comparison Table -->
-    <div class="table-responsive mt-5">
-      <table class="table table-bordered align-middle text-center">
-        <thead class="table-light">
-          <tr>
-            <th style="width: 35%;">Key Features</th>
-            <th>Starter</th>
-            <th>Professional</th>
-            <th>Enterprise</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Job Postings</td>
-            <td>1 per month</td>
-            <td>Unlimited</td>
-            <td>Unlimited</td>
-          </tr>
-          <tr>
-            <td>CV/Resume Downloads</td>
-            <td>10 per month</td>
-            <td>Unlimited</td>
-            <td>Unlimited</td>
-          </tr>
-          <tr>
-            <td>Direct Messaging (Email + WhatsApp)</td>
-            <td>Limited</td>
-            <td>Full Access</td>
-            <td>Full Access</td>
-          </tr>
-          <tr>
-            <td>Interview Analytics</td>
-            <td>Basic</td>
-            <td>Advanced</td>
-            <td>Advanced + Reports</td>
-          </tr>
-          <tr>
-            <td>Support</td>
-            <td>Email + Chat</td>
-            <td>Priority WhatsApp</td>
-            <td>Dedicated Manager</td>
-          </tr>
-          <tr>
-            <td>Job Boost / Visibility</td>
-            <td>—</td>
-            <td>2 per month</td>
-            <td>Unlimited</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="text-center mt-5">
-      <p class="text-muted">
-        All plans are billed monthly and can be cancelled anytime from your dashboard.<br>
-        Annual billing available with 15% discount (contact support).
+      <p class="section-label">Employer Pricing</p>
+      <h1 class="section-title">Choose Your <em>Hiring Plan</em></h1>
+      <div class="vp-divider"></div>
+      <p class="section-subtitle">
+        Access Nigeria's verified military talent pipeline.
+        Every plan gives you real candidates — upgrade for deeper tools.
       </p>
     </div>
+
+    <!-- Billing toggle -->
+    <div class="text-center mb-5">
+      <div style="display:inline-flex;background:rgba(255,255,255,0.04);border:1px solid rgba(212,175,55,0.15);border-radius:4px;padding:4px;">
+        <button onclick="setBilling('monthly')" id="btn-monthly"
+          style="padding:8px 20px;font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:2px;cursor:pointer;transition:all 0.2s ease;background:var(--gold);color:var(--navy);">
+          Monthly
+        </button>
+        <button onclick="setBilling('6_months')" id="btn-6_months"
+          style="padding:8px 20px;font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:2px;cursor:pointer;transition:all 0.2s ease;background:transparent;color:rgba(255,255,255,0.5);">
+          6 Months <span style="color:#4ade80;font-size:10px;">-10%</span>
+        </button>
+        <button onclick="setBilling('yearly')" id="btn-yearly"
+          style="padding:8px 20px;font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:2px;cursor:pointer;transition:all 0.2s ease;background:transparent;color:rgba(255,255,255,0.5);">
+          Yearly <span style="color:#4ade80;font-size:10px;">-20%</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Plan cards -->
+    <div class="row g-4 justify-content-center mb-5">
+
+      {% for plan_key, plan in plans.items() %}
+      {% set is_current = current_subscription and current_subscription.plan_type == plan_key and current_subscription.is_active() %}
+      {% set is_popular = plan_key == 'professional' %}
+
+      <div class="col-md-6 col-lg-4">
+        <div style="background:rgba(15,32,64,0.5);border:1px solid {% if is_popular %}rgba(212,175,55,0.4){% elif is_current %}rgba(74,222,128,0.3){% else %}rgba(255,255,255,0.07){% endif %};border-radius:0;padding:0;position:relative;height:100%;display:flex;flex-direction:column;transition:border-color 0.3s ease;">
+
+          {% if is_popular %}
+          <div style="position:absolute;top:-1px;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);"></div>
+          <div style="text-align:center;padding:6px;background:rgba(212,175,55,0.1);border-bottom:1px solid rgba(212,175,55,0.2);">
+            <span style="font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);">Most Popular</span>
+          </div>
+          {% elif is_current %}
+          <div style="text-align:center;padding:6px;background:rgba(74,222,128,0.08);border-bottom:1px solid rgba(74,222,128,0.2);">
+            <span style="font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#4ade80;"><i class="fas fa-check-circle me-1"></i>Current Plan</span>
+          </div>
+          {% endif %}
+
+          <!-- Plan header -->
+          <div style="padding:28px 28px 20px;">
+            <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.85);margin-bottom:4px;">{{ plan.name }}</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:20px;line-height:1.5;">{{ plan.description }}</div>
+            <div style="display:flex;align-items:baseline;gap:4px;">
+              <span style="font-family:var(--font-cond);font-size:13px;color:rgba(255,255,255,0.4);">₦</span>
+              <span class="plan-price" data-base="{{ plan.price }}"
+                style="font-family:var(--font-cond);font-size:36px;font-weight:800;color:{% if is_popular %}var(--gold){% else %}#ffffff{% endif %};line-height:1;">
+                {{ "{:,.0f}".format(plan.price) }}
+              </span>
+              <span style="font-size:12px;color:rgba(255,255,255,0.35);margin-left:2px;">/ month</span>
+            </div>
+            {% if plan.price > 0 %}
+            <div class="billing-note" style="font-family:var(--font-cond);font-size:10px;color:rgba(255,255,255,0.3);margin-top:6px;letter-spacing:0.5px;"></div>
+            {% endif %}
+          </div>
+
+          <!-- Divider -->
+          <div style="height:1px;background:rgba(255,255,255,0.05);margin:0 28px;"></div>
+
+          <!-- Features -->
+          <div style="padding:20px 28px;flex:1;">
+            {% for feature in plan.features %}
+            <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
+              <i class="fas fa-check" style="color:{% if is_popular %}var(--gold){% else %}#4ade80{% endif %};font-size:11px;margin-top:3px;flex-shrink:0;"></i>
+              <span style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.5;">{{ feature }}</span>
+            </div>
+            {% endfor %}
+            {% if plan.not_included %}
+            <div style="height:1px;background:rgba(255,255,255,0.04);margin:14px 0;"></div>
+            {% for feature in plan.not_included %}
+            <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;">
+              <i class="fas fa-times" style="color:rgba(255,255,255,0.2);font-size:11px;margin-top:3px;flex-shrink:0;"></i>
+              <span style="font-size:12px;color:rgba(255,255,255,0.3);line-height:1.5;">{{ feature }}</span>
+            </div>
+            {% endfor %}
+            {% endif %}
+          </div>
+
+          <!-- CTA -->
+          <div style="padding:20px 28px 28px;">
+            {% if is_current %}
+            <button disabled
+              style="width:100%;padding:12px;font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ade80;cursor:not-allowed;">
+              <i class="fas fa-check-circle me-1"></i>Active Plan
+            </button>
+            {% else %}
+            <button onclick="subscribeToPlan('{{ plan_key }}')"
+              style="width:100%;padding:12px;font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;background:{% if is_popular %}var(--gold){% else %}transparent{% endif %};border:1px solid {% if is_popular %}var(--gold){% else %}rgba(255,255,255,0.2){% endif %};color:{% if is_popular %}var(--navy){% else %}rgba(255,255,255,0.8){% endif %};cursor:pointer;transition:all 0.2s ease;">
+              Choose {{ plan.name }}
+            </button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+    </div>
+
+    <!-- Comparison table -->
+    <div style="background:rgba(15,32,64,0.4);border:1px solid rgba(255,255,255,0.06);overflow:hidden;margin-bottom:40px;">
+      <div style="padding:20px 28px;border-bottom:1px solid rgba(255,255,255,0.05);">
+        <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.8);">Full Plan Comparison</div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(212,175,55,0.15);">
+              <th style="padding:14px 20px;font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);text-align:left;width:35%;">Feature</th>
+              <th style="padding:14px 16px;font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.5);text-align:center;">Starter</th>
+              <th style="padding:14px 16px;font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);text-align:center;">Professional</th>
+              <th style="padding:14px 16px;font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.5);text-align:center;">Enterprise Plus</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in [
+              ("Job Postings",              "3",        "Unlimited",  "Unlimited"),
+              ("Browse Veteran Profiles",   "✓",        "✓",          "✓"),
+              ("View CVs Online",           "✓",        "✓",          "✓"),
+              ("Download CVs",              "—",        "✓",          "✓"),
+              ("Direct Messaging",          "—",        "✓",          "✓"),
+              ("Smart Candidate Matching",  "—",        "✓",          "✓"),
+              ("Hiring Analytics",          "—",        "✓",          "✓"),
+              ("Job Boosts / Month",        "—",        "2",          "5"),
+              ("Priority Support",          "—",        "✓",          "✓"),
+              ("Dedicated Manager",         "—",        "—",          "✓"),
+            ] %}
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <td style="padding:12px 20px;font-size:13px;color:rgba(255,255,255,0.6);">{{ row[0] }}</td>
+              <td style="padding:12px 16px;font-size:13px;color:{% if row[1] == "—" %}rgba(255,255,255,0.2){% else %}rgba(255,255,255,0.7){% endif %};text-align:center;">{{ row[1] }}</td>
+              <td style="padding:12px 16px;font-size:13px;color:{% if row[2] == "—" %}rgba(255,255,255,0.2){% else %}var(--gold){% endif %};text-align:center;background:rgba(212,175,55,0.03);">{{ row[2] }}</td>
+              <td style="padding:12px 16px;font-size:13px;color:{% if row[3] == "—" %}rgba(255,255,255,0.2){% else %}rgba(255,255,255,0.7){% endif %};text-align:center;">{{ row[3] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer note -->
+    <div class="text-center">
+      <p style="font-size:13px;color:rgba(255,255,255,0.3);line-height:1.8;">
+        All plans billed in Naira (NGN). Cancel anytime from your dashboard.<br>
+        6-month and yearly billing available at checkout with automatic discounts applied.
+      </p>
+      <p style="font-size:13px;color:rgba(255,255,255,0.25);margin-top:8px;">
+        Questions? <a href="{{ url_for('main.contact') }}" style="color:var(--gold);">Contact our team</a>
+      </p>
+    </div>
+
   </div>
 </section>
 
 <script>
-function subscribeToPlan(plan) {
-  const billing = document.getElementById("billingCycle").value;
+const basePrices = {
+  starter:        {{ plans["starter"].price | int }},
+  professional:   {{ plans["professional"].price | int }},
+  enterprise_plus:{{ plans["enterprise_plus"].price | int }}
+};
 
-  if (!confirm(`Proceed with ${plan} plan (${billing.replace('_', ' ')})?`)) {
-    return;
-  }
+const discountMap = { monthly: 0, "6_months": 0.10, yearly: 0.20 };
+const durationMap = { monthly: 1, "6_months": 6, yearly: 12 };
+let currentBilling = "monthly";
 
-  fetch(`/payments/employer/subscription/initialize`, {  // ✅ FIXED URL
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      plan_type: plan,
-      billing_cycle: billing
-    })
-  })
-  .then(async res => {
-    const data = await res.json().catch(() => null);
-
-    if (!res.ok || !data) {
-      throw new Error(data?.message || "Server error");
+function setBilling(cycle) {
+  currentBilling = cycle;
+  ["monthly","6_months","yearly"].forEach(c => {
+    const btn = document.getElementById("btn-" + c);
+    if (c === cycle) {
+      btn.style.background = "var(--gold)";
+      btn.style.color = "var(--navy)";
+    } else {
+      btn.style.background = "transparent";
+      btn.style.color = "rgba(255,255,255,0.5)";
     }
+  });
 
-    return data;
+  const months   = durationMap[cycle];
+  const discount = discountMap[cycle];
+
+  document.querySelectorAll(".plan-price").forEach(el => {
+    const base  = parseInt(el.dataset.base);
+    const total = Math.round(base * months * (1 - discount));
+    const monthly = Math.round(base * (1 - discount));
+    el.textContent = monthly.toLocaleString();
+  });
+
+  document.querySelectorAll(".billing-note").forEach((el, i) => {
+    if (cycle !== "monthly") {
+      const keys = ["starter","professional","enterprise_plus"];
+      const total = Math.round(basePrices[keys[i]] * months * (1 - discount));
+      el.textContent = "₦" + total.toLocaleString() + " billed " + cycle.replace("_"," ");
+    } else {
+      el.textContent = "";
+    }
+  });
+}
+
+function subscribeToPlan(plan) {
+  if (!confirm("Proceed with the " + plan.replace("_"," ") + " plan?")) return;
+  fetch("/payments/employer/subscription/initialize", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ plan_type: plan, billing_cycle: currentBilling })
   })
+  .then(r => r.json())
   .then(data => {
     if (data.success && data.authorization_url) {
       window.location.href = data.authorization_url;
     } else {
-      alert(data.message || "Payment failed");
+      alert(data.message || "Payment could not be initialised. Please try again.");
     }
   })
-  .catch(err => {
-    console.error(err);
-    alert("Something went wrong. Check console.");
-  });
+  .catch(() => alert("Something went wrong. Please try again."));
 }
-</script>  
-<script>
-const basePrices = {
-  starter: {{ plans['starter'].price | int }},
-  professional: {{ plans['professional'].price | int }},
-  enterprise_plus: {{ plans['enterprise_plus'].price | int }}
-};
-
-const durationMap = {
-  monthly: 1,
-  "6_months": 6,
-  yearly: 12
-};
-
-const discountMap = {
-  monthly: 0,
-  "6_months": 0.10,
-  yearly: 0.20
-};
-
-function formatPrice(num) {
-  return "₦" + num.toLocaleString();
-}
-
-function updatePrices() {
-  const billing = document.getElementById("billingCycle").value;
-  const months = durationMap[billing];
-  const discount = discountMap[billing];
-
-  let starterP = basePrices.starter * months * (1 - discount);
-  document.getElementById("price-starter").innerText = formatPrice(Math.round(starterP));
-
-  let prof = basePrices.professional * months * (1 - discount);
-  document.getElementById("price-professional").innerText = formatPrice(Math.round(prof));
-
-  let ent = basePrices.enterprise_plus * months * (1 - discount);
-  document.getElementById("price-enterprise").innerText = formatPrice(Math.round(ent));
-}
-
-document.getElementById("billingCycle").addEventListener("change", updatePrices);
-
-// Run once on load
-updatePrices();
 </script>
 {% endblock %}

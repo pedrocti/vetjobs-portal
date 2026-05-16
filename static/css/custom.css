@@ -553,3 +553,12 @@ footer a:hover {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
 }
+
+/* ── Dark select dropdowns ── */
+select option {
+  background: #0a1628 !important;
+  color: #ffffff !important;
+}
+select {
+  color-scheme: dark;
+}

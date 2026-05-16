@@ -1,528 +1,365 @@
 {% extends "base.html" %}
-{% block title %}Search Veterans - VetLink{% endblock %}
+{% block title %}Find Veterans — VetJobPortal{% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4">
-    <div class="row">
+<div style="background:#04080f;min-height:100vh;padding:40px 0 80px;">
+  <div class="container-fluid" style="max-width:1400px;padding:0 24px;">
 
-        <!-- Search Filters Sidebar -->
-        <div class="col-lg-3 col-md-4 mb-4">
-            <div class="card h-100 position-relative {% if not can_search %}border-warning{% endif %}">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-filter me-2"></i>Search Filters
-                    </h5>
-                    {% if not can_search %}
-                    <span class="badge bg-warning text-dark"><i class="fas fa-lock me-1"></i>Locked</span>
-                    {% endif %}
-                </div>
+    <!-- Page header -->
+    <div style="margin-bottom:32px;">
+      <p class="section-label mb-1">Employer Tools</p>
+      <h1 style="font-family:var(--font-display);font-size:clamp(24px,4vw,36px);font-weight:700;color:#fff;margin:0 0 6px;">
+        Find <em style="color:var(--gold);font-style:italic;">Verified Veterans</em>
+      </h1>
+      <p style="font-size:13px;color:rgba(255,255,255,0.4);margin:0;">
+        {% if can_search and search_results.total_count > 0 %}
+          {{ search_results.total_count }} veteran{{ 's' if search_results.total_count != 1 }} in our network
+        {% else %}
+          Search and connect with pre-vetted military talent
+        {% endif %}
+      </p>
+    </div>
 
-                {% if can_search %}
-                <div class="card-body">
-                    <form id="searchForm" method="GET">
-                        <div class="mb-3">
-                            <label for="keywords" class="form-label">Keywords</label>
-                            <input type="text" class="form-control" id="keywords" name="keywords"
-                                   value="{{ current_filters.get('keywords', '') }}"
-                                   placeholder="Skills, experience, keywords...">
-                        </div>
+    <div style="display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:start;">
 
-                        <div class="mb-3">
-                            <label for="skills" class="form-label">Skills</label>
-                            <select class="form-select" id="skills" name="skills" multiple>
-                                {% for skill in popular_skills %}
-                                <option value="{{ skill }}"
-                                    {% if skill in current_filters.getlist('skills') %}selected{% endif %}>
-                                    {{ skill.title() }}
-                                </option>
-                                {% endfor %}
-                            </select>
-                            <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple</small>
-                        </div>
+      <!-- ── LEFT: Filters ── -->
+      <div style="position:sticky;top:24px;">
 
-                        <div class="mb-3">
-                            <label for="location" class="form-label">Location</label>
-                            <input type="text" class="form-control" id="location" name="location"
-                                   value="{{ current_filters.get('location', '') }}"
-                                   placeholder="City, State"
-                                   list="locationSuggestions">
-                            <datalist id="locationSuggestions">
-                                {% for location in popular_locations %}
-                                <option value="{{ location }}">
-                                {% endfor %}
-                            </datalist>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Years of Service</label>
-                            <div class="row">
-                                <div class="col-6">
-                                    <input type="number" class="form-control" name="min_experience"
-                                           value="{{ current_filters.get('min_experience', '') }}"
-                                           placeholder="Min" min="0" max="50">
-                                </div>
-                                <div class="col-6">
-                                    <input type="number" class="form-control" name="max_experience"
-                                           value="{{ current_filters.get('max_experience', '') }}"
-                                           placeholder="Max" min="0" max="50">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="verified_only" name="verified_only" value="true"
-                                       {% if current_filters.get('verified_only') %}checked{% endif %}>
-                                <label class="form-check-label" for="verified_only">
-                                    <i class="fas fa-shield-alt text-success me-1"></i>Verified Veterans Only
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="available_only" name="available_only" value="true"
-                                       {% if current_filters.get('available_only') %}checked{% endif %}>
-                                <label class="form-check-label" for="available_only">
-                                    <i class="fas fa-check-circle text-primary me-1"></i>Seeking Employment Only
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-search me-2"></i>Search Veterans
-                            </button>
-                            <a href="{{ url_for('search.search_veterans') }}" class="btn btn-outline-secondary btn-sm">
-                                Clear Filters
-                            </a>
-                        </div>
-                    </form>
-                </div>
-
-                {% else %}
-                <!-- Locked sidebar for free/starter -->
-                <div class="card-body d-flex flex-column align-items-center justify-content-center text-center py-4">
-                    <div class="mb-3" style="font-size:3rem; opacity:.25;">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-2">Search Filters Locked</h6>
-                    <p class="small text-muted mb-3">Upgrade to Professional or Enterprise Plus to filter and search through veteran profiles.</p>
-                    <a href="{{ url_for('payments.employer_subscription_plans') }}" class="btn btn-warning btn-sm fw-bold">
-                        <i class="fas fa-crown me-1"></i>Upgrade Now
-                    </a>
-                </div>
-                {% endif %}
+        <div style="background:#080f1e;border:1px solid rgba(255,255,255,0.06);padding:0;overflow:hidden;">
+          <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);">
+              <i class="fas fa-filter me-2" style="color:var(--gold);"></i>Filters
             </div>
-
-            <!-- Saved Veterans -->
-            <div class="card mt-3">
-                <div class="card-body text-center">
-                    <i class="fas fa-bookmark fs-1 mb-2 {% if can_search %}text-primary{% else %}text-muted{% endif %}"></i>
-                    <h6>Saved Veterans</h6>
-                    <p class="small text-muted">View your saved veteran profiles</p>
-                    {% if can_search %}
-                    <a href="#" class="btn btn-outline-primary btn-sm">
-                        View Saved <i class="fas fa-arrow-right ms-1"></i>
-                    </a>
-                    {% else %}
-                    <button class="btn btn-outline-secondary btn-sm" disabled>
-                        <i class="fas fa-lock me-1"></i>Upgrade to Access
-                    </button>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Search Results -->
-        <div class="col-lg-9 col-md-8">
-
-            <!-- Search Header -->
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <h3 class="mb-1">
-                        <i class="fas fa-users me-2 text-primary"></i>Search Veterans
-                    </h3>
-                    {% if can_search and search_results.total_count > 0 %}
-                    <p class="text-muted mb-0">
-                        Found {{ search_results.total_count }} veteran{{ 's' if search_results.total_count != 1 else '' }}
-                        {% if current_filters.get('keywords') or current_filters.getlist('skills') or current_filters.get('location') %}
-                        matching your criteria
-                        {% endif %}
-                    </p>
-                    {% elif not can_search %}
-                    <p class="text-muted mb-0">Upgrade your plan to search and connect with veteran talent.</p>
-                    {% endif %}
-                </div>
-                {% if can_search %}
-                <button class="btn btn-outline-secondary" id="toggleView" title="Toggle view">
-                    <i class="fas fa-th" id="viewIcon"></i>
-                </button>
-                {% endif %}
-            </div>
-
             {% if not can_search %}
-            <!-- ===== UPGRADE WALL ===== -->
-            <div class="card border-warning mb-4">
-                <div class="card-body p-4">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <div class="d-flex align-items-start gap-3">
-                                <div class="text-warning" style="font-size:2.5rem;"><i class="fas fa-crown"></i></div>
-                                <div>
-                                    <h5 class="fw-bold mb-1">Unlock Veteran Search</h5>
-                                    <p class="text-muted mb-3">Your current plan does not include veteran search. Upgrade to <strong>Professional</strong> or <strong>Enterprise Plus</strong> to:</p>
-                                    <ul class="list-unstyled mb-0">
-                                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Search all veteran profiles with advanced filters</li>
-                                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>View full profiles including skills and service history</li>
-                                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Save and manage a shortlist of candidates</li>
-                                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Contact candidates directly</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 text-center mt-3 mt-md-0">
-                            <a href="{{ url_for('payments.employer_subscription_plans') }}"
-                               class="btn btn-warning btn-lg fw-bold px-4">
-                                <i class="fas fa-arrow-up me-2"></i>Upgrade Plan
-                            </a>
-                            <p class="small text-muted mt-2 mb-0">Starting from ₦49,000/month</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <span style="font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#f97316;background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.2);padding:2px 8px;">
+              <i class="fas fa-lock me-1"></i>Locked
+            </span>
+            {% endif %}
+          </div>
 
-            <!-- Blurred preview cards -->
-            {% if search_results.results %}
-            <p class="text-muted small mb-3"><i class="fas fa-eye-slash me-1"></i>Preview only — upgrade to see full profiles</p>
-            <div class="row">
-                {% for result in search_results.results %}
-                {% set profile = result.profile %}
-                <div class="col-lg-6 col-xl-4 mb-4">
-                    <div class="card h-100 border-0 shadow-sm position-relative overflow-hidden">
-                        <!-- Blur overlay -->
-                        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center"
-                             style="background:rgba(var(--bs-dark-rgb),.55);backdrop-filter:blur(6px);z-index:10;">
-                            <i class="fas fa-lock text-warning mb-2" style="font-size:1.8rem;"></i>
-                            <a href="{{ url_for('payments.employer_subscription_plans') }}"
-                               class="btn btn-warning btn-sm fw-bold mt-1">
-                                Upgrade to View
-                            </a>
-                        </div>
-                        <!-- Hidden card content behind blur -->
-                        <div class="card-body" style="filter:blur(4px);user-select:none;pointer-events:none;">
-                            <div class="d-flex align-items-start mb-3">
-                                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                                     style="width:50px;height:50px;">
-                                    <i class="fas fa-user fs-5"></i>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="card-title mb-1">&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;</h6>
-                                    <p class="text-muted small mb-1">{{ profile.military_branch or 'Military Veteran' }}</p>
-                                    <p class="text-muted small mb-0"><i class="fas fa-map-marker-alt me-1"></i>&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;</p>
-                                </div>
-                            </div>
-                            <p class="card-text small text-muted">
-                                {% if profile.bio %}{{ profile.display_bio or profile.bio }}{% else %}Profile details hidden. Upgrade to view.{% endif %}
-                            </p>
-                            {% if profile.seeking_employment %}
-                            <span class="badge bg-success"><i class="fas fa-check me-1"></i>Seeking Employment</span>
-                            {% endif %}
-                        </div>
-                        <div class="card-footer bg-transparent" style="filter:blur(4px);pointer-events:none;">
-                            <div class="d-flex justify-content-between">
-                                <span class="btn btn-primary btn-sm disabled">View Profile</span>
-                                <span class="btn btn-outline-secondary btn-sm disabled">Save</span>
-                            </div>
-                        </div>
-                    </div>
+          {% if can_search %}
+          <div style="padding:20px;">
+            <form id="searchForm" method="GET">
+
+              <div style="margin-bottom:16px;">
+                <label style="font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);display:block;margin-bottom:6px;">Keywords</label>
+                <input type="text" name="keywords" value="{{ current_filters.get('keywords', '') }}"
+                       placeholder="Skills, role, experience..."
+                       style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);padding:9px 12px;color:#fff;font-size:13px;outline:none;">
+              </div>
+
+              <div style="margin-bottom:16px;">
+                <label style="font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);display:block;margin-bottom:6px;">Location</label>
+                <input type="text" name="location" value="{{ current_filters.get('location', '') }}"
+                       placeholder="City, State" list="locationSuggestions"
+                       style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);padding:9px 12px;color:#fff;font-size:13px;outline:none;">
+                <datalist id="locationSuggestions">
+                  {% for loc in popular_locations %}<option value="{{ loc }}">{% endfor %}
+                </datalist>
+              </div>
+
+              <div style="margin-bottom:16px;">
+                <label style="font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);display:block;margin-bottom:6px;">Years of Service</label>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                  <input type="number" name="min_experience" value="{{ current_filters.get('min_experience', '') }}"
+                         placeholder="Min" min="0" max="50"
+                         style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);padding:9px 12px;color:#fff;font-size:13px;outline:none;width:100%;">
+                  <input type="number" name="max_experience" value="{{ current_filters.get('max_experience', '') }}"
+                         placeholder="Max" min="0" max="50"
+                         style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);padding:9px 12px;color:#fff;font-size:13px;outline:none;width:100%;">
+                </div>
+              </div>
+
+              <div style="margin-bottom:16px;">
+                <label style="font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);display:block;margin-bottom:8px;">Skills</label>
+                <select name="skills" multiple id="skillsSelect"
+                        style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-size:12px;padding:4px;">
+                  {% for skill in popular_skills %}
+                  <option value="{{ skill }}" {% if skill in current_filters.getlist('skills') %}selected{% endif %}>{{ skill.title() }}</option>
+                  {% endfor %}
+                </select>
+                <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:4px;">Hold Ctrl/Cmd for multiple</div>
+              </div>
+
+              <div style="margin-bottom:20px;display:flex;flex-direction:column;gap:10px;">
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                  <input type="checkbox" name="verified_only" value="true"
+                         {% if current_filters.get('verified_only') %}checked{% endif %}
+                         style="accent-color:var(--gold);">
+                  <span style="font-family:var(--font-cond);font-size:11px;font-weight:700;color:rgba(255,255,255,0.6);">
+                    <i class="fas fa-shield-alt me-1" style="color:var(--gold);"></i>Verified Only
+                  </span>
+                </label>
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                  <input type="checkbox" name="available_only" value="true"
+                         {% if current_filters.get('available_only') %}checked{% endif %}
+                         style="accent-color:var(--gold);">
+                  <span style="font-family:var(--font-cond);font-size:11px;font-weight:700;color:rgba(255,255,255,0.6);">
+                    <i class="fas fa-check-circle me-1" style="color:#4ade80;"></i>Seeking Employment
+                  </span>
+                </label>
+              </div>
+
+              <button type="submit" class="btn-vp-primary" style="width:100%;justify-content:center;padding:11px;">
+                <i class="fas fa-search"></i><span>Search</span>
+              </button>
+              <a href="{{ url_for('search.search_veterans') }}"
+                 style="display:block;text-align:center;margin-top:10px;font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.3);text-decoration:none;">
+                Clear Filters
+              </a>
+            </form>
+          </div>
+
+          {% else %}
+          <!-- Locked state -->
+          <div style="padding:32px 20px;text-align:center;">
+            <i class="fas fa-lock" style="font-size:28px;color:rgba(255,255,255,0.1);display:block;margin-bottom:14px;"></i>
+            <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);margin-bottom:8px;">Search Locked</div>
+            <p style="font-size:12px;color:rgba(255,255,255,0.3);line-height:1.6;margin-bottom:16px;">Upgrade to Professional or Enterprise Plus to filter and search veteran profiles.</p>
+            <a href="{{ url_for('payments.employer_subscription_plans') }}" class="btn-vp-primary" style="padding:9px 16px;font-size:10px;width:100%;justify-content:center;">
+              <i class="fas fa-arrow-up"></i><span>Upgrade Plan</span>
+            </a>
+          </div>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <!-- ── RIGHT: Results ── -->
+      <div>
+
+        {% if not can_search %}
+        <!-- Upgrade wall -->
+        <div style="background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.2);border-left:3px solid var(--gold);padding:28px 32px;margin-bottom:24px;">
+          <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:200px;">
+              <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Professional Feature</div>
+              <h3 style="font-family:var(--font-display);font-size:clamp(18px,2.5vw,24px);font-weight:700;color:#fff;margin-bottom:10px;">Unlock Veteran Search</h3>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                {% for item in ["Search all verified veteran profiles with advanced filters","View full profiles, service records and skill sets","Save and manage a shortlist of candidates","Contact candidates directly via messaging"] %}
+                <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,0.6);">
+                  <i class="fas fa-check" style="color:#4ade80;font-size:11px;flex-shrink:0;"></i>{{ item }}
                 </div>
                 {% endfor %}
+              </div>
             </div>
-            {% endif %}
-            <!-- ===== END UPGRADE WALL ===== -->
+            <div style="flex-shrink:0;">
+              <a href="{{ url_for('payments.employer_subscription_plans') }}" class="btn-vp-primary" style="padding:12px 28px;">
+                <i class="fas fa-arrow-up"></i><span>Upgrade Now</span>
+              </a>
+            </div>
+          </div>
+        </div>
 
-            {% else %}
-            <!-- ===== FULL ACCESS RESULTS ===== -->
-            {% if search_results.results %}
-            <div id="veteranResults" class="row">
-                {% for result in search_results.results %}
-                {% set user = result.user %}
-                {% set profile = result.profile %}
-
-                <div class="col-lg-6 col-xl-4 mb-4">
-                    <div class="card h-100 veteran-card {% if result.is_boosted %}border-warning{% endif %}">
-                        {% if result.is_boosted %}
-                        <div class="position-absolute top-0 end-0 p-2">
-                            <span class="badge bg-warning text-dark">
-                                <i class="fas fa-star me-1"></i>Boosted
-                            </span>
-                        </div>
-                        {% endif %}
-
-                        <div class="card-body">
-                            <div class="d-flex align-items-start mb-3">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                                     style="width:50px;height:50px;">
-                                    <i class="fas fa-user fs-5"></i>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="card-title mb-1">
-                                        {{ user.full_name }}
-                                        {% if profile.is_verified %}
-                                        <i class="fas fa-shield-alt text-success ms-1" title="Verified Veteran"></i>
-                                        {% endif %}
-                                    </h6>
-                                    <p class="text-muted small mb-1">
-                                        {% if profile.rank %}{{ profile.rank }}, {% endif %}
-                                        {{ profile.military_branch or 'Military Veteran' }}
-                                    </p>
-                                    <p class="text-muted small mb-0">
-                                        <i class="fas fa-map-marker-alt me-1"></i>
-                                        {{ profile.location or user.location or 'Location not specified' }}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {% if profile.years_of_service %}
-                            <div class="mb-2">
-                                <small class="text-muted">
-                                    <i class="fas fa-clock me-1"></i>{{ profile.years_of_service }} years of service
-                                </small>
-                            </div>
-                            {% endif %}
-
-                            {% if profile.skills %}
-                            <div class="mb-3">
-                                {% set skills_list = profile.skills.split(',') %}
-                                {% for skill in skills_list[:4] %}
-                                <span class="badge bg-light text-dark me-1 mb-1">{{ skill.strip() }}</span>
-                                {% endfor %}
-                                {% if skills_list|length > 4 %}
-                                <span class="badge bg-secondary">+{{ skills_list|length - 4 }} more</span>
-                                {% endif %}
-                            </div>
-                            {% endif %}
-
-                            {% if profile.bio %}
-                            <p class="card-text small text-muted">
-                                {{ profile.bio[:150] }}{% if profile.bio|length > 150 %}...{% endif %}
-                            </p>
-                            {% endif %}
-
-                            {% if profile.seeking_employment %}
-                            <span class="badge bg-success">
-                                <i class="fas fa-check me-1"></i>Seeking Employment
-                            </span>
-                            {% endif %}
-                        </div>
-
-                        <div class="card-footer bg-transparent">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <a href="{{ url_for('veteran.public_profile', user_id=user.id) }}"
-                                   class="btn btn-primary btn-sm">
-                                    <i class="fas fa-eye me-1"></i>View Profile
-                                </a>
-                                <button class="btn btn-outline-secondary btn-sm save-veteran-btn"
-                                        data-veteran-id="{{ user.id }}"
-                                        data-saved="{{ result.is_saved|lower }}">
-                                    <i class="fas fa-bookmark me-1"></i>
-                                    <span class="save-text">{% if result.is_saved %}Saved{% else %}Save{% endif %}</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+        <!-- Blurred preview -->
+        {% if search_results.results %}
+        <div style="font-family:var(--font-cond);font-size:10px;color:rgba(255,255,255,0.25);margin-bottom:14px;letter-spacing:1px;text-transform:uppercase;">
+          <i class="fas fa-eye-slash me-1"></i>Preview only — upgrade to view full profiles
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;">
+          {% for result in search_results.results %}
+          <div style="background:#080f1e;border:1px solid rgba(255,255,255,0.06);position:relative;overflow:hidden;">
+            <div style="position:absolute;inset:0;background:rgba(8,15,30,0.7);backdrop-filter:blur(5px);z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+              <i class="fas fa-lock" style="font-size:20px;color:rgba(212,175,55,0.4);margin-bottom:10px;"></i>
+              <a href="{{ url_for('payments.employer_subscription_plans') }}"
+                 style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);text-decoration:none;border:1px solid rgba(212,175,55,0.3);padding:6px 14px;">
+                Upgrade to View
+              </a>
+            </div>
+            <div style="padding:20px;filter:blur(4px);pointer-events:none;user-select:none;">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                <div style="width:44px;height:44px;background:rgba(255,255,255,0.05);border-left:2px solid rgba(212,175,55,0.2);flex-shrink:0;"></div>
+                <div>
+                  <div style="height:12px;background:rgba(255,255,255,0.1);width:120px;margin-bottom:6px;"></div>
+                  <div style="height:10px;background:rgba(255,255,255,0.06);width:80px;"></div>
                 </div>
-                {% endfor %}
+              </div>
+              <div style="height:10px;background:rgba(255,255,255,0.05);width:100%;margin-bottom:6px;"></div>
+              <div style="height:10px;background:rgba(255,255,255,0.05);width:75%;"></div>
             </div>
-
-            <!-- Pagination -->
-            {% if search_results.total_pages > 1 %}
-            <nav aria-label="Search results pagination">
-                <ul class="pagination justify-content-center">
-                    {% if search_results.page > 1 %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('search.search_veterans', page=search_results.page-1, **current_filters) }}">
-                            <i class="fas fa-chevron-left"></i>
-                        </a>
-                    </li>
-                    {% endif %}
-
-                    {% for page_num in range(1, search_results.total_pages + 1) %}
-                    {% if page_num == search_results.page or page_num <= 3 or page_num >= search_results.total_pages - 2 or (page_num - search_results.page)|abs <= 1 %}
-                    <li class="page-item {% if page_num == search_results.page %}active{% endif %}">
-                        <a class="page-link" href="{{ url_for('search.search_veterans', page=page_num, **current_filters) }}">
-                            {{ page_num }}
-                        </a>
-                    </li>
-                    {% elif page_num == 4 or page_num == search_results.total_pages - 3 %}
-                    <li class="page-item disabled"><span class="page-link">...</span></li>
-                    {% endif %}
-                    {% endfor %}
-
-                    {% if search_results.page < search_results.total_pages %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('search.search_veterans', page=search_results.page+1, **current_filters) }}">
-                            <i class="fas fa-chevron-right"></i>
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-            {% endif %}
-
-            {% else %}
-            <!-- No Results -->
-            <div class="text-center py-5">
-                <i class="fas fa-search text-muted" style="font-size:4rem;"></i>
-                <h4 class="mt-3">No Veterans Found</h4>
-                <p class="text-muted">
-                    {% if current_filters.get('keywords') or current_filters.getlist('skills') or current_filters.get('location') %}
-                    Try adjusting your search criteria or removing some filters.
-                    {% else %}
-                    Start by entering some search criteria in the filters panel.
-                    {% endif %}
-                </p>
-                <a href="{{ url_for('search.search_veterans') }}" class="btn btn-primary">
-                    <i class="fas fa-redo me-2"></i>Clear Filters & Search Again
-                </a>
-            </div>
-            {% endif %}
-            <!-- ===== END FULL ACCESS ===== -->
-            {% endif %}
-
+          </div>
+          {% endfor %}
         </div>
-    </div>
-</div>
+        {% endif %}
 
-<!-- Save Veteran Modal (pro/enterprise only) -->
-{% if can_search %}
-<div class="modal fade" id="saveVeteranModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Save Veteran</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        {% else %}
+        <!-- Full access results -->
+        {% if search_results.results %}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;" id="veteranResults">
+          {% for result in search_results.results %}
+          {% set user = result.user %}
+          {% set profile = result.profile %}
+          <div style="background:#080f1e;border:1px solid {% if result.is_boosted %}rgba(212,175,55,0.3){% else %}rgba(255,255,255,0.06){% endif %};position:relative;display:flex;flex-direction:column;transition:border-color 0.2s ease;">
+
+            {% if result.is_boosted %}
+            <div style="position:absolute;top:12px;right:12px;font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.25);padding:2px 8px;">
+              <i class="fas fa-bolt me-1"></i>Featured
             </div>
-            <div class="modal-body">
-                <form id="saveVeteranForm">
-                    <div class="mb-3">
-                        <label for="veteranNotes" class="form-label">Notes (Optional)</label>
-                        <textarea class="form-control" id="veteranNotes" rows="3"
-                                  placeholder="Add private notes about this veteran..."></textarea>
+            {% endif %}
+
+            <div style="padding:20px 20px 16px;">
+              <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;">
+                <div style="width:44px;height:44px;flex-shrink:0;background:rgba(212,175,55,0.08);border-left:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:var(--font-cond);font-size:15px;font-weight:800;color:var(--gold);">
+                  {{ user.first_name[0] | upper }}{{ user.last_name[0] | upper if user.last_name else '' }}
+                </div>
+                <div style="min-width:0;">
+                  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                    <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;">
+                      {{ user.full_name }}
                     </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="confirmSaveVeteran">Save Veteran</button>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-{% endblock %}
+                    {% if profile.is_verified %}
+                    <i class="fas fa-shield-alt" style="color:#4ade80;font-size:10px;" title="Verified Veteran"></i>
+                    {% endif %}
+                  </div>
+                  <div style="font-family:var(--font-cond);font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;">
+                    {% if profile.rank %}{{ profile.rank }}, {% endif %}{{ profile.get_service_branch_display() }}
+                  </div>
+                  {% if profile.location %}
+                  <div style="font-family:var(--font-cond);font-size:10px;color:rgba(255,255,255,0.3);margin-top:2px;">
+                    <i class="fas fa-map-marker-alt me-1" style="color:var(--gold);font-size:9px;"></i>{{ profile.location }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
 
-{% block extra_js %}
+              {% if profile.years_of_service %}
+              <div style="font-family:var(--font-cond);font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:10px;">
+                <i class="fas fa-clock me-1" style="color:var(--gold);"></i>{{ profile.years_of_service }} years service
+              </div>
+              {% endif %}
+
+              {% if profile.skills %}
+              <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;">
+                {% for skill in profile.skills.split(',')[:4] %}
+                {% set s = skill.strip() %}
+                {% if s %}
+                <span style="font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:0.5px;color:rgba(255,255,255,0.55);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:2px 8px;">{{ s }}</span>
+                {% endif %}
+                {% endfor %}
+                {% if profile.skills.split(',')|length > 4 %}
+                <span style="font-family:var(--font-cond);font-size:9px;color:rgba(255,255,255,0.3);padding:2px 4px;">+{{ profile.skills.split(',')|length - 4 }}</span>
+                {% endif %}
+              </div>
+              {% endif %}
+
+              {% if profile.bio %}
+              <p style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.6;margin:0 0 12px;">
+                {{ profile.bio[:120] }}{% if profile.bio|length > 120 %}…{% endif %}
+              </p>
+              {% endif %}
+            </div>
+
+            <div style="margin-top:auto;padding:14px 20px;border-top:1px solid rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:space-between;gap:8px;">
+              <a href="{{ url_for('veteran.public_profile', user_id=user.id) }}"
+                 style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--gold);color:var(--navy);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-decoration:none;transition:opacity 0.2s;">
+                <i class="fas fa-eye" style="font-size:10px;"></i>View Profile
+              </a>
+              <button class="save-veteran-btn"
+                      data-veteran-id="{{ user.id }}"
+                      data-saved="{{ result.is_saved | lower }}"
+                      style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;background:transparent;border:1px solid {% if result.is_saved %}rgba(74,222,128,0.3){% else %}rgba(255,255,255,0.12){% endif %};color:{% if result.is_saved %}#4ade80{% else %}rgba(255,255,255,0.4){% endif %};font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;">
+                <i class="fas fa-bookmark" style="font-size:10px;"></i>
+                <span class="save-text">{% if result.is_saved %}Saved{% else %}Save{% endif %}</span>
+              </button>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if search_results.total_pages > 1 %}
+        <div style="display:flex;justify-content:center;gap:4px;margin-top:32px;">
+          {% if search_results.page > 1 %}
+          <a href="{{ url_for('search.search_veterans', page=search_results.page-1, **current_filters) }}"
+             style="padding:8px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);text-decoration:none;font-family:var(--font-cond);font-size:11px;">
+            <i class="fas fa-chevron-left"></i>
+          </a>
+          {% endif %}
+          {% for page_num in range(1, search_results.total_pages + 1) %}
+          {% if page_num == search_results.page or page_num <= 2 or page_num >= search_results.total_pages - 1 or (page_num - search_results.page)|abs <= 1 %}
+          <a href="{{ url_for('search.search_veterans', page=page_num, **current_filters) }}"
+             style="padding:8px 14px;background:{% if page_num == search_results.page %}var(--gold){% else %}rgba(255,255,255,0.04){% endif %};border:1px solid {% if page_num == search_results.page %}var(--gold){% else %}rgba(255,255,255,0.08){% endif %};color:{% if page_num == search_results.page %}var(--navy){% else %}rgba(255,255,255,0.5){% endif %};text-decoration:none;font-family:var(--font-cond);font-size:11px;font-weight:700;">
+            {{ page_num }}
+          </a>
+          {% elif page_num == 3 or page_num == search_results.total_pages - 2 %}
+          <span style="padding:8px 6px;color:rgba(255,255,255,0.3);font-family:var(--font-cond);font-size:11px;">…</span>
+          {% endif %}
+          {% endfor %}
+          {% if search_results.page < search_results.total_pages %}
+          <a href="{{ url_for('search.search_veterans', page=search_results.page+1, **current_filters) }}"
+             style="padding:8px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);text-decoration:none;font-family:var(--font-cond);font-size:11px;">
+            <i class="fas fa-chevron-right"></i>
+          </a>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- No results -->
+        <div style="text-align:center;padding:80px 20px;">
+          <i class="fas fa-search" style="font-size:48px;color:rgba(255,255,255,0.08);display:block;margin-bottom:20px;"></i>
+          <h4 style="font-family:var(--font-display);font-size:22px;color:rgba(255,255,255,0.6);margin-bottom:10px;">No Veterans Found</h4>
+          <p style="font-size:13px;color:rgba(255,255,255,0.3);margin-bottom:20px;">
+            {% if current_filters.get('keywords') or current_filters.get('location') %}
+            Try adjusting your search filters.
+            {% else %}
+            Enter keywords or filters to search the veteran network.
+            {% endif %}
+          </p>
+          <a href="{{ url_for('search.search_veterans') }}"
+             style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-decoration:none;">
+            <i class="fas fa-redo"></i>Clear & Start Over
+          </a>
+        </div>
+        {% endif %}
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+@media (max-width: 767px) {
+  div[style*="grid-template-columns:260px 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  div[style*="position:sticky"] { position: static !important; }
+}
+</style>
+
 {% if can_search %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('searchForm');
-    if (form) {
-        const inputs = form.querySelectorAll('input, select');
-        inputs.forEach(input => {
-            input.addEventListener('change', function() {
-                if (this.type !== 'checkbox' || this.checked) {
-                    setTimeout(() => form.submit(), 100);
-                }
-            });
-        });
-    }
+document.addEventListener('DOMContentLoaded', function () {
+  // Auto-submit on filter change
+  const form = document.getElementById('searchForm');
+  if (form) {
+    form.querySelectorAll('input[type="checkbox"]').forEach(el => {
+      el.addEventListener('change', () => form.submit());
+    });
+  }
 
-    let currentVeteranId = null;
-    const saveButtons = document.querySelectorAll('.save-veteran-btn');
-    const saveModalEl = document.getElementById('saveVeteranModal');
-    const saveModal = saveModalEl ? new bootstrap.Modal(saveModalEl) : null;
+  // Save/unsave veteran
+  document.querySelectorAll('.save-veteran-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const id     = this.dataset.veteranId;
+      const saved  = this.dataset.saved === 'true';
+      const url    = saved ? `/search/unsave-veteran/${id}` : `/search/save-veteran/${id}`;
+      const me     = this;
 
-    saveButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const veteranId = this.dataset.veteranId;
-            const isSaved = this.dataset.saved === 'true';
-            if (isSaved) {
-                unsaveVeteran(veteranId, this);
-            } else {
-                currentVeteranId = veteranId;
-                if (saveModal) saveModal.show();
-            }
+      fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            const nowSaved = !saved;
+            me.dataset.saved = nowSaved ? 'true' : 'false';
+            me.querySelector('.save-text').textContent = nowSaved ? 'Saved' : 'Save';
+            me.style.borderColor = nowSaved ? 'rgba(74,222,128,0.3)' : 'rgba(255,255,255,0.12)';
+            me.style.color = nowSaved ? '#4ade80' : 'rgba(255,255,255,0.4)';
+          }
         });
     });
-
-    const confirmBtn = document.getElementById('confirmSaveVeteran');
-    if (confirmBtn) {
-        confirmBtn.addEventListener('click', function() {
-            if (currentVeteranId) {
-                const notes = document.getElementById('veteranNotes').value;
-                saveVeteran(currentVeteranId, notes);
-                if (saveModal) saveModal.hide();
-                document.getElementById('veteranNotes').value = '';
-            }
-        });
-    }
-
-    function saveVeteran(veteranId, notes) {
-        fetch(`/search/save-veteran/${veteranId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ notes: notes })
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                const btn = document.querySelector(`[data-veteran-id="${veteranId}"]`);
-                btn.dataset.saved = 'true';
-                btn.querySelector('.save-text').textContent = 'Saved';
-                btn.classList.replace('btn-outline-secondary', 'btn-success');
-                showAlert('Veteran saved!', 'success');
-            } else {
-                showAlert(data.message || 'Error saving veteran', 'danger');
-            }
-        })
-        .catch(() => showAlert('Error saving veteran', 'danger'));
-    }
-
-    function unsaveVeteran(veteranId, button) {
-        fetch(`/search/unsave-veteran/${veteranId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                button.dataset.saved = 'false';
-                button.querySelector('.save-text').textContent = 'Save';
-                button.classList.replace('btn-success', 'btn-outline-secondary');
-                showAlert('Veteran removed from saved list', 'info');
-            } else {
-                showAlert(data.message || 'Error removing veteran', 'danger');
-            }
-        })
-        .catch(() => showAlert('Error removing veteran', 'danger'));
-    }
-
-    function showAlert(message, type) {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed bottom-0 end-0 m-3`;
-        alertDiv.style.zIndex = '9999';
-        alertDiv.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
-        document.body.appendChild(alertDiv);
-        setTimeout(() => { if (alertDiv.parentNode) alertDiv.remove(); }, 4000);
-    }
-
-    const skillsSelect = document.getElementById('skills');
-    if (skillsSelect) {
-        skillsSelect.addEventListener('click', function() { this.size = Math.min(this.options.length, 8); });
-        skillsSelect.addEventListener('blur', function() { this.size = 1; });
-    }
+  });
 });
 </script>
 {% endif %}

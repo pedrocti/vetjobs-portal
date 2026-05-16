@@ -13,22 +13,27 @@ search_bp = Blueprint('search', __name__)
 # Subscription Helper
 # -------------------------
 def can_search_veterans(user):
-    """
-    Returns True only for Professional or Enterprise Plus active plans.
-    Free and Starter plans can visit the page but cannot search or view profiles.
-    Admins always have access.
-    """
+    """Professional and Enterprise Plus can search and view profiles."""
     if not user:
         return False
-
     if user.is_admin():
         return True
-
     from models.subscription import Subscription
     sub = Subscription.get_for_user(user)
     if sub and sub.is_active():
         return sub.plan_type in ('professional', 'enterprise_plus')
+    return False
 
+def can_browse_veterans(user):
+    """Starter and above can browse veteran profiles (view only, no CV download)."""
+    if not user:
+        return False
+    if user.is_admin():
+        return True
+    from models.subscription import Subscription
+    sub = Subscription.get_for_user(user)
+    if sub and sub.is_active():
+        return sub.plan_type in ('starter', 'professional', 'enterprise_plus')
     return False
 
 

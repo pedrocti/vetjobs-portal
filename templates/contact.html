@@ -1,152 +1,152 @@
 {% extends "base.html" %}
-
-{% block title %}Contact Us - Veteran-Employer Job Portal{% endblock %}
+{% block title %}Contact Us — VetJobPortal{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <div class="text-center mb-5">
-                <h1 class="fw-bold mb-3">Contact Us</h1>
-                <p class="lead text-muted"> Reach out to us with any questions or feedback.</p>
-            </div>
-        </div>
+<section style="background:#04080f;min-height:100vh;padding:60px 20px 80px;">
+  <div class="container" style="max-width:960px;">
+
+    <!-- Header -->
+    <div class="text-center mb-5">
+      <p class="section-label">Get In Touch</p>
+      <h1 class="section-title">Contact <em>Our Team</em></h1>
+      <div class="vp-divider"></div>
+      <p class="section-subtitle">Whether you're a veteran, employer or partner — we're here to help.</p>
     </div>
 
-    <div class="row">
-        <!-- Contact Form -->
-        <div class="col-lg-8 mb-4">
-            <div class="card shadow">
-                <div class="card-body p-5">
-                    <h4 class="fw-bold mb-4">Send us a Message</h4>
-                    
-                    <form method="POST">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="first_name" class="form-label">First Name *</label>
-                                <input type="text" class="form-control" id="first_name" name="first_name" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="last_name" class="form-label">Last Name *</label>
-                                <input type="text" class="form-control" id="last_name" name="last_name" required>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email Address *</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="fas fa-envelope"></i>
-                                </span>
-                                <input type="email" class="form-control" id="email" name="email" required>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="subject" class="form-label">Subject *</label>
-                            <select class="form-select" id="subject" name="subject" required>
-                                <option value="">Select a subject</option>
-                                <option value="general">General Inquiry</option>
-                                <option value="veteran_support">Veteran Support</option>
-                                <option value="employer_services">Employer Services</option>
-                                <option value="technical_support">Technical Support</option>
-                                <option value="partnership">Partnership Opportunities</option>
-                                <option value="feedback">Feedback</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="message" class="form-label">Message *</label>
-                            <textarea class="form-control" id="message" name="message" rows="5" placeholder="Tell us how we can help you..." required></textarea>
-                        </div>
-                        
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-paper-plane me-2"></i>Send Message
-                            </button>
-                        </div>
-                    </form>
-                </div>
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;">
+
+      <!-- Contact Form -->
+      <div style="background:#080f1e;border:1px solid rgba(255,255,255,0.06);padding:36px 40px;">
+        <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:24px;">Send a Message</div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+            <div style="padding:12px 16px;margin-bottom:20px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);color:#4ade80;font-size:13px;border-radius:2px;">
+              <i class="fas fa-check-circle me-2"></i>{{ message }}
             </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+            <div>
+              <label style="font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);display:block;margin-bottom:6px;">First Name *</label>
+              <input type="text" name="first_name" required
+                     style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);padding:11px 14px;color:#fff;font-size:14px;outline:none;transition:border-color 0.2s;"
+                     onfocus="this.style.borderColor='rgba(212,175,55,0.4)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+            </div>
+            <div>
+              <label style="font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);display:block;margin-bottom:6px;">Last Name *</label>
+              <input type="text" name="last_name" required
+                     style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);padding:11px 14px;color:#fff;font-size:14px;outline:none;transition:border-color 0.2s;"
+                     onfocus="this.style.borderColor='rgba(212,175,55,0.4)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <label style="font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);display:block;margin-bottom:6px;">Email Address *</label>
+            <input type="email" name="email" required
+                   style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);padding:11px 14px;color:#fff;font-size:14px;outline:none;transition:border-color 0.2s;"
+                   onfocus="this.style.borderColor='rgba(212,175,55,0.4)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <label style="font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);display:block;margin-bottom:6px;">Subject *</label>
+            <select name="subject" required
+                    style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);padding:11px 14px;color:rgba(255,255,255,0.7);font-size:14px;outline:none;">
+              <option value="">Select a subject</option>
+              <option value="general">General Inquiry</option>
+              <option value="veteran_support">Veteran Support</option>
+              <option value="employer_services">Employer Services</option>
+              <option value="technical_support">Technical Support</option>
+              <option value="partnership">Partnership Opportunities</option>
+              <option value="feedback">Feedback</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom:24px;">
+            <label style="font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);display:block;margin-bottom:6px;">Message *</label>
+            <textarea name="message" rows="6" required
+                      placeholder="Tell us how we can help..."
+                      style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);padding:11px 14px;color:#fff;font-size:14px;outline:none;resize:vertical;transition:border-color 0.2s;font-family:inherit;"
+                      onfocus="this.style.borderColor='rgba(212,175,55,0.4)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'"></textarea>
+          </div>
+
+          <button type="submit" class="btn-vp-primary" style="width:100%;justify-content:center;padding:13px;">
+            <i class="fas fa-paper-plane"></i><span>Send Message</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Contact Info -->
+      <div style="display:flex;flex-direction:column;gap:4px;">
+
+        <!-- Contact details -->
+        <div style="background:#080f1e;border:1px solid rgba(255,255,255,0.06);padding:28px;">
+          <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:20px;">Contact Details</div>
+          {% for icon, label, value in [
+            ("fa-envelope", "Email", "support@vetjobportal.com"),
+            ("fa-phone",   "Phone", "+234-911-029-8851"),
+            ("fa-clock",   "Hours", "Mon–Fri: 8AM–6PM WAT"),
+          ] %}
+          <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;">
+            <div style="width:36px;height:36px;flex-shrink:0;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);display:flex;align-items:center;justify-content:center;">
+              <i class="fas {{ icon }}" style="color:var(--gold);font-size:13px;"></i>
+            </div>
+            <div>
+              <div style="font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:3px;">{{ label }}</div>
+              <div style="font-size:13px;color:rgba(255,255,255,0.7);">{{ value }}</div>
+            </div>
+          </div>
+          {% endfor %}
         </div>
 
-        <!-- Contact Information -->
-        <div class="col-lg-4">
-            <div class="card shadow mb-4">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold mb-4">Get in Touch</h5>
-                    
-                    <div class="d-flex mb-3">
-                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; min-width: 40px;">
-                            <i class="fas fa-envelope"></i>
-                        </div>
-                        <div>
-                            <h6 class="fw-bold mb-1">Email</h6>
-                            <p class="text-muted mb-0">support@vetjobportal.com</p>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex mb-3">
-                        <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; min-width: 40px;">
-                            <i class="fas fa-phone"></i>
-                        </div>
-                        <div>
-                            <h6 class="fw-bold mb-1">Phone</h6>
-                            <p class="text-muted mb-0">+234-911-029-8851</p>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex mb-3">
-                        <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; min-width: 40px;">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div>
-                            <h6 class="fw-bold mb-1">Support Hours</h6>
-                            <p class="text-muted mb-0">Mon-Fri: 8AM-6PM EST</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card shadow mb-4">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold mb-4">Quick Support</h5>
-                    
-                    <div class="d-grid gap-2">
-                        <a href="#" class="btn btn-outline-primary">
-                            <i class="fas fa-question-circle me-2"></i>FAQ
-                        </a>
-                        <a href="#" class="btn btn-outline-success">
-                            <i class="fas fa-book me-2"></i>Help Center
-                        </a>
-                        <a href="#" class="btn btn-outline-info">
-                            <i class="fas fa-comments me-2"></i>Live Chat
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card shadow">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold mb-4">Follow Us</h5>
-                    
-                    <div class="d-flex gap-3">
-                        <a href="https://web.facebook.com/profile.php?id=61580578907586" target="_blank" class="btn btn-outline-primary">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="https://x.com/VetConnectxlm" target="_blank" class="btn btn-outline-info">
-                            <i class="fab fa-x-twitter"></i>
-                        </a>
-                        <a href="#" class="btn btn-outline-primary">
-                            <i class="fab fa-linkedin-in"></i>
-                        </a>
-                        <a href="https://www.instagram.com/vetconnectxlm/" target="_blank" class="btn btn-outline-danger">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
+        <!-- Social -->
+        <div style="background:#080f1e;border:1px solid rgba(255,255,255,0.06);padding:28px;">
+          <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:16px;">Follow Us</div>
+          <div style="display:flex;gap:10px;">
+            {% for icon, url, label in [
+              ("fab fa-facebook-f",  "https://web.facebook.com/profile.php?id=61580578907586", "Facebook"),
+              ("fab fa-x-twitter",   "https://x.com/VetConnectxlm", "X"),
+              ("fab fa-instagram",   "https://www.instagram.com/vetconnectxlm/", "Instagram"),
+              ("fab fa-linkedin-in", "#", "LinkedIn"),
+            ] %}
+            <a href="{{ url }}" target="_blank"
+               style="width:38px;height:38px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.4);text-decoration:none;transition:all 0.2s;"
+               onmouseover="this.style.borderColor='rgba(212,175,55,0.3)';this.style.color='var(--gold)'"
+               onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.4)'"
+               title="{{ label }}">
+              <i class="{{ icon }}" style="font-size:13px;"></i>
+            </a>
+            {% endfor %}
+          </div>
         </div>
+
+        <!-- Response time -->
+        <div style="background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.15);border-left:2px solid var(--gold);padding:20px 24px;">
+          <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;color:var(--gold);margin-bottom:6px;">
+            <i class="fas fa-bolt me-1"></i>Response Time
+          </div>
+          <p style="font-size:12px;color:rgba(255,255,255,0.5);margin:0;line-height:1.6;">
+            We typically respond within <strong style="color:rgba(255,255,255,0.7);">24 hours</strong> on business days. Urgent matters can be escalated via WhatsApp.
+          </p>
+        </div>
+
+      </div>
     </div>
-</div>
+  </div>
+</section>
+
+<style>
+@media (max-width: 767px) {
+  div[style*="grid-template-columns:1fr 340px"] {
+    grid-template-columns: 1fr !important;
+  }
+  div[style*="padding:36px 40px"] {
+    padding: 24px 20px !important;
+  }
+}
+</style>
 {% endblock %}

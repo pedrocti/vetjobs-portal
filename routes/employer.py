@@ -425,3 +425,68 @@ def view_job(job_id):
         return redirect(url_for('employer.manage_jobs'))
 
     return render_template("employer/view_job.html", job_post=job)
+
+@employer_bp.route('/analytics')
+@login_required
+def analytics():
+    """Employer hiring analytics — Pro and Enterprise Plus only."""
+    if not current_user.is_employer():
+        flash('Access denied.', 'error')
+        return redirect(url_for('main.index'))
+
+    from models.subscription import Subscription
+    sub = Subscription.get_or_create_for_user(current_user)
+    if not sub.can_use_feature('analytics_access'):
+        flash('Analytics requires a Professional or Enterprise Plus plan.', 'warning')
+        return redirect(url_for('payments.employer_subscription_plans'))
+
+    from models import JobPosting, JobApplication, User
+    from sqlalchemy import func
+
+    # Job stats
+    jobs = JobPosting.query.filter_by(posted_by=current_user.id).all()
+    total_jobs     = len(jobs)
+    active_jobs    = sum(1 for j in jobs if j.is_active and j.status == 'approved')
+    pending_jobs   = sum(1 for j in jobs if j.status == 'pending')
+
+    # Application stats
+    apps = (
+        db.session.query(JobApplication)
+        .join(JobPosting, JobApplication.job_id == JobPosting.id)
+        .filter(JobPosting.posted_by == current_user.id)
+        .all()
+    )
+    total_apps    = len(apps)
+    pending_apps  = sum(1 for a in apps if a.status == 'pending')
+    reviewed_apps = sum(1 for a in apps if a.status == 'reviewed')
+    accepted_apps = sum(1 for a in apps if a.status == 'accepted')
+    rejected_apps = sum(1 for a in apps if a.status == 'rejected')
+    interview_apps = sum(1 for a in apps if a.status == 'interview')
+
+    # Per-job breakdown
+    job_breakdown = []
+    for job in sorted(jobs, key=lambda j: j.created_at, reverse=True)[:10]:
+        job_apps = [a for a in apps if a.job_id == job.id]
+        job_breakdown.append({
+            'job': job,
+            'total': len(job_apps),
+            'pending': sum(1 for a in job_apps if a.status == 'pending'),
+            'accepted': sum(1 for a in job_apps if a.status == 'accepted'),
+            'rejected': sum(1 for a in job_apps if a.status == 'rejected'),
+            'interview': sum(1 for a in job_apps if a.status == 'interview'),
+        })
+
+    return render_template(
+        'employer/analytics.html',
+        total_jobs=total_jobs,
+        active_jobs=active_jobs,
+        pending_jobs=pending_jobs,
+        total_apps=total_apps,
+        pending_apps=pending_apps,
+        reviewed_apps=reviewed_apps,
+        accepted_apps=accepted_apps,
+        rejected_apps=rejected_apps,
+        interview_apps=interview_apps,
+        job_breakdown=job_breakdown,
+        subscription=sub,
+    )

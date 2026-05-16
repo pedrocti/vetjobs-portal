@@ -270,6 +270,43 @@ def download_document(filename):
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
 
 
+@veteran_bp.route('/cv/<int:user_id>')
+@login_required
+def download_cv(user_id):
+    from models.subscription import Subscription
+    if current_user.is_admin():
+        pass
+    elif current_user.is_employer():
+        sub = Subscription.get_or_create_for_user(current_user)
+        if not sub.is_active() or not sub.is_cv_access_granted():
+            flash('CV download requires a Professional or Enterprise Plus plan.', 'warning')
+            return redirect(url_for('payments.employer_subscription_plans'))
+    else:
+        flash('Access denied.', 'error')
+        return redirect(url_for('main.index'))
+
+    profile = VeteranProfile.query.filter_by(user_id=user_id).first()
+    if not profile or not profile.resume_file:
+        flash('CV not available.', 'warning')
+        return redirect(url_for('main.index'))
+
+    import os
+    resume_folder = current_app.config.get('RESUME_FOLDER', current_app.config.get('UPLOAD_FOLDER'))
+    fname = secure_filename(profile.resume_file)
+    
+    # Try RESUME_FOLDER first, then UPLOAD_FOLDER
+    if not os.path.exists(os.path.join(resume_folder, fname)):
+        upload_folder = current_app.config.get('UPLOAD_FOLDER')
+        if os.path.exists(os.path.join(upload_folder, fname)):
+            resume_folder = upload_folder
+        else:
+            flash('CV file not found. The veteran may need to re-upload their CV.', 'warning')
+            return redirect(request.referrer or url_for('main.index'))
+    
+    download_name = f"{profile.user.first_name}_{profile.user.last_name}_CV.pdf"
+    return send_from_directory(resume_folder, fname, as_attachment=True, download_name=download_name)
+
+
 # ===============================
 # Public Profile
 # ===============================
@@ -279,29 +316,39 @@ def download_document(filename):
 def public_profile(user_id):
     from models.subscription import Subscription
 
-    # Employers must have Professional or Enterprise Plus to view veteran profiles
     if current_user.is_employer():
-        sub = Subscription.query.filter_by(user_id=current_user.id).first()
-        has_access = (
-            sub
-            and sub.status == 'active'
-            and sub.expires_at
-            and sub.expires_at > datetime.utcnow()
-            and sub.plan_type in ('professional', 'enterprise_plus')
-        )
-        if not has_access:
+        sub = Subscription.get_or_create_for_user(current_user)
+        if not sub.is_active() or sub.plan_type not in ('professional', 'enterprise_plus'):
             flash("Viewing veteran profiles requires a Professional or Enterprise Plus plan.", "warning")
             return redirect(url_for("payments.employer_subscription_plans"))
 
     user = User.query.get_or_404(user_id)
     profile = user.veteran_profile
-
     if not profile:
         flash("This veteran's profile is not available.", "warning")
         return redirect(url_for("main.index"))
 
+    can_view_cv     = False
+    can_download_cv = False
+    can_contact     = False
+
+    if current_user.is_employer():
+        sub = Subscription.get_or_create_for_user(current_user)
+        if sub and sub.is_active():
+            can_view_cv     = sub.is_cv_view_granted()
+            can_download_cv = sub.is_cv_access_granted()
+            can_contact     = bool(sub.can_contact_candidates)
+    elif current_user.is_admin():
+        can_view_cv     = True
+        can_download_cv = True
+        can_contact     = True
+
     return render_template(
         "veteran/public_profile.html",
         user=user,
-        profile=profile
+        profile=profile,
+        can_view_cv=can_view_cv,
+        can_download_cv=can_download_cv,
+        can_contact=can_contact,
     )
+

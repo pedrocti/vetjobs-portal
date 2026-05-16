@@ -45,8 +45,12 @@
       <a class="emp-mob-link {% if request.endpoint == 'search.search_veterans' %}active{% endif %}" href="{{ url_for('search.search_veterans') }}"><i class="fas fa-user-check"></i>Find Veterans</a>
 
       <span class="emp-mob-nav-label">Account</span>
-      <a class="emp-mob-link {% if request.endpoint == 'messaging.inbox' %}active{% endif %}" href="{{ url_for('messaging.inbox') }}"><i class="fas fa-inbox"></i>Messages</a>
-      <a class="emp-mob-link {% if request.endpoint == 'payments.init_payment' %}active{% endif %}" href="{{ url_for('payments.init_payment') }}"><i class="fas fa-credit-card"></i>Billing</a>
+      <a class="emp-mob-link {% if request.endpoint == 'messaging.inbox' %}active{% endif %}" href="{{ url_for('messaging.inbox') }}"><i class="fas fa-inbox"></i>Messages
+        {% if unread_messages and unread_messages > 0 %}
+        <span style="margin-left:auto;background:#ef4444;color:#fff;font-family:var(--font-cond);font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;">{{ unread_messages if unread_messages < 100 else '99+' }}</span>
+        {% endif %}
+      </a>
+      
       <a class="emp-mob-link {% if request.endpoint == 'employer.edit_profile' %}active{% endif %}" href="{{ url_for('employer.edit_profile') }}"><i class="fas fa-building"></i>Company Profile</a>
       <a class="emp-mob-link" href="{{ url_for('main.contact') }}"><i class="fas fa-life-ring"></i>Support</a>
     </nav>
@@ -72,6 +76,14 @@
 
   <!-- SIDEBAR -->
   <nav class="emp-sidebar d-none d-md-flex">
+
+    <!-- Brand -->
+    <div class="emp-sidebar-header">
+      <img src="{{ url_for('static', filename='images/vetjoblogo1.webp') }}" alt="VetJobPortal" style="height:26px;width:auto;">
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;letter-spacing:0.08em;white-space:nowrap;">
+        <span style="color:#fff;">VET</span><span style="color:var(--gold);">JOB</span><span style="color:#fff;">PORTAL</span>
+      </span>
+    </div>
 
     <!-- Identity -->
     <div class="emp-sidebar-brand">
@@ -122,13 +134,19 @@
       <li>
         <a href="{{ url_for('messaging.inbox') }}" class="emp-nav-link {% if request.endpoint == 'messaging.inbox' %}active{% endif %}">
           <i class="fas fa-inbox"></i><span>Messages</span>
+          {% if unread_messages and unread_messages > 0 %}
+          <span style="margin-left:auto;background:#ef4444;color:#fff;font-family:var(--font-cond);font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center;">{{ unread_messages if unread_messages < 100 else '99+' }}</span>
+          {% endif %}
         </a>
       </li>
+      {% if can_use_analytics %}
       <li>
-        <a href="{{ url_for('payments.init_payment') }}" class="emp-nav-link {% if request.endpoint == 'payments.init_payment' %}active{% endif %}">
-          <i class="fas fa-credit-card"></i><span>Billing</span>
+        <a href="{{ url_for('employer.analytics') }}" class="emp-nav-link {% if request.endpoint == 'employer.analytics' %}active{% endif %}">
+          <i class="fas fa-chart-bar"></i><span>Analytics</span>
         </a>
       </li>
+      {% endif %}
+
       <li>
         <a href="{{ url_for('employer.edit_profile') }}" class="emp-nav-link {% if request.endpoint == 'employer.edit_profile' %}active{% endif %}">
           <i class="fas fa-building"></i><span>Company Profile</span>
@@ -400,9 +418,9 @@
         <div class="emp-card">
           <div class="emp-card-header">
             <span>
-              <i class="fas fa-robot" style="color: var(--gold);"></i> AI Suggested Veterans
+              <i class="fas fa-user-check" style="color: var(--gold);"></i> Matched Candidates
               {% if can_use_ai %}
-              <span class="emp-ai-badge">AI Matching</span>
+              <span class="emp-ai-badge">Smart Matching</span>
               {% endif %}
             </span>
             {% if can_use_ai %}
@@ -414,10 +432,10 @@
             {% if not can_use_ai %}
             <div class="emp-empty-state">
               <div class="emp-empty-icon"><i class="fas fa-robot"></i></div>
-              <h6>AI Matching is a Pro Feature</h6>
-              <p>Upgrade to <strong>Professional</strong> or <strong>Enterprise Plus</strong> to get AI-powered veteran suggestions matched to your job postings.</p>
+              <h6>Smart Matching is a Pro Feature</h6>
+              <p>Upgrade to <strong>Professional</strong> or <strong>Enterprise Plus</strong> to get candidates matched to your job postings automatically.</p>
               <a href="{{ url_for('payments.employer_subscription_plans') }}" class="emp-cta-btn emp-cta-gold">
-                <i class="fas fa-crown me-1"></i>Unlock AI Matching
+                <i class="fas fa-arrow-up me-1"></i>Unlock Smart Matching
               </a>
             </div>
 
@@ -556,42 +574,91 @@
               </p>
               {% endif %}
 
+              {% if not subscription.is_active() %}
+              <!-- Expired state — show what they had and what they lost -->
+              <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);padding:12px 14px;margin-bottom:14px;">
+                <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#f87171;margin-bottom:6px;">
+                  <i class="fas fa-exclamation-circle me-1"></i>Plan Expired
+                </div>
+                <p style="font-size:12px;color:rgba(255,255,255,0.5);margin:0;line-height:1.6;">
+                  Your {{ subscription.plan_type | replace('_',' ') | title }} plan expired on
+                  {{ subscription.expires_at.strftime('%b %d, %Y') }}.
+                  You have been moved to the Free plan — renew to restore full access.
+                </p>
+              </div>
+              {% endif %}
+
               <ul class="emp-plan-features">
+                <!-- Job postings -->
                 <li class="{% if can_post_job %}feat-on{% else %}feat-off{% endif %}">
                   <i class="fas fa-{% if can_post_job %}check{% else %}times{% endif %}"></i>
-                  Job Postings {% if subscription.max_job_posts == -1 %}(Unlimited){% else %}(up to {{ subscription.max_job_posts }}){% endif %}
+                  {% if subscription.max_job_posts == -1 %}
+                    Unlimited Job Postings
+                  {% else %}
+                    Job Postings ({{ subscription.max_job_posts }} max)
+                  {% endif %}
                 </li>
-                <li class="{% if can_contact %}feat-on{% else %}feat-off{% endif %}">
-                  <i class="fas fa-{% if can_contact %}check{% else %}times{% endif %}"></i>
-                  Contact Candidates
+
+                <!-- CV view — Starter and above -->
+                <li class="{% if can_view_cv %}feat-on{% else %}feat-off{% endif %}">
+                  <i class="fas fa-{% if can_view_cv %}check{% else %}times{% endif %}"></i>
+                  View Veteran CVs Online
                 </li>
+
+                <!-- CV download — Pro and above -->
                 <li class="{% if can_access_cv %}feat-on{% else %}feat-off{% endif %}">
                   <i class="fas fa-{% if can_access_cv %}check{% else %}times{% endif %}"></i>
-                  CV / Resume Access
+                  Download CVs
+                  {% if can_view_cv and not can_access_cv %}
+                  <span style="font-size:10px;color:rgba(255,255,255,0.3);margin-left:4px;">(upgrade to download)</span>
+                  {% endif %}
                 </li>
-                <li class="{% if can_use_analytics %}feat-on{% else %}feat-off{% endif %}">
-                  <i class="fas fa-{% if can_use_analytics %}check{% else %}times{% endif %}"></i>
-                  Analytics Dashboard
+
+                <!-- Direct messaging — Pro and above -->
+                <li class="{% if can_contact %}feat-on{% else %}feat-off{% endif %}">
+                  <i class="fas fa-{% if can_contact %}check{% else %}times{% endif %}"></i>
+                  Direct Messaging
                 </li>
-                <li class="{% if can_use_ai %}feat-on{% else %}feat-off{% endif %}">
-                  <i class="fas fa-{% if can_use_ai %}check{% else %}times{% endif %}"></i>
-                  AI Talent Suggestions
-                </li>
+
+                <!-- Job boosts -->
                 {% if job_boosts > 0 %}
                 <li class="feat-boost">
                   <i class="fas fa-bolt"></i>
-                  {{ job_boosts }} Job Boost{{ 's' if job_boosts != 1 else '' }}
+                  {{ job_boosts }} Job Boost{{ 's' if job_boosts != 1 else '' }} / month
+                </li>
+                {% else %}
+                <li class="feat-off">
+                  <i class="fas fa-times"></i>
+                  Job Boosts
                 </li>
                 {% endif %}
               </ul>
             {% else %}
-              <p class="emp-plan-none">No active plan found.</p>
+              <!-- No subscription at all -->
+              <div style="padding:16px 0;">
+                <p style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:14px;line-height:1.6;">
+                  You are on the Free plan. Upgrade to access veteran CVs,
+                  direct messaging and more job postings.
+                </p>
+                <ul class="emp-plan-features">
+                  <li class="feat-on"><i class="fas fa-check"></i>1 Job Posting</li>
+                  <li class="feat-off"><i class="fas fa-times"></i>View Veteran CVs</li>
+                  <li class="feat-off"><i class="fas fa-times"></i>Direct Messaging</li>
+                  <li class="feat-off"><i class="fas fa-times"></i>Job Boosts</li>
+                </ul>
+              </div>
             {% endif %}
 
             <a href="{{ url_for('payments.employer_subscription_plans') }}"
-               class="emp-plan-cta {% if subscription and subscription.plan_type != 'free' and subscription.is_active() %}emp-plan-cta-manage{% else %}emp-plan-cta-upgrade{% endif %}">
-              <i class="fas fa-{% if subscription and subscription.plan_type != 'free' and subscription.is_active() %}cog{% else %}arrow-up{% endif %} me-1"></i>
-              {% if subscription and subscription.plan_type != 'free' and subscription.is_active() %}Manage Plan{% else %}Upgrade Now{% endif %}
+               class="emp-plan-cta {% if subscription and subscription.plan_type not in ('free', None) and subscription.is_active() %}emp-plan-cta-manage{% else %}emp-plan-cta-upgrade{% endif %}">
+              <i class="fas fa-{% if subscription and subscription.plan_type not in ('free', None) and subscription.is_active() %}cog{% else %}arrow-up{% endif %} me-1"></i>
+              {% if subscription and subscription.plan_type not in ('free', None) and subscription.is_active() %}
+                Manage Plan
+              {% elif subscription and not subscription.is_active() and subscription.plan_type not in ('free', None) %}
+                Renew Plan
+              {% else %}
+                Upgrade Now
+              {% endif %}
             </a>
           </div>
         </div>
@@ -641,8 +708,12 @@
   <a href="{{ url_for('search.search_veterans') }}" class="vp-tab {% if request.endpoint == 'search.search_veterans' %}active{% endif %}">
     <i class="fas fa-user-check"></i><span>Find Vets</span>
   </a>
-  <a href="{{ url_for('messaging.inbox') }}" class="vp-tab {% if request.endpoint == 'messaging.inbox' %}active{% endif %}">
-    <i class="fas fa-inbox"></i><span>Messages</span>
+  <a href="{{ url_for('messaging.inbox') }}" class="vp-tab {% if request.endpoint == 'messaging.inbox' %}active{% endif %}" style="position:relative;">
+    <i class="fas fa-inbox"></i>
+    {% if unread_messages and unread_messages > 0 %}
+    <span style="position:absolute;top:6px;right:calc(50% - 18px);background:#ef4444;color:#fff;font-family:var(--font-cond);font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;min-width:16px;text-align:center;line-height:1.4;">{{ unread_messages if unread_messages < 100 else '99+' }}</span>
+    {% endif %}
+    <span>Messages</span>
   </a>
 </nav>
 
@@ -658,11 +729,11 @@
 
   /* ── SIDEBAR ──────────────────────────────────────────── */
   .emp-sidebar {
-      width: 220px;
+      width: 240px;
       flex-shrink: 0;
       flex-direction: column;
       gap: 0;
-      padding: 24px 0;
+      padding: 0;
       background: #080f1e;
       border-right: 1px solid rgba(255,255,255,0.05);
       position: sticky;
@@ -673,26 +744,35 @@
   }
   .emp-sidebar::-webkit-scrollbar { display: none; }
 
-  .emp-sidebar-brand {
+  .emp-sidebar-header {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 0 20px 20px;
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      flex-shrink: 0;
+  }
+
+  .emp-sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px 16px;
       border-bottom: 1px solid rgba(255,255,255,0.05);
       margin-bottom: 8px;
   }
 
   .emp-sidebar-avatar {
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       flex-shrink: 0;
       background: rgba(212,175,55,0.1);
-      border-left: 2px solid var(--gold);
+      border-left: 3px solid var(--gold);
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: var(--font-cond);
-      font-size: 13px;
+      font-size: 15px;
       font-weight: 800;
       color: var(--gold);
       letter-spacing: 0.5px;
@@ -700,25 +780,25 @@
 
   .emp-sidebar-name {
       font-family: var(--font-cond);
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 700;
-      color: rgba(255,255,255,0.85);
+      color: rgba(255,255,255,0.9);
       letter-spacing: 0.5px;
       line-height: 1.2;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 130px;
+      max-width: 140px;
   }
 
   .emp-sidebar-badge {
       font-family: var(--font-cond);
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 700;
       letter-spacing: 1px;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.35);
-      margin-top: 2px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 3px;
       display: block;
   }
 
@@ -730,12 +810,12 @@
 
   .emp-sidebar-section-label {
       font-family: var(--font-cond);
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 700;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.2);
-      padding: 8px 20px 4px;
+      color: rgba(255,255,255,0.25);
+      padding: 10px 20px 4px;
       display: block;
   }
 
@@ -751,13 +831,13 @@
   .emp-nav-link {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 8px 20px;
+      gap: 12px;
+      padding: 10px 20px;
       font-family: var(--font-cond);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 700;
       letter-spacing: 0.5px;
-      color: rgba(255,255,255,0.5);
+      color: rgba(255,255,255,0.55);
       text-decoration: none;
       transition: all 0.15s ease;
       border-left: 2px solid transparent;
@@ -765,9 +845,9 @@
   }
 
   .emp-nav-link i:first-child {
-      width: 14px;
+      width: 16px;
       text-align: center;
-      font-size: 12px;
+      font-size: 14px;
       flex-shrink: 0;
       opacity: 0.6;
       transition: opacity 0.15s ease;

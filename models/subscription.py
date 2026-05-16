@@ -70,18 +70,20 @@ class Subscription(db.Model):
         )
 
     def _has_premium_access(self):
-        """
-        INTERNAL ONLY:
-        Defines plans that can access CV system.
-        """
+        """Plans that can download/export CVs."""
         return self.plan_type in ['professional', 'enterprise_plus']
 
+    def _has_cv_view_access(self):
+        """Plans that can view CVs online (not download)."""
+        return self.plan_type in ['starter', 'professional', 'enterprise_plus']
+
     def is_cv_access_granted(self):
-        """
-        🚨 FINAL SECURITY GATE (USE THIS IN ROUTES)
-        ONLY Professional + Enterprise can access CVs.
-        """
+        """Download/export access — Professional and Enterprise Plus only."""
         return self.is_active() and self._has_premium_access()
+
+    def is_cv_view_granted(self):
+        """View-only CV access — Starter and above."""
+        return self.is_active() and self._has_cv_view_access()
 
     def enforce_cv_access(self):
         """
@@ -155,6 +157,7 @@ class Subscription(db.Model):
                 'max_job_posts': 1,
                 'can_contact_candidates': False,
                 'can_export_resumes': False,
+                'can_view_cv': False,
                 'job_boosts': 0,
                 'analytics_access': False,
                 'team_accounts': False,
@@ -165,11 +168,11 @@ class Subscription(db.Model):
                 'amount': 0,
                 'name': 'Free Plan'
             },
-
             'starter': {
                 'max_job_posts': 3,
                 'can_contact_candidates': False,
                 'can_export_resumes': False,
+                'can_view_cv': True,
                 'job_boosts': 0,
                 'analytics_access': False,
                 'team_accounts': False,
@@ -180,25 +183,26 @@ class Subscription(db.Model):
                 'amount': 15000,
                 'name': 'Starter Plan'
             },
-
             'professional': {
                 'max_job_posts': -1,
                 'can_contact_candidates': True,
                 'can_export_resumes': True,
+                'can_view_cv': True,
                 'smart_candidate_matching': True,
                 'ai_talent_suggestions': True,
                 'job_boosts': 2,
                 'analytics_access': True,
                 'team_accounts': False,
                 'priority_support': True,
+                'dedicated_manager': False,
                 'amount': 49000,
                 'name': 'Professional Plan'
             },
-
             'enterprise_plus': {
                 'max_job_posts': -1,
                 'can_contact_candidates': True,
                 'can_export_resumes': True,
+                'can_view_cv': True,
                 'smart_candidate_matching': True,
                 'ai_talent_suggestions': True,
                 'job_boosts': 5,
@@ -207,11 +211,10 @@ class Subscription(db.Model):
                 'priority_support': True,
                 'dedicated_manager': True,
                 'amount': 99000,
-                'name': 'Enterprise Plan'
+                'name': 'Enterprise Plus Plan'
             }
         }
-
-        return plans.get(plan_type, plans['starter'])
+        return plans.get(plan_type, plans['free'])
 
     # =========================================================
     # 🏗️ SUBSCRIPTION CREATION (SAFE)

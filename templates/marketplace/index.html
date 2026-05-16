@@ -1,80 +1,222 @@
 {% extends "base.html" %}
-{% block title %}Verified Workforce — VetJobPortal{% endblock %}
+{% block title %}Hire Verified Veterans — VetJobPortal{% endblock %}
 
 {% block content %}
 <div style="background:#0a1628;min-height:100vh;">
 
   <!-- ── HERO ── -->
-  <div style="background:linear-gradient(135deg,rgba(212,175,55,0.1) 0%,rgba(10,22,40,0.95) 100%);border-bottom:1px solid rgba(212,175,55,0.15);padding:clamp(40px,8vw,80px) 20px clamp(32px,6vw,60px);">
-    <div class="container text-center">
-      <p style="font-family:var(--font-cond);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">
-        <i class="fas fa-shield-alt me-2"></i>Verified Workforce
-      </p>
-      <h1 style="font-family:var(--font-display);font-size:clamp(32px,6vw,60px);font-weight:700;color:#ffffff;line-height:1.15;margin-bottom:16px;">
-        Hire <em style="color:var(--gold);font-style:italic;">Verified Veterans</em><br>for Any Role
-      </h1>
-      <p style="color:rgba(255,255,255,0.55);font-size:17px;max-width:580px;margin:0 auto 36px;line-height:1.75;">
-      Every candidate is reviewed for discipline, reliability, and readiness before being recommended.      </p>
-      <div class="d-flex gap-3 flex-wrap justify-content-center">
-        <a href="{{ url_for('marketplace.request_personnel') }}"
-           style="display:inline-flex;align-items:center;gap:10px;padding:16px 36px;background:var(--gold);color:#0a1628;border-radius:4px;font-family:var(--font-cond);font-size:14px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;">
-          <i class="fas fa-paper-plane"></i> Request Verified Personnel
-        </a>
-        {% if current_user.is_authenticated and current_user.is_veteran() %}
-        <a href="{{ url_for('marketplace.offer_service') }}"
-           style="display:inline-flex;align-items:center;gap:10px;padding:16px 36px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:#ffffff;border-radius:4px;font-family:var(--font-cond);font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;">
-          <i class="fas fa-hands-helping"></i> Offer My Services
-        </a>
-        {% endif %}
+  <div style="background:linear-gradient(135deg,#0d1f3c 0%,#0a1628 100%);border-bottom:1px solid rgba(212,175,55,0.12);padding:clamp(60px,10vw,100px) 20px clamp(48px,8vw,80px);position:relative;overflow:hidden;">
+    <!-- Decorative background elements -->
+    <div style="position:absolute;top:0;right:0;width:50%;height:100%;background:linear-gradient(270deg,rgba(212,175,55,0.04) 0%,transparent 60%);pointer-events:none;"></div>
+    <div style="position:absolute;bottom:-60px;right:10%;width:300px;height:300px;border:1px solid rgba(212,175,55,0.06);border-radius:50%;pointer-events:none;"></div>
+    <div style="position:absolute;bottom:-20px;right:15%;width:180px;height:180px;border:1px solid rgba(212,175,55,0.04);border-radius:50%;pointer-events:none;"></div>
+
+    <div class="container" style="position:relative;">
+      <div style="display:grid;grid-template-columns:1fr 400px;gap:60px;align-items:center;max-width:1100px;margin:0 auto;">
+
+        <!-- Left: Text -->
+        <div>
+          <p style="font-family:var(--font-cond);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;">
+            <i class="fas fa-shield-alt me-2"></i>Nigeria's Verified Military Talent
+          </p>
+          <h1 style="font-family:var(--font-display);font-size:clamp(32px,5vw,56px);font-weight:700;color:#ffffff;line-height:1.1;margin-bottom:20px;">
+            Two Ways to Hire<br>
+            <em style="color:var(--gold);font-style:italic;">Verified Veterans</em>
+          </h1>
+          <p style="color:rgba(255,255,255,0.55);font-size:16px;max-width:500px;line-height:1.85;margin-bottom:32px;">
+            Every candidate is identity-verified, background-checked and service-record confirmed before being listed. Choose the hiring path that fits your need.
+          </p>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;">
+            {% if current_user.is_authenticated and current_user.is_employer() %}
+            <a href="{{ url_for('employer.post_job') }}" class="btn-vp-primary" style="padding:13px 24px;font-size:12px;">
+              <i class="fas fa-plus-circle"></i><span>Post a Job</span>
+            </a>
+            {% else %}
+            <a href="{{ url_for('auth.register') }}?type=employer" class="btn-vp-primary" style="padding:13px 24px;font-size:12px;">
+              <i class="fas fa-building"></i><span>Register as Employer</span>
+            </a>
+            {% endif %}
+            <a href="{{ url_for('marketplace.request_personnel') }}"
+               style="display:inline-flex;align-items:center;gap:8px;padding:13px 24px;background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;transition:all 0.2s;"
+               onmouseover="this.style.borderColor='rgba(212,175,55,0.4)';this.style.color='var(--gold)'"
+               onmouseout="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='rgba(255,255,255,0.7)'">
+              <i class="fas fa-paper-plane"></i><span>Request Personnel</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Right: Image + stats -->
+        <div style="position:relative;">
+          <div style="background:linear-gradient(135deg,rgba(212,175,55,0.1) 0%,rgba(10,22,40,0.8) 100%);border:1px solid rgba(212,175,55,0.2);padding:0;overflow:hidden;height:380px;position:relative;">
+            <img src="{{ url_for('static', filename='images/teams2.webp') }}"
+                 alt="Verified Veterans"
+                 style="width:100%;height:100%;object-fit:cover;opacity:0.6;mix-blend-mode:luminosity;">
+            <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(10,22,40,0.9) 100%);"></div>
+            <!-- Overlay stats -->
+            <div style="position:absolute;bottom:0;left:0;right:0;padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(212,175,55,0.1);">
+              {% for value, label in [("100%","Identity Verified"),("24hr","Placement Time")] %}
+              <div style="background:rgba(10,22,40,0.85);padding:14px 16px;text-align:center;">
+                <div style="font-family:var(--font-cond);font-size:22px;font-weight:800;color:var(--gold);">{{ value }}</div>
+                <div style="font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-top:3px;">{{ label }}</div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          <!-- Floating verified badge -->
+          <div style="position:absolute;top:-16px;right:-16px;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);padding:10px 16px;display:flex;align-items:center;gap:8px;">
+            <i class="fas fa-shield-alt" style="color:#4ade80;font-size:14px;"></i>
+            <div>
+              <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;color:#4ade80;">Pre-Vetted</div>
+              <div style="font-family:var(--font-cond);font-size:9px;color:rgba(255,255,255,0.35);">All candidates</div>
+            </div>
+          </div>
+        </div>
+
       </div>
-      {% if total_offers %}
-      <p style="color:rgba(255,255,255,0.3);font-size:13px;margin-top:20px;">
-        <i class="fas fa-users me-1"></i> {{ total_offers }} veteran{{ 's' if total_offers != 1 else '' }} currently available
-      </p>
-      {% endif %}
     </div>
   </div>
 
-  <!-- ── HOW IT WORKS ── -->
-  <div style="border-bottom:1px solid rgba(255,255,255,0.06);padding:56px 20px;">
-    <div class="container">
-      <h3 style="font-family:var(--font-display);font-size:clamp(22px,3vw,30px);color:#ffffff;text-align:center;margin-bottom:40px;">
-        How It Works
-      </h3>
-      <div class="row g-4 text-center">
-        <div class="col-md-4">
-          <div style="width:56px;height:56px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-            <i class="fas fa-paper-plane" style="color:var(--gold);font-size:22px;"></i>
+  <!-- ── TWO SERVICE PATHS ── -->
+  <div style="padding:clamp(60px,10vw,90px) 20px;border-bottom:1px solid rgba(255,255,255,0.06);">
+    <div class="container" style="max-width:1100px;">
+      <div class="text-center mb-5">
+        <p style="font-family:var(--font-cond);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:10px;">Choose Your Path</p>
+        <h2 style="font-family:var(--font-display);font-size:clamp(22px,3vw,32px);color:#fff;margin-bottom:0;">Which service fits your need?</h2>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:1000px;margin:0 auto;">
+
+        <!-- Path 1: Corporate Hiring -->
+        <div style="background:#0d1f3c;border:1px solid rgba(212,175,55,0.15);padding:48px 40px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),rgba(212,175,55,0.2));"></div>
+          <div style="width:56px;height:56px;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:28px;">
+            <i class="fas fa-building" style="color:var(--gold);font-size:22px;"></i>
           </div>
-          <h5 style="color:#ffffff;font-family:var(--font-display);font-size:17px;margin-bottom:8px;">1. Submit Request</h5>
-          <p style="color:rgba(255,255,255,0.5);font-size:13px;line-height:1.7;">Tell us what role you need, your location, and budget. No account required.</p>
-        </div>
-        <div class="col-md-4">
-          <div style="width:56px;height:56px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-            <i class="fas fa-search" style="color:var(--gold);font-size:22px;"></i>
+          <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">For Organisations</div>
+          <h3 style="font-family:var(--font-display);font-size:clamp(20px,2.5vw,26px);font-weight:700;color:#fff;margin-bottom:16px;line-height:1.2;">
+            Corporate Hiring Platform
+          </h3>
+          <p style="font-size:14px;color:rgba(255,255,255,0.55);line-height:1.85;margin-bottom:32px;">
+            Register your organisation, post open roles, and receive applications from pre-vetted veteran candidates. Run a full recruitment process from your employer dashboard.
+          </p>
+          <ul style="list-style:none;padding:0;margin:0 0 36px;display:flex;flex-direction:column;gap:12px;">
+            {% for item in [
+              "Post job openings to verified veterans",
+              "Full applicant tracking — shortlist, review, accept",
+              "Access candidate CVs and service records",
+              "Direct messaging with shortlisted candidates",
+              "Smart matching by skill and service background",
+            ] %}
+            <li style="display:flex;align-items:flex-start;gap:12px;font-size:14px;color:rgba(255,255,255,0.65);line-height:1.6;">
+              <i class="fas fa-check" style="color:var(--gold);font-size:11px;margin-top:4px;flex-shrink:0;"></i>{{ item }}
+            </li>
+            {% endfor %}
+          </ul>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            {% if current_user.is_authenticated and current_user.is_employer() %}
+            <a href="{{ url_for('employer.post_job') }}"
+               style="display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 24px;background:var(--gold);color:#0a1628;font-family:var(--font-cond);font-size:13px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;">
+              <i class="fas fa-plus-circle"></i>Post a Job Now
+            </a>
+            {% elif current_user.is_authenticated %}
+            <a href="{{ url_for('auth.register') }}?type=employer"
+               style="display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 24px;background:var(--gold);color:#0a1628;font-family:var(--font-cond);font-size:13px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;">
+              <i class="fas fa-building"></i>Register as Employer
+            </a>
+            {% else %}
+            <a href="{{ url_for('auth.register') }}?type=employer"
+               style="display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 24px;background:var(--gold);color:#0a1628;font-family:var(--font-cond);font-size:13px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;">
+              <i class="fas fa-building"></i>Register Your Organisation
+            </a>
+            <a href="{{ url_for('auth.login') }}"
+               style="display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;background:transparent;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.5);font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-decoration:none;">
+              <i class="fas fa-sign-in-alt"></i>Already registered? Sign In
+            </a>
+            {% endif %}
           </div>
-          <h5 style="color:#ffffff;font-family:var(--font-display);font-size:17px;margin-bottom:8px;">2. We Select & Match</h5>
-          <p style="color:rgba(255,255,255,0.5);font-size:13px;line-height:1.7;">Our team manually matches you with the best-fit verified veteran from our network.</p>
         </div>
-        <div class="col-md-4">
-          <div style="width:56px;height:56px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-            <i class="fas fa-handshake" style="color:var(--gold);font-size:22px;"></i>
+
+        <!-- Path 2: Direct Placement -->
+        <div style="background:#0d1f3c;border:1px solid rgba(96,165,250,0.15);padding:48px 40px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,rgba(96,165,250,0.6),rgba(96,165,250,0.1));"></div>
+          <div style="width:56px;height:56px;background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:28px;">
+            <i class="fas fa-user-check" style="color:#60a5fa;font-size:22px;"></i>
           </div>
-          <h5 style="color:#ffffff;font-family:var(--font-display);font-size:17px;margin-bottom:8px;">3. Get Introduced</h5>
-          <p style="color:rgba(255,255,255,0.5);font-size:13px;line-height:1.7;">We facilitate the connection and ensure alignment.</p>
+          <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#60a5fa;margin-bottom:12px;">For Individuals & Businesses</div>
+          <h3 style="font-family:var(--font-display);font-size:clamp(20px,2.5vw,26px);font-weight:700;color:#fff;margin-bottom:16px;line-height:1.2;">
+            Direct Placement Service
+          </h3>
+          <p style="font-size:14px;color:rgba(255,255,255,0.55);line-height:1.85;margin-bottom:32px;">
+            Need one person for a specific role — a driver, security detail, estate manager, technician? Submit your requirement and we handle everything. No job board, no long process.
+          </p>
+          <ul style="list-style:none;padding:0;margin:0 0 36px;display:flex;flex-direction:column;gap:12px;">
+            {% for item in [
+              "Submit your requirement — no account needed",
+              "Our team manually selects the best match",
+              "All candidates identity and background verified",
+              "Introduction facilitated within 24 hours",
+              "Drivers, security, technicians, logistics & more",
+            ] %}
+            <li style="display:flex;align-items:flex-start;gap:12px;font-size:14px;color:rgba(255,255,255,0.65);line-height:1.6;">
+              <i class="fas fa-check" style="color:#60a5fa;font-size:11px;margin-top:4px;flex-shrink:0;"></i>{{ item }}
+            </li>
+            {% endfor %}
+          </ul>
+          <a href="{{ url_for('marketplace.request_personnel') }}"
+             style="display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 24px;background:transparent;border:1px solid rgba(96,165,250,0.4);color:#60a5fa;font-family:var(--font-cond);font-size:13px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;transition:all 0.2s;width:100%;box-sizing:border-box;"
+             onmouseover="this.style.background='rgba(96,165,250,0.1)'"
+             onmouseout="this.style.background='transparent'">
+            <i class="fas fa-paper-plane"></i>Submit a Request
+          </a>
+          {% if total_offers %}
+          <div style="margin-top:16px;text-align:center;font-family:var(--font-cond);font-size:11px;color:rgba(255,255,255,0.3);">
+            <i class="fas fa-circle" style="color:#4ade80;font-size:7px;margin-right:5px;"></i>
+            {{ total_offers }} verified professional{{ 's' if total_offers != 1 }} currently available
+          </div>
+          {% endif %}
         </div>
+
       </div>
     </div>
   </div>
 
-  <!-- ── CATEGORIES ── -->
-  <div style="padding:60px 20px;">
-    <div class="container">
-      <p style="font-family:var(--font-cond);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:12px;">Browse by Role</p>
-      <h3 style="font-family:var(--font-display);font-size:clamp(22px,3vw,30px);color:#ffffff;text-align:center;margin-bottom:40px;">
-        What Veterans Are Available For
-      </h3>
-      <div class="row g-4">
+  <!-- ── HOW DIRECT PLACEMENT WORKS ── -->
+  <div style="background:#0d1f3c;padding:clamp(60px,8vw,80px) 20px;border-bottom:1px solid rgba(255,255,255,0.06);">
+    <div class="container" style="max-width:1000px;">
+      <div class="text-center" style="margin-bottom:52px;">
+        <p style="font-family:var(--font-cond);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:10px;">Direct Placement</p>
+        <h3 style="font-family:var(--font-display);font-size:clamp(20px,3vw,28px);color:#fff;margin-bottom:0;">How the Placement Process Works</h3>
+      </div>
+      <div class="row g-5 justify-content-center">
+        {% for num, icon, title, desc in [
+          ("01", "fa-paper-plane", "Submit Your Requirement", "Tell us the role, location, and any specific requirements. No account needed — takes 3 minutes."),
+          ("02", "fa-search", "We Source & Verify", "Our team reviews your requirement and selects a verified veteran whose background, skills and availability match."),
+          ("03", "fa-handshake", "We Make the Introduction", "Within 24 hours we connect you with the selected professional and confirm the engagement details."),
+        ] %}
+        <div class="col-md-4">
+          <div style="text-align:center;padding:0 8px;">
+            <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:3px;color:rgba(212,175,55,0.4);margin-bottom:16px;">STEP {{ num }}</div>
+            <div style="width:64px;height:64px;background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+              <i class="fas {{ icon }}" style="color:var(--gold);font-size:22px;"></i>
+            </div>
+            <h5 style="font-family:var(--font-display);font-size:18px;color:#fff;margin-bottom:12px;">{{ title }}</h5>
+            <p style="font-size:14px;color:rgba(255,255,255,0.45);line-height:1.8;margin:0;">{{ desc }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- ── AVAILABLE ROLES ── -->
+  <div style="padding:clamp(60px,8vw,80px) 20px;border-bottom:1px solid rgba(255,255,255,0.06);">
+    <div class="container" style="max-width:1100px;">
+      <div class="text-center" style="margin-bottom:48px;">
+        <p style="font-family:var(--font-cond);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:10px;">Direct Placement Categories</p>
+        <h3 style="font-family:var(--font-display);font-size:clamp(20px,3vw,28px);color:#fff;margin-bottom:12px;">Professionals Available for Placement</h3>
+        <p style="font-size:14px;color:rgba(255,255,255,0.35);max-width:500px;margin:0 auto;">All professionals are service-verified, background-checked and ready for deployment.</p>
+      </div>
+      <div class="row g-3">
         {% set cat_icons = {
           'driver': 'fa-car',
           'security': 'fa-shield-alt',
@@ -88,18 +230,20 @@
         {% for slug, label in categories %}
         <div class="col-6 col-md-4 col-lg-3">
           <a href="{{ url_for('marketplace.browse', category=slug) }}"
-             style="display:block;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:28px 20px;text-align:center;text-decoration:none;transition:all 0.2s ease;"
-             onmouseover="this.style.borderColor='rgba(212,175,55,0.4)';this.style.background='rgba(212,175,55,0.07)'"
-             onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.background='rgba(255,255,255,0.03)'">
-            <div style="width:52px;height:52px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
-              <i class="fas {{ cat_icons.get(slug, 'fa-user') }}" style="color:var(--gold);font-size:20px;"></i>
+             style="display:flex;align-items:center;gap:16px;padding:20px 22px;background:#0d1f3c;border:1px solid rgba(255,255,255,0.07);text-decoration:none;transition:all 0.2s ease;"
+             onmouseover="this.style.borderColor='rgba(212,175,55,0.3)';this.style.background='rgba(212,175,55,0.05)'"
+             onmouseout="this.style.borderColor='rgba(255,255,255,0.07)';this.style.background='#0d1f3c'">
+            <div style="width:40px;height:40px;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="fas {{ cat_icons.get(slug, 'fa-user') }}" style="color:var(--gold);font-size:16px;"></i>
             </div>
-            <p style="font-family:var(--font-cond);font-size:15px;font-weight:700;color:#ffffff;margin-bottom:4px;">{{ label }}</p>
-            {% if offers_by_cat.get(slug) %}
-            <span style="font-size:11px;color:rgba(74,222,128,0.7);">{{ offers_by_cat[slug] }} available</span>
-            {% else %}
-            <span style="font-size:11px;color:rgba(255,255,255,0.25);">Taking requests</span>
-            {% endif %}
+            <div>
+              <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:rgba(255,255,255,0.85);">{{ label }}</div>
+              {% if offers_by_cat.get(slug) %}
+              <div style="font-size:11px;color:rgba(74,222,128,0.6);margin-top:3px;">{{ offers_by_cat[slug] }} available</div>
+              {% else %}
+              <div style="font-size:11px;color:rgba(255,255,255,0.2);margin-top:3px;">Taking requests</div>
+              {% endif %}
+            </div>
           </a>
         </div>
         {% endfor %}
@@ -107,28 +251,55 @@
     </div>
   </div>
 
-  <!-- ── BOTTOM CTA ── -->
-  <div style="border-top:1px solid rgba(255,255,255,0.06);padding:60px 20px;text-align:center;">
-    <div class="container" style="max-width:600px;">
-      <h3 style="font-family:var(--font-display);color:#ffffff;font-size:clamp(22px,3vw,28px);margin-bottom:12px;">
-        Are you a veteran? <em style="color:var(--gold);font-style:italic;">Offer your skills.</em>
-      </h3>
-      <p style="color:rgba(255,255,255,0.5);font-size:14px;line-height:1.7;margin-bottom:28px;">
-        Register your service availability and get matched with clients who need your expertise.
-      </p>
-      {% if current_user.is_authenticated and current_user.is_veteran() %}
-      <a href="{{ url_for('marketplace.offer_service') }}"
-         style="display:inline-flex;align-items:center;gap:10px;padding:14px 32px;background:var(--gold);color:#0a1628;border-radius:4px;font-family:var(--font-cond);font-size:14px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;">
-        <i class="fas fa-hands-helping"></i> Offer My Services
-      </a>
-      {% else %}
-      <a href="{{ url_for('auth.register') }}"
-         style="display:inline-flex;align-items:center;gap:10px;padding:14px 32px;background:var(--gold);color:#0a1628;border-radius:4px;font-family:var(--font-cond);font-size:14px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;">
-        <i class="fas fa-user-shield"></i> Register as Veteran
-      </a>
-      {% endif %}
+  <!-- ── TRUST STRIP ── -->
+  <div style="background:#0d1f3c;padding:56px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">
+    <div class="container" style="max-width:900px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:40px;text-align:center;">
+        {% for icon, value, label in [
+          ("fa-shield-alt",  "100%",   "Identity Verified"),
+          ("fa-user-check",  "2-Step", "Background Checked"),
+          ("fa-clock",       "24hr",   "Placement Response"),
+          ("fa-star",        "Vetted", "Service Confirmed"),
+        ] %}
+        <div>
+          <i class="fas {{ icon }}" style="color:var(--gold);font-size:24px;display:block;margin-bottom:14px;"></i>
+          <div style="font-family:var(--font-cond);font-size:26px;font-weight:800;color:#fff;margin-bottom:6px;">{{ value }}</div>
+          <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);">{{ label }}</div>
+        </div>
+        {% endfor %}
+      </div>
     </div>
   </div>
 
+  <!-- ── VETERAN CTA ── -->
+  {% if current_user.is_authenticated and current_user.is_veteran() %}
+  <div style="padding:64px 20px;">
+    <div class="container" style="max-width:600px;">
+      <div style="background:#0d1f3c;border:1px solid rgba(212,175,55,0.15);border-left:3px solid var(--gold);padding:40px 44px;text-align:center;">
+        <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">For Veterans</div>
+        <h4 style="font-family:var(--font-display);font-size:24px;color:#fff;margin-bottom:12px;">Offer Your Professional Services</h4>
+        <p style="font-size:14px;color:rgba(255,255,255,0.5);line-height:1.8;margin-bottom:24px;">
+          List your availability and skills. When a client request matches your profile, our team will reach out to you directly.
+        </p>
+        <a href="{{ url_for('marketplace.offer_service') }}"
+           style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:var(--gold);color:#0a1628;font-family:var(--font-cond);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;">
+          <i class="fas fa-handshake"></i>List My Services
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
 </div>
+
+<style>
+@media (max-width: 900px) {
+  div[style*="grid-template-columns:1fr 400px"] { grid-template-columns: 1fr !important; }
+  div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
+  div[style*="padding:48px 40px"] { padding: 32px 24px !important; }
+}
+@media (max-width: 767px) {
+  div[style*="padding:clamp(60px"] { padding: 40px 16px !important; }
+}
+</style>
 {% endblock %}

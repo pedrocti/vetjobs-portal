@@ -21,6 +21,14 @@
   ════════════════════════════════════════ -->
   <nav class="vp-vet-sidebar">
 
+    <!-- Brand header -->
+    <div class="vp-vet-brand">
+      <img src="{{ url_for('static', filename='images/vetjoblogo1.webp') }}" alt="VetJobPortal" style="height:28px;width:auto;">
+      <span class="vp-vet-brand-name">
+        <span style="color:#fff;">VET</span><span style="color:var(--gold);">JOB</span><span style="color:#fff;">PORTAL</span>
+      </span>
+    </div>
+
     <!-- Identity block -->
     <div class="vp-vet-identity">
       <div class="vp-vet-monogram">
@@ -30,9 +38,9 @@
         <div class="vp-vet-name">{{ current_user.first_name }} {{ current_user.last_name }}</div>
         <div class="vp-vet-role">
           {% if current_user.veteran_profile and current_user.veteran_profile.veteran_tier == 'verified' %}
-            <span style="color:#4ade80;"><i class="fas fa-check-circle me-1"></i>Verified</span>
+            <span style="color:#4ade80;"><i class="fas fa-check-circle me-1"></i>Verified Veteran</span>
           {% else %}
-            <span style="color:rgba(255,255,255,0.35);"><i class="fas fa-shield-alt me-1"></i>Veteran</span>
+            <span style="color:rgba(255,255,255,0.4);"><i class="fas fa-shield-alt me-1"></i>Veteran</span>
           {% endif %}
         </div>
       </div>
@@ -56,6 +64,9 @@
       <a class="vp-vet-nav-link {% if request.endpoint == 'messaging.inbox' %}active{% endif %}"
          href="{{ url_for('messaging.inbox') }}">
         <i class="fas fa-inbox"></i><span>Messages</span>
+        {% if unread_messages and unread_messages > 0 %}
+        <span style="margin-left:auto;background:#ef4444;color:#fff;font-family:var(--font-cond);font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center;">{{ unread_messages if unread_messages < 100 else '99+' }}</span>
+        {% endif %}
       </a>
     </div>
 
@@ -77,13 +88,22 @@
       </a>
     </div>
 
-    <!-- Community & services -->
+    <!-- Marketplace -->
     <div class="vp-vet-nav-group">
-      <div class="vp-vet-nav-label">Community</div>
+      <div class="vp-vet-nav-label">Marketplace</div>
       <a class="vp-vet-nav-link {% if 'marketplace' in (request.endpoint or '') %}active{% endif %}"
          href="{{ url_for('marketplace.offer_service') }}">
-        <i class="fas fa-handshake"></i><span>Offer Services</span>
+        <i class="fas fa-store"></i><span>Sell My Services</span>
       </a>
+      <a class="vp-vet-nav-link"
+         href="{{ url_for('marketplace.index') }}">
+        <i class="fas fa-briefcase"></i><span>Browse Opportunities</span>
+      </a>
+    </div>
+
+    <!-- Community -->
+    <div class="vp-vet-nav-group">
+      <div class="vp-vet-nav-label">Community</div>
       <a class="vp-vet-nav-link"
          href="https://chat.whatsapp.com/FiXN7lzXYi6IvxjhXMcx2E"
          target="_blank" rel="noopener noreferrer"
@@ -146,7 +166,11 @@
       <a class="vp-vet-mob-link {% if request.endpoint == 'applications.my_applications' %}active{% endif %}"
          href="{{ url_for('applications.my_applications') }}"><i class="fas fa-layer-group"></i>Applications</a>
       <a class="vp-vet-mob-link {% if request.endpoint == 'messaging.inbox' %}active{% endif %}"
-         href="{{ url_for('messaging.inbox') }}"><i class="fas fa-inbox"></i>Messages</a>
+         href="{{ url_for('messaging.inbox') }}"><i class="fas fa-inbox"></i>Messages
+        {% if unread_messages and unread_messages > 0 %}
+        <span style="margin-left:auto;background:#ef4444;color:#fff;font-family:var(--font-cond);font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;">{{ unread_messages if unread_messages < 100 else '99+' }}</span>
+        {% endif %}
+      </a>
 
       <span class="vp-vet-mob-nav-label">Profile &amp; Tools</span>
       <a class="vp-vet-mob-link {% if request.endpoint == 'dashboard.profile' %}active{% endif %}"
@@ -157,9 +181,13 @@
          href="{{ url_for('payments.veteran_boost_payment') }}"
          style="color:rgba(212,175,55,0.75);"><i class="fas fa-rocket" style="color:var(--gold);"></i>Boost Profile</a>
 
-      <span class="vp-vet-mob-nav-label">Community</span>
+      <span class="vp-vet-mob-nav-label">Marketplace</span>
       <a class="vp-vet-mob-link {% if 'marketplace' in (request.endpoint or '') %}active{% endif %}"
-         href="{{ url_for('marketplace.offer_service') }}"><i class="fas fa-handshake"></i>Offer Services</a>
+         href="{{ url_for('marketplace.offer_service') }}"><i class="fas fa-store"></i>Sell My Services</a>
+      <a class="vp-vet-mob-link"
+         href="{{ url_for('marketplace.index') }}"><i class="fas fa-briefcase"></i>Browse Opportunities</a>
+
+      <span class="vp-vet-mob-nav-label">Community</span>
       <a class="vp-vet-mob-link"
          href="https://chat.whatsapp.com/FiXN7lzXYi6IvxjhXMcx2E"
          target="_blank" rel="noopener noreferrer"
@@ -253,27 +281,44 @@
 }
 .vp-vet-sidebar::-webkit-scrollbar { display: none; }
 
-.vp-vet-identity {
+.vp-vet-brand {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 22px 20px 18px;
+  padding: 20px 20px 16px;
   border-bottom: 1px solid rgba(255,255,255,0.05);
-  margin-bottom: 6px;
+  flex-shrink: 0;
+}
+
+.vp-vet-brand-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.vp-vet-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  margin-bottom: 8px;
   flex-shrink: 0;
 }
 
 .vp-vet-monogram {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
   background: rgba(212,175,55,0.1);
-  border-left: 2px solid var(--gold);
+  border-left: 3px solid var(--gold);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-cond);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 800;
   color: var(--gold);
   letter-spacing: 0.5px;
@@ -281,48 +326,48 @@
 
 .vp-vet-name {
   font-family: var(--font-cond);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
-  color: rgba(255,255,255,0.85);
+  color: rgba(255,255,255,0.9);
   letter-spacing: 0.5px;
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 130px;
+  max-width: 140px;
 }
 
 .vp-vet-role {
   font-family: var(--font-cond);
   letter-spacing: 0.5px;
-  margin-top: 2px;
-  font-size: 9px;
+  margin-top: 3px;
+  font-size: 11px;
   text-transform: uppercase;
 }
 
-.vp-vet-nav-group { padding: 6px 0; }
+.vp-vet-nav-group { padding: 8px 0; }
 
 .vp-vet-nav-label {
   font-family: var(--font-cond);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.2);
-  padding: 8px 20px 3px;
+  color: rgba(255,255,255,0.25);
+  padding: 10px 20px 4px;
   display: block;
 }
 
 .vp-vet-nav-link {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 20px;
+  gap: 12px;
+  padding: 10px 20px;
   font-family: var(--font-cond);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.5px;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.55);
   text-decoration: none;
   transition: all 0.15s ease;
   border-left: 2px solid transparent;
