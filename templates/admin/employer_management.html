@@ -3,330 +3,380 @@
 {% block title %}Employer Management - Admin Panel{% endblock %}
 
 {% block admin_content %}
-<div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="fw-bold mb-1">Employer Management</h1>
-                    <p class="text-muted mb-0">Manage employer accounts, job postings, and platform access</p>
-                </div>
-                <div>
-                    <span style="background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:2px;">
-                        <i class="fas fa-building me-1"></i>{{ stats.total }} Employers
-                    </span>
-                </div>
-            </div>
-        </div>
+<div class="container-fluid px-4 py-3">
+
+  {# ── Header ── #}
+  <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+    <div>
+      <h1 class="h4 fw-semibold mb-0">
+        <i class="fas fa-building me-2 text-primary"></i>Employer Management
+      </h1>
+      <p class="text-muted small mb-0">Review company accounts and verify employers before they go live</p>
     </div>
+    <span class="badge bg-primary fs-6">{{ stats.total }} Employers</span>
+  </div>
 
-    <!-- Statistics -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body text-center">
-                    <h3 class="mb-0">{{ stats.total }}</h3>
-                    <p class="mb-0">Total Employers</p>
-                </div>
-            </div>
+  {# ── Flashes ── #}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="alert alert-{{ 'success' if cat=='success' else 'warning' if cat=='warning' else 'danger' if cat=='error' else 'info' }} alert-dismissible fade show py-2">
+        {{ msg }}
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endwith %}
+
+  {# ── Stat cards ── #}
+  <div class="row g-3 mb-4">
+    {% for label, val, color in [
+        ('Total Employers', stats.total, 'primary'),
+        ('Pending Approval', stats.pending, 'warning'),
+        ('Approved',         stats.active, 'success'),
+        ('Rejected',         stats.rejected, 'danger'),
+    ] %}
+      <div class="col-6 col-md-3">
+        <div class="card border-0 bg-{{ color }} bg-opacity-10 h-100">
+          <div class="card-body py-3">
+            <div class="text-muted small">{{ label }}</div>
+            <div class="fs-3 fw-bold text-{{ color }}">{{ val }}</div>
+          </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card bg-warning text-dark">
-                <div class="card-body text-center">
-                    <h3 class="mb-0">{{ stats.pending }}</h3>
-                    <p class="mb-0">Pending Approval</p>
-                </div>
-            </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {# ── Filters ── #}
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body py-2">
+      <form method="GET" action="{{ url_for('admin.employer_management') }}" class="row g-2 align-items-end">
+        <div class="col-md-6">
+          <input type="text" class="form-control form-control-sm" name="search"
+                 placeholder="Search by company, email, or name…"
+                 value="{{ current_filters.search }}">
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card bg-success text-white">
-                <div class="card-body text-center">
-                    <h3 class="mb-0">{{ stats.active }}</h3>
-                    <p class="mb-0">Approved</p>
-                </div>
-            </div>
+        <div class="col-md-4">
+          <select class="form-select form-select-sm" name="status">
+            <option value="">All Statuses</option>
+            <option value="pending"  {{ 'selected' if current_filters.status == 'pending' }}>Pending Approval</option>
+            <option value="active"   {{ 'selected' if current_filters.status == 'active' }}>Approved</option>
+            <option value="rejected" {{ 'selected' if current_filters.status == 'rejected' }}>Rejected</option>
+          </select>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card bg-danger text-white">
-                <div class="card-body text-center">
-                    <h3 class="mb-0">{{ stats.rejected }}</h3>
-                    <p class="mb-0">Rejected</p>
-                </div>
-            </div>
+        <div class="col-md-2 d-flex gap-2">
+          <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
+            <i class="fas fa-search me-1"></i>Filter
+          </button>
+          {% if current_filters.search or current_filters.status %}
+            <a href="{{ url_for('admin.employer_management') }}" class="btn btn-outline-secondary btn-sm">
+              <i class="fas fa-times"></i>
+            </a>
+          {% endif %}
         </div>
+      </form>
     </div>
+  </div>
 
-    <!-- Filters -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="GET" action="{{ url_for('admin.employer_management') }}">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="search" class="form-label">Search Employers</label>
-                        <input type="text" class="form-control" id="search" name="search" 
-                               placeholder="Company name, email, or contact person..." 
-                               value="{{ current_filters.search }}">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="status" class="form-label">Account Status</label>
-                        <select class="form-select" id="status" name="status">
-                            <option value="">All Statuses</option>
-                            <option value="pending" {{ 'selected' if current_filters.status == 'pending' else '' }}>Pending Approval</option>
-                            <option value="active" {{ 'selected' if current_filters.status == 'active' else '' }}>Approved</option>
-                            <option value="rejected" {{ 'selected' if current_filters.status == 'rejected' else '' }}>Rejected</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">&nbsp;</label>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-search me-1"></i>Filter
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
+  {# ── Employer cards ── #}
+  {% if employers %}
+    {% for employer in employers %}
+      {% set p = employer.profile_data %}
 
-    <!-- Employers List -->
-    <div class="vp-dash-card">
-        <div class="vp-dash-card-header">
-            <h5 class="mb-0">
-                <i class="fas fa-building me-2"></i>Employer Accounts
-                {% if current_filters.search or current_filters.status %}
-                <span class="badge bg-secondary ms-2">Filtered</span>
-                {% endif %}
-            </h5>
-        </div>
-        <div class="vp-dash-card-body" style="padding:0;">
-            {% if employers %}
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead>
-                        <tr>
-                            <th>Employer</th>
-                            <th>Contact Information</th>
-                            <th>Job Activity</th>
-                            <th>Joined</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for employer in employers %}
-                    <tr>
-                        <!-- Employer -->
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <div class="bg-{{ 'warning' if employer.employer_status == 'pending' else ('success' if employer.employer_status == 'active' else 'danger') }} text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
-                                     style="width: 40px; height: 40px;">
-                                    <i class="fas fa-building"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-1 fw-bold">{{ employer.full_name }}</h6>
-                                    <small class="text-muted">@{{ employer.username }}</small>
-                                </div>
-                            </div>
-                        </td>
+      <div class="card border-0 shadow-sm mb-3">
 
-                        <!-- Contact Information -->
-                        <td>
-                            <div>{{ employer.email }}</div>
-                            {% if employer.profile_data and employer.profile_data.recruiter_email %}
-                            <small class="text-muted d-block">
-                                <i class="fas fa-user-tie me-1"></i>{{ employer.profile_data.recruiter_email }}
-                            </small>
-                            {% endif %}
-                            {% if employer.profile_data and employer.profile_data.recruiter_phone %}
-                            <small class="text-muted d-block">
-                                <i class="fas fa-phone me-1"></i>{{ employer.profile_data.recruiter_phone }}
-                            </small>
-                            {% endif %}
-                        </td>
-
-                        <!-- Job Activity -->
-                        <td>
-                            <span class="badge bg-primary">{{ employer.job_count }} Jobs</span>
-                            {% if employer.active_job_count > 0 %}
-                            <div class="mt-1">
-                                <span class="badge bg-success">{{ employer.active_job_count }} Active</span>
-                            </div>
-                            {% endif %}
-                        </td>
-
-                        <!-- Joined -->
-                        <td>
-                            <small class="text-muted">
-                                {{ employer.created_at.strftime('%B %d, %Y') }}
-                            </small>
-                        </td>
-
-                        <!-- Status -->
-                        <td>
-                            {% if employer.employer_status == 'pending' %}
-                            <span class="badge bg-warning text-dark">
-                                <i class="fas fa-clock me-1"></i>Pending
-                            </span>
-                            {% elif employer.employer_status == 'active' %}
-                            <span style="background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);font-size:10px;font-weight:700;padding:4px 10px;border-radius:2px;">
-                                <i class="fas fa-check me-1"></i>Approved
-                            </span>
-                            {% elif employer.employer_status == 'rejected' %}
-                            <span class="badge bg-danger">
-                                <i class="fas fa-times me-1"></i>Rejected
-                            </span>
-                            {% endif %}
-                        </td>
-
-                        <!-- Actions -->
-                        <td>
-                            <div class="d-flex flex-column gap-2">
-
-                                {% if employer.employer_status == 'pending' %}
-                                <form method="POST" action="{{ url_for('admin.approve_employer', employer_id=employer.id) }}">
-                                    <button type="submit" class="btn btn-success btn-sm w-100"
-                                            onclick="return confirm('Approve {{ employer.full_name }}?')">
-                                        <i class="fas fa-check me-1"></i>Approve
-                                    </button>
-                                </form>
-
-                                <button type="button" class="btn btn-danger btn-sm w-100"
-                                        onclick="rejectEmployer({{ employer.id }}, {{ employer.full_name|tojson }})">
-                                    Reject
-                                </button>
-                                {% else %}
-
-                                {% if employer.job_count > 0 %}
-                                <a href="{{ url_for('employer.manage_jobs') }}?employer_id={{ employer.id }}" 
-                                   class="btn btn-outline-info btn-sm">
-                                    <i class="fas fa-briefcase me-1"></i>Jobs
-                                </a>
-                                {% endif %}
-
-                                <button type="button"
-                                        class="btn btn-outline-{{ 'warning' if employer.is_active else 'success' }} btn-sm"
-                                        onclick="toggleUserStatus({{ employer.id }}, {{ employer.full_name|tojson }}, {{ employer.is_active|tojson }})">
-                                    <i class="fas fa-{{ 'ban' if employer.is_active else 'check' }}"></i>
-                                    {{ 'Suspend' if employer.is_active else 'Activate' }}
-                                </button>
-
-                                {% endif %}
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Optional expandable details row (keeps your rich data without breaking layout) -->
-                    {% if employer.employer_status == 'pending' and employer.profile_data %}
-                    <tr class="bg-light">
-                        <td colspan="6">
-                            <div class="p-3">
-
-                                <strong>Company:</strong> {{ employer.profile_data.company_name or 'N/A' }} |
-                                <strong>Industry:</strong> {{ employer.profile_data.industry or 'N/A' }} |
-                                <strong>Size:</strong> {{ employer.profile_data.company_size or 'N/A' }}
-
-                                {% if employer.profile_data.company_description %}
-                                <div class="mt-2">
-                                    <small>{{ employer.profile_data.company_description[:150] }}...</small>
-                                </div>
-                                {% endif %}
-
-                            </div>
-                        </td>
-                    </tr>
-                    {% endif %}
-
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+        {# Card header: name + status + quick actions #}
+        <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <div class="d-flex align-items-center gap-3">
+            {# Company logo or initials #}
+            {% if p and p.company_logo %}
+              <img src="/static/uploads/{{ p.company_logo }}" alt="logo"
+                   style="width:44px;height:44px;object-fit:contain;border-radius:6px;border:1px solid #eee;">
             {% else %}
-            <div class="text-center py-5">
-                <i class="fas fa-building fa-4x text-muted mb-3"></i>
-                <h5 class="text-muted">No Employers Found</h5>
-                {% if current_filters.search or current_filters.status %}
-                <p class="text-muted mb-4">No employers match your current filter criteria.</p>
-                <a href="{{ url_for('admin.employer_management') }}" class="btn btn-outline-primary">
-                    <i class="fas fa-times me-2"></i>Clear Filters
-                </a>
-                {% else %}
-                <p class="text-muted mb-0">No employers have registered yet.</p>
-                {% endif %}
-            </div>
+              <div class="bg-primary text-white rounded d-flex align-items-center justify-content-center fw-bold"
+                   style="width:44px;height:44px;font-size:18px;">
+                {{ (p.company_name[0] if p and p.company_name else employer.first_name[0]) | upper }}
+              </div>
             {% endif %}
+
+            <div>
+              <div class="fw-semibold">
+                {{ p.company_name if p and p.company_name else employer.full_name }}
+              </div>
+              <div class="text-muted small">
+                {{ employer.email }} &nbsp;·&nbsp; @{{ employer.username }}
+                &nbsp;·&nbsp; Joined {{ employer.created_at.strftime('%d %b %Y') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            {# Status badge #}
+            {% if employer.employer_status == 'pending' %}
+              <span class="badge bg-warning text-dark">Pending</span>
+            {% elif employer.employer_status == 'active' %}
+              <span class="badge bg-success">Approved</span>
+            {% elif employer.employer_status == 'rejected' %}
+              <span class="badge bg-danger">Rejected</span>
+            {% endif %}
+
+            {# Job count #}
+            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">
+              {{ employer.job_count }} job{{ 's' if employer.job_count != 1 }}
+              {% if employer.active_job_count %} · {{ employer.active_job_count }} active{% endif %}
+            </span>
+
+            {# Expand/collapse toggle #}
+            <button class="btn btn-outline-secondary btn-sm" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#emp-{{ employer.id }}"
+                    aria-expanded="{{ 'true' if employer.employer_status == 'pending' else 'false' }}">
+              <i class="fas fa-chevron-down"></i>
+            </button>
+          </div>
         </div>
+
+        {# Collapsible detail body — auto-open for pending #}
+        <div class="collapse {{ 'show' if employer.employer_status == 'pending' }}"
+             id="emp-{{ employer.id }}">
+          <div class="card-body">
+            <div class="row g-4">
+
+              {# ── Col 1: Company info ── #}
+              <div class="col-md-4">
+                <div class="fw-semibold small text-uppercase text-muted mb-2">Company</div>
+                <table class="table table-sm table-borderless mb-0 small">
+                  <tr>
+                    <td class="text-muted ps-0" style="width:110px">Name</td>
+                    <td>{{ p.company_name if p and p.company_name else '—' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted ps-0">Industry</td>
+                    <td>{{ p.industry if p and p.industry else '—' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted ps-0">Size</td>
+                    <td>{{ p.company_size if p and p.company_size else '—' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted ps-0">CAC No.</td>
+                    <td>
+                      {% if p and p.cac_number %}
+                        <span class="font-monospace fw-semibold text-success">{{ p.cac_number }}</span>
+                      {% else %}
+                        <span class="text-danger">Not provided</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted ps-0">Website</td>
+                    <td>
+                      {% if p and p.company_website %}
+                        <a href="{{ p.company_website }}" target="_blank" rel="noopener" class="small">
+                          {{ p.company_website | truncate(30) }}
+                          <i class="fas fa-external-link-alt ms-1" style="font-size:10px"></i>
+                        </a>
+                      {% else %}—{% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted ps-0">Email</td>
+                    <td>{{ p.company_email if p and p.company_email else '—' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted ps-0">Address</td>
+                    <td>{{ p.company_address if p and p.company_address else '—' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted ps-0">Work Type</td>
+                    <td>{{ p.work_type if p and p.work_type else '—' }}</td>
+                  </tr>
+                </table>
+              </div>
+
+              {# ── Col 2: Recruiter / HR contact ── #}
+              <div class="col-md-4">
+                <div class="fw-semibold small text-uppercase text-muted mb-2">Recruiter / HR Contact</div>
+                <table class="table table-sm table-borderless mb-0 small">
+                  <tr>
+                    <td class="text-muted ps-0" style="width:110px">Name</td>
+                    <td>{{ p.recruiter_name if p and p.recruiter_name else '—' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted ps-0">Position</td>
+                    <td>{{ p.recruiter_position if p and p.recruiter_position else '—' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted ps-0">Email</td>
+                    <td>{{ p.recruiter_email if p and p.recruiter_email else '—' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted ps-0">Phone</td>
+                    <td>{{ p.recruiter_phone if p and p.recruiter_phone else '—' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted ps-0">LinkedIn</td>
+                    <td>
+                      {% if p and p.hr_linkedin %}
+                        <a href="{{ p.hr_linkedin }}" target="_blank" rel="noopener" class="small">
+                          View <i class="fas fa-external-link-alt ms-1" style="font-size:10px"></i>
+                        </a>
+                      {% else %}—{% endif %}
+                    </td>
+                  </tr>
+                </table>
+
+                <div class="fw-semibold small text-uppercase text-muted mb-2 mt-3">Subscription</div>
+                <table class="table table-sm table-borderless mb-0 small">
+                  <tr>
+                    <td class="text-muted ps-0" style="width:110px">Plan</td>
+                    <td>
+                      {% if p and p.subscription_plan %}
+                        <span class="badge bg-info">{{ p.subscription_plan | title }}</span>
+                      {% else %}
+                        <span class="badge bg-secondary">Free</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted ps-0">Active</td>
+                    <td>{{ 'Yes' if p and p.subscription_active else 'No' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted ps-0">Expires</td>
+                    <td>
+                      {% if p and p.subscription_expires_at %}
+                        {{ p.subscription_expires_at.strftime('%d %b %Y') }}
+                      {% else %}—{% endif %}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              {# ── Col 3: Description + diversity + actions ── #}
+              <div class="col-md-4">
+                {% if p and p.company_description %}
+                  <div class="fw-semibold small text-uppercase text-muted mb-1">About</div>
+                  <p class="small text-muted mb-3">{{ p.company_description | truncate(300) }}</p>
+                {% endif %}
+
+                {% if p and p.diversity_statement %}
+                  <div class="fw-semibold small text-uppercase text-muted mb-1">Diversity Statement</div>
+                  <p class="small text-muted mb-3">{{ p.diversity_statement | truncate(200) }}</p>
+                {% endif %}
+
+                {% if p and p.benefits_offered %}
+                  <div class="fw-semibold small text-uppercase text-muted mb-1">Benefits Offered</div>
+                  <p class="small text-muted mb-3">{{ p.benefits_offered | truncate(150) }}</p>
+                {% endif %}
+
+                {% if p and p.rejection_reason %}
+                  <div class="alert alert-danger py-2 small mb-3">
+                    <strong>Rejection reason:</strong> {{ p.rejection_reason }}
+                  </div>
+                {% endif %}
+
+                {# ── Action buttons ── #}
+                <div class="d-grid gap-2 mt-2">
+                  {% if employer.employer_status == 'pending' %}
+                    <form method="POST"
+                          action="{{ url_for('admin.approve_employer', employer_id=employer.id) }}">
+                      <button type="submit" class="btn btn-success btn-sm w-100"
+                              onclick="return confirm('Approve {{ (p.company_name if p and p.company_name else employer.full_name) | replace("'","\'") }}?')">
+                        <i class="fas fa-check me-1"></i>Approve Employer
+                      </button>
+                    </form>
+                    <button type="button" class="btn btn-danger btn-sm w-100"
+                            onclick="rejectEmployer({{ employer.id }}, {{ (p.company_name if p and p.company_name else employer.full_name) | tojson }})">
+                      <i class="fas fa-times me-1"></i>Reject
+                    </button>
+
+                  {% elif employer.employer_status == 'active' %}
+                    {% if employer.job_count > 0 %}
+                      <a href="{{ url_for('employer.manage_jobs') }}?employer_id={{ employer.id }}"
+                         class="btn btn-outline-info btn-sm">
+                        <i class="fas fa-briefcase me-1"></i>View Jobs ({{ employer.job_count }})
+                      </a>
+                    {% endif %}
+                    <button type="button" class="btn btn-outline-warning btn-sm"
+                            onclick="toggleUserStatus({{ employer.id }}, {{ employer.full_name | tojson }}, {{ employer.active | tojson }})">
+                      <i class="fas fa-ban me-1"></i>Suspend
+                    </button>
+
+                  {% elif employer.employer_status == 'rejected' %}
+                    <form method="POST"
+                          action="{{ url_for('admin.approve_employer', employer_id=employer.id) }}">
+                      <button type="submit" class="btn btn-outline-success btn-sm w-100">
+                        <i class="fas fa-undo me-1"></i>Re-approve
+                      </button>
+                    </form>
+                  {% endif %}
+
+                  <a href="mailto:{{ employer.email }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-envelope me-1"></i>Email Employer
+                  </a>
+                </div>
+
+              </div>
+            </div>{# end row #}
+          </div>
+        </div>
+
+      </div>{# end card #}
+    {% endfor %}
+
+  {% else %}
+    <div class="card border-0 shadow-sm">
+      <div class="text-center py-5 text-muted">
+        <i class="fas fa-building fa-3x mb-3 opacity-25"></i>
+        <p class="fw-semibold mb-1">No employers found</p>
+        {% if current_filters.search or current_filters.status %}
+          <p class="small">Try clearing the filters.</p>
+          <a href="{{ url_for('admin.employer_management') }}" class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-times me-1"></i>Clear Filters
+          </a>
+        {% else %}
+          <p class="small mb-0">No employers have registered yet.</p>
+        {% endif %}
+      </div>
     </div>
+  {% endif %}
+
 </div>
 
-<!-- Status Toggle Form -->
-<form id="statusForm" method="POST" style="display: none;">
-    <input type="hidden" name="admin_reason" id="statusReason">
-</form>
-
-<!-- Delete User Form -->
-<form id="deleteForm" method="POST" style="display: none;">
-    <input type="hidden" name="admin_reason" id="deleteReason">
+{# ── Hidden forms for JS actions ── #}
+<form id="statusForm" method="POST" style="display:none;">
+  <input type="hidden" name="admin_reason" id="statusReason">
 </form>
 
 <script>
-function toggleUserStatus(userId, userName, isActive) {
-    const action = isActive ? 'suspend' : 'activate';
-    const reason = prompt(`Why are you ${action}ing ${userName}?\n\nPlease provide a detailed reason:`);
-    
-    if (reason === null || reason.trim() === '') {
-        return; // User cancelled or didn't provide reason
-    }
-    
-    if (confirm(`Are you sure you want to ${action} ${userName}?\n\nReason: ${reason}`)) {
-        const form = document.getElementById('statusForm');
-        const reasonInput = document.getElementById('statusReason');
-        
-        form.action = `/admin/user/${userId}/toggle-status`;
-        reasonInput.value = reason;
-        form.submit();
-    }
-}
-
-function deleteUser(userId, userName) {
-    const reason = prompt(`Why are you deleting ${userName}'s account?\n\nThis action is PERMANENT and cannot be undone.\nAll their job posts and applications will also be deleted.\n\nPlease provide a detailed reason:`);
-    
-    if (reason === null || reason.trim() === '') {
-        return; // User cancelled or didn't provide reason
-    }
-    
-    if (confirm(`Are you ABSOLUTELY SURE you want to permanently delete ${userName}'s account?\n\nThis will:\n- Delete their profile and all job posts\n- Remove all applications to their jobs\n- Cannot be undone\n\nReason: ${reason}`)) {
-        const form = document.getElementById('deleteForm');
-        const reasonInput = document.getElementById('deleteReason');
-        
-        // Delete functionality not implemented yet
-        alert('Delete functionality will be implemented in future updates.');
-    }
-}
-
 function rejectEmployer(employerId, employerName) {
-    const reason = prompt(`Please provide a reason for rejecting ${employerName}:`);
-    
-    if (!reason || reason.trim() === '') {
-        alert('A reason is required for rejection.');
-        return;
-    }
-    
-    if (confirm(`Are you sure you want to reject ${employerName}?`)) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/admin/employer/${employerId}/reject`;
-        
-        const reasonInput = document.createElement('input');
-        reasonInput.type = 'hidden';
-        reasonInput.name = 'rejection_reason';
-        reasonInput.value = reason.trim();
-        
-        form.appendChild(reasonInput);
-        document.body.appendChild(form);
-        form.submit();
-    }
+  const reason = prompt(`Reason for rejecting ${employerName}:`);
+  if (!reason || !reason.trim()) {
+    alert('A reason is required.');
+    return;
+  }
+  if (confirm(`Reject ${employerName}?\n\nReason: ${reason}`)) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/admin/employer/${employerId}/reject`;
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'rejection_reason';
+    input.value = reason.trim();
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+
+function toggleUserStatus(userId, userName, isActive) {
+  const action = isActive ? 'suspend' : 'activate';
+  const reason = prompt(`Why are you ${action}ing ${userName}?`);
+  if (!reason || !reason.trim()) return;
+  if (confirm(`${action.charAt(0).toUpperCase()+action.slice(1)} ${userName}?\n\nReason: ${reason}`)) {
+    const form = document.getElementById('statusForm');
+    form.action = `/admin/user/${userId}/toggle-status`;
+    document.getElementById('statusReason').value = reason;
+    form.submit();
+  }
 }
 </script>
 {% endblock %}

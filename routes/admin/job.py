@@ -146,3 +146,110 @@ def flag_job(job_id):
         flash('An error occurred while flagging the job. Please try again.', 'error')
 
     return redirect(url_for('admin.job_moderation'))
+
+@admin_bp.route('/job/<int:job_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_job(job_id):
+    if not current_user.is_admin():
+        flash('Access denied.', 'error')
+        return redirect(url_for('main.index'))
+
+    from .stats import get_admin_stats
+    from werkzeug.utils import secure_filename
+    import os
+
+    job   = JobPosting.query.get_or_404(job_id)
+    stats = get_admin_stats()
+
+    if request.method == 'POST':
+        try:
+            job.title            = request.form.get('job_title', '').strip()
+            job.company_name     = request.form.get('company_name', '').strip()
+            job.location         = request.form.get('location', '').strip()
+            job.job_type         = request.form.get('job_type', 'full-time')
+            job.industry         = request.form.get('industry', '').strip() or None
+            job.experience_level = request.form.get('experience_level', '').strip() or None
+            job.description      = request.form.get('job_description', '').strip()
+            job.requirements     = request.form.get('requirements', '').strip()
+            job.status           = request.form.get('status', job.status)
+            job.is_active        = bool(request.form.get('is_active'))
+            job.updated_at       = datetime.utcnow()
+
+            sal_min = request.form.get('salary_min', '').strip()
+            sal_max = request.form.get('salary_max', '').strip()
+            job.salary_min = int(sal_min) if sal_min.isdigit() else None
+            job.salary_max = int(sal_max) if sal_max.isdigit() else None
+
+            logo_file = request.files.get('company_logo')
+            if request.form.get('clear_logo') == 'yes':
+                job.company_logo = 'images/vetjoblogo1.png'
+            elif logo_file and logo_file.filename:
+                from werkzeug.utils import secure_filename
+                filename  = secure_filename(logo_file.filename)
+                ext       = os.path.splitext(filename)[1]
+                unique    = f"job_logo_{job.id}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}{ext}"
+                save_path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique)
+                logo_file.save(save_path)
+                job.company_logo = f"uploads/{unique}"
+
+            try:
+                job.external_apply_url = request.form.get('external_apply_url', '').strip() or None
+            except Exception:
+                pass
+
+            try:
+                deadline_str = request.form.get('deadline', '').strip()
+                job.deadline = datetime.strptime(deadline_str, '%Y-%m-%d') if deadline_str else None
+            except Exception:
+                pass
+
+            db.session.commit()
+            flash(f'✅ "{job.title}" updated successfully.', 'success')
+            return redirect(url_for('admin.review_job', job_id=job.id))
+
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(f'[admin.edit_job] {e}', exc_info=True)
+            flash(f'Error saving changes: {e}', 'error')
+
+    return render_template('admin/edit_job.html', job=job, stats=stats)
+
+
+@admin_bp.route('/job/<int:job_id>/delete', methods=['POST'])
+@login_required
+def delete_job(job_id):
+    if not current_user.is_admin():
+        flash('Access denied.', 'error')
+        return redirect(url_for('main.index'))
+
+    job   = JobPosting.query.get_or_404(job_id)
+    title = job.title
+
+    try:
+        JobApplication.query.filter_by(job_id=job.id).delete()
+        db.session.delete(job)
+        db.session.commit()
+        flash(f'🗑️ "{title}" and all its applications deleted.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f'[admin.delete_job] {e}', exc_info=True)
+        flash(f'Error deleting job: {e}', 'error')
+
+    return redirect(url_for('admin.job_moderation'))
+
+
+@admin_bp.route('/job/<int:job_id>/toggle', methods=['POST'])
+@login_required
+def toggle_job(job_id):
+    if not current_user.is_admin():
+        flash('Access denied.', 'error')
+        return redirect(url_for('main.index'))
+
+    job            = JobPosting.query.get_or_404(job_id)
+    job.is_active  = not job.is_active
+    job.updated_at = datetime.utcnow()
+    db.session.commit()
+
+    state = 'activated' if job.is_active else 'deactivated'
+    flash(f'"{job.title}" {state}.', 'info')
+    return redirect(request.referrer or url_for('admin.job_moderation'))

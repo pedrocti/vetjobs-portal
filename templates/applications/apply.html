@@ -4,294 +4,469 @@
 
 {% block content %}
 <div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">
-                        <i class="fas fa-paper-plane me-2"></i>Apply for Position
-                    </h4>
-                </div>
-                <div class="card-body p-4">
-                    <!-- Job Information -->
-                    <div class="mb-4 p-3 bg-light rounded">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5 class="fw-bold text-primary mb-2">{{ job_post.job_title }}</h5>
-                                <p class="mb-1">
-                                    <i class="fas fa-building me-2 text-muted"></i>{{ job_post.company_name }}
-                                </p>
-                                <p class="mb-1">
-                                    <i class="fas fa-map-marker-alt me-2 text-muted"></i>{{ job_post.location }}
-                                </p>
-                                {% if job_post.salary_range %}
-                                <p class="mb-0">
-                                    <i class="fas fa-money-bill me-2 text-muted"></i>{{ job_post.salary_range }}
-                                </p>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-4 text-md-end">
-                                <span class="badge bg-info fs-6">{{ job_post.get_job_type_display() }}</span>
-                                <br>
-                                <small class="text-muted">Posted {{ job_post.created_at.strftime('%B %d, %Y') }}</small>
-                            </div>
-                        </div>
-                    </div>
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
 
-                    <!-- Application Form -->
-                    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
-                        <!-- Cover Letter -->
-                        <div class="mb-4">
-                            <label for="cover_letter" class="form-label fw-bold">
-                                <i class="fas fa-file-alt me-2 text-primary"></i>Cover Letter *
-                            </label>
-                            <textarea 
-                                class="form-control" 
-                                id="cover_letter" 
-                                name="cover_letter" 
-                                rows="8" 
-                                required
-                                placeholder="Dear Hiring Manager,&#10;&#10;I am writing to express my interest in the {{ job_post.job_title }} position at {{ job_post.company_name }}. As a military veteran with [your experience], I am excited about the opportunity to bring my skills in [relevant skills] to your team.&#10;&#10;During my service, I [specific achievements or experiences relevant to the role]. I believe these experiences have prepared me well for this position because [explain the connection].&#10;&#10;I am particularly drawn to this role because [mention something specific about the company or position]. I would welcome the opportunity to discuss how my background and skills can contribute to your team's success.&#10;&#10;Thank you for considering my application. I look forward to hearing from you.&#10;&#10;Respectfully,&#10;{{ current_user.full_name }}"
-                                maxlength="2000"></textarea>
-                            <div class="form-text">
-                                <small>
-                                    <i class="fas fa-info-circle me-1"></i>
-                                    Minimum 50 characters. Tell the employer why you're interested in this position and what makes you a great fit.
-                                </small>
-                            </div>
-                            <div class="invalid-feedback">
-                                Please provide a cover letter (minimum 50 characters).
-                            </div>
-                        </div>
-
-                        <!-- Resume Upload -->
-                        <div class="mb-4">
-                          <label for="resume_file" class="form-label fw-bold">
-                            <i class="fas fa-file-upload me-2 text-primary"></i>Resume *
-                          </label>
-
-                          <div class="input-group">
-                            <input 
-                              type="file" 
-                              class="form-control" 
-                              id="resume_file" 
-                              name="resume_file" 
-                              accept=".pdf,.doc,.docx"
-                              required>
-                            <div class="invalid-feedback">
-                              Please upload your resume.
-                            </div>
-                          </div>
-
-                          <div class="form-text">
-                            <small>
-                              <i class="fas fa-info-circle me-1"></i>
-                              Accepted formats: PDF, DOC, DOCX. Maximum size: 16MB.
-                            </small>
-                          </div>
-
-                          <!-- Optional Resume Builder -->
-                          <div class="text-center mt-3">
-                            <p class="text-muted mb-1">Don’t have a resume yet?</p>
-                            <a href="{{ url_for('resources.resume_builder') }}" class="btn btn-outline-info btn-sm mb-3">
-                              <i class="fas fa-file-alt me-2"></i>Generate Resume with Our Builder
-                            </a>
-
-                            <hr class="my-3">
-
-                            <p class="text-muted mb-1">Already have a resume but want it professionally reviewed?</p>
-                            <a href="{{ url_for('payments.init_payment', feature='review') }}" class="btn btn-outline-success btn-sm">
-                              <i class="fas fa-user-check me-2"></i>Submit for Professional Review
-                            </a>
-                          </div>
-                        </div>
-                        <!-- Application Tips -->
-                        <div class="alert alert-info mb-4">
-                            <h6 class="alert-heading">
-                                <i class="fas fa-lightbulb me-2"></i>Application Tips
-                            </h6>
-                            <ul class="mb-0">
-                                <li>Customize your cover letter for this specific position</li>
-                                <li>Highlight relevant military experience and transferable skills</li>
-                                <li>Ensure your resume is up-to-date and professionally formatted</li>
-                                <li>Double-check for spelling and grammar errors</li>
-                            </ul>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <div class="row">
-                            <div class="col-md-6">
-                                <button type="submit" class="btn btn-primary btn-lg w-100">
-                                    <i class="fas fa-paper-plane me-2"></i>Submit Application
-                                </button>
-                            </div>
-                            <div class="col-md-6">
-                                <a href="{{ url_for('jobs.job_board') }}" class="btn btn-outline-secondary btn-lg w-100">
-                                    <i class="fas fa-arrow-left me-2"></i>Back to Jobs
-                                </a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
+      <!-- ── CV SCAN PANEL ─────────────────────────────────── -->
+      <!-- Auto-runs on page load if user has a CV on file -->
+      <div id="cvScanPanel" class="vp-dash-card mb-4">
+        <div class="vp-dash-card-header" style="display:flex;align-items:center;justify-content:space-between;">
+          <span><i class="fas fa-microscope me-2"></i>CV Match Analysis</span>
+          <span id="scanStatusBadge"
+                style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;border-radius:2px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);">
+            Scanning…
+          </span>
         </div>
 
-        <!-- Sidebar -->
-        <div class="col-lg-4">
-            <div class="card shadow mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0">
-                        <i class="fas fa-info-circle me-2"></i>Application Process
-                    </h6>
+        <!-- Scanning state -->
+        <div id="scanLoading" class="vp-dash-card-body text-center py-5">
+          <div class="spinner-border mb-3" style="color:var(--gold);" role="status"></div>
+          <p style="color:rgba(255,255,255,0.5);font-size:14px;margin:0;">
+            Analysing your CV against this role's requirements…
+          </p>
+        </div>
+
+        <!-- No CV state -->
+        <div id="scanNoCv" class="vp-dash-card-body" style="display:none;">
+          <div style="background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.2);border-radius:8px;padding:20px;display:flex;align-items:flex-start;gap:16px;">
+            <i class="fas fa-exclamation-triangle fa-2x" style="color:#fbbf24;flex-shrink:0;margin-top:2px;"></i>
+            <div>
+              <div style="font-weight:700;color:#fff;margin-bottom:6px;">No CV Found in Your Profile</div>
+              <p style="color:rgba(255,255,255,0.55);font-size:14px;margin:0 0 14px;line-height:1.6;">
+                You haven't uploaded a CV to your profile yet. You can still apply by uploading
+                one below, or update your profile CV first for automatic scanning on future applications.
+              </p>
+              <a href="/dashboard/profile"
+                 style="display:inline-flex;align-items:center;gap:8px;padding:8px 18px;background:rgba(251,191,36,0.15);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-decoration:none;">
+                <i class="fas fa-upload"></i>Upload Profile CV
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Result state -->
+        <div id="scanResult" class="vp-dash-card-body" style="display:none;">
+
+          <!-- Score bar -->
+          <div class="mb-4">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);">
+                Overall Match Score
+              </span>
+              <span id="scoreValue" style="font-family:var(--font-display);font-size:28px;font-weight:700;color:#fff;">0%</span>
+            </div>
+            <div style="background:rgba(255,255,255,0.07);border-radius:6px;height:10px;overflow:hidden;">
+              <div id="scoreBarFill"
+                   style="height:100%;width:0%;border-radius:6px;transition:width 1.2s ease;background:linear-gradient(90deg,#d4af37,#4ade80);"></div>
+            </div>
+          </div>
+
+          <!-- Verdict box -->
+          <div id="verdictBox" class="mb-4" style="border-radius:8px;padding:18px 20px;border-left:4px solid #ccc;">
+            <div style="display:flex;align-items:flex-start;gap:12px;">
+              <i id="verdictIcon" class="fas fa-check-circle fa-lg" style="margin-top:2px;flex-shrink:0;"></i>
+              <div>
+                <div id="verdictTitle" style="font-weight:700;color:#fff;margin-bottom:4px;font-size:15px;"></div>
+                <div id="verdictText" style="color:rgba(255,255,255,0.65);font-size:14px;line-height:1.7;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Two columns: matched + gaps -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-6" id="matchedCol" style="display:none;">
+              <div style="background:rgba(74,222,128,0.05);border:1px solid rgba(74,222,128,0.12);border-radius:8px;padding:14px 16px;height:100%;">
+                <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#4ade80;margin-bottom:10px;">
+                  <i class="fas fa-check me-1"></i>Strengths Found in Your CV
                 </div>
-                <div class="card-body">
-                    <div class="timeline">
-                        <div class="timeline-item active">
-                            <div class="timeline-marker bg-success"></div>
-                            <div class="timeline-content">
-                                <h6>Submit Application</h6>
-                                <p class="small text-muted">Complete the form and upload your resume</p>
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-marker bg-secondary"></div>
-                            <div class="timeline-content">
-                                <h6>Employer Review</h6>
-                                <p class="small text-muted">The employer will review your application</p>
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-marker bg-secondary"></div>
-                            <div class="timeline-content">
-                                <h6>Response</h6>
-                                <p class="small text-muted">You'll be notified of their decision</p>
-                            </div>
-                        </div>
-                    </div>
+                <div id="matchedSkillsList" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+              </div>
+            </div>
+            <div class="col-md-6" id="gapsCol" style="display:none;">
+              <div style="background:rgba(248,113,113,0.05);border:1px solid rgba(248,113,113,0.12);border-radius:8px;padding:14px 16px;height:100%;">
+                <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#f87171;margin-bottom:10px;">
+                  <i class="fas fa-times me-1"></i>Gaps / Missing Keywords
                 </div>
+                <div id="missingSkillsList" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Honest assessment -->
+          <div id="honestyBox" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:16px 20px;margin-bottom:20px;display:none;">
+            <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:10px;">
+              <i class="fas fa-chart-bar me-1"></i>Honest Assessment
+            </div>
+            <ul id="assessmentList" style="margin:0;padding-left:18px;color:rgba(255,255,255,0.6);font-size:14px;line-height:1.9;"></ul>
+          </div>
+
+          <!-- CV Optimization CTA — shown when score < 70 -->
+          <div id="optimizeCta" style="display:none;background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(212,175,55,0.03));border:1px solid rgba(212,175,55,0.25);border-radius:10px;padding:20px 22px;">
+            <div style="display:flex;align-items:flex-start;gap:16px;">
+              <div style="background:rgba(212,175,55,0.15);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="fas fa-magic" style="color:var(--gold);font-size:18px;"></i>
+              </div>
+              <div style="flex:1;">
+                <div style="font-family:var(--font-cond);font-size:14px;font-weight:700;color:var(--gold);margin-bottom:6px;">
+                  Recommended: Professional CV Optimisation
+                </div>
+                <p style="color:rgba(255,255,255,0.6);font-size:13px;line-height:1.7;margin:0 0 14px;">
+                  Our expert team will rewrite your CV to match civilian employer expectations —
+                  translating your military achievements into language that resonates, filling
+                  the gaps identified above, and giving you a significant edge over other applicants.
+                </p>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+                  <span style="font-size:12px;color:rgba(255,255,255,0.5);display:flex;align-items:center;gap:5px;">
+                    <i class="fas fa-check" style="color:#4ade80;"></i>Tailored to this job's requirements
+                  </span>
+                  <span style="font-size:12px;color:rgba(255,255,255,0.5);display:flex;align-items:center;gap:5px;">
+                    <i class="fas fa-check" style="color:#4ade80;"></i>Professional military-to-civilian translation
+                  </span>
+                  <span style="font-size:12px;color:rgba(255,255,255,0.5);display:flex;align-items:center;gap:5px;">
+                    <i class="fas fa-check" style="color:#4ade80;"></i>ATS-optimised formatting
+                  </span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                  <a href="{{ url_for('payments.init_payment', feature='cv_optimization') }}"
+                     class="btn-vp-primary" style="padding:10px 22px;font-size:12px;">
+                    <i class="fas fa-magic"></i>
+                    <span>Optimise My CV</span>
+                  </a>
+                  <span style="font-size:12px;color:rgba(255,255,255,0.3);">or continue with your current CV below</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <!-- /CV Scan Panel -->
+
+
+      <!-- ── APPLICATION FORM ──────────────────────────────── -->
+      <div class="vp-dash-card">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-paper-plane me-2"></i>Submit Your Application</span>
+        </div>
+        <div class="vp-dash-card-body">
+
+          <!-- Job Info Banner -->
+          <div style="background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.15);border-radius:8px;padding:16px 20px;margin-bottom:24px;">
+            <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:#fff;margin-bottom:6px;">
+              {{ job_post.job_title }}
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:14px;">
+              <span style="font-size:13px;color:rgba(255,255,255,0.55);">
+                <i class="fas fa-building me-1" style="color:var(--gold);"></i>{{ job_post.company_name }}
+              </span>
+              <span style="font-size:13px;color:rgba(255,255,255,0.55);">
+                <i class="fas fa-map-marker-alt me-1" style="color:#f87171;"></i>{{ job_post.location }}
+              </span>
+            </div>
+          </div>
+
+          <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+
+            <!-- Cover Letter -->
+            <div class="mb-4">
+              <label for="cover_letter" class="form-label fw-bold" style="color:rgba(255,255,255,0.8);">
+                <i class="fas fa-file-alt me-2" style="color:var(--gold);"></i>Cover Letter <span style="color:#f87171;">*</span>
+              </label>
+              <textarea
+                class="form-control"
+                id="cover_letter"
+                name="cover_letter"
+                rows="8"
+                required
+                style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;resize:vertical;"
+                placeholder="Dear Hiring Manager,&#10;&#10;I am writing to express my interest in the {{ job_post.job_title }} position at {{ job_post.company_name }}. As a military veteran with [your experience], I am confident I bring the discipline and skills this role demands.&#10;&#10;During my service, I [specific achievements]. I believe these prepare me well because [explain connection].&#10;&#10;Thank you for your consideration.&#10;&#10;Respectfully,&#10;{{ current_user.full_name }}"
+                maxlength="2000"></textarea>
+              <div class="form-text" style="color:rgba(255,255,255,0.4);font-size:12px;margin-top:6px;">
+                Minimum 50 characters. Tip: address the specific skills gaps identified above.
+              </div>
+              <div class="invalid-feedback">Please provide a cover letter (minimum 50 characters).</div>
             </div>
 
-            <!-- Job Details -->
-            <div class="card shadow">
-                <div class="card-header">
-                    <h6 class="mb-0">
-                        <i class="fas fa-briefcase me-2"></i>Job Details
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="fw-bold text-muted small">Company</label>
-                        <p class="mb-0">{{ job_post.company_name }}</p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="fw-bold text-muted small">Location</label>
-                        <p class="mb-0">{{ job_post.location }}</p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="fw-bold text-muted small">Employment Type</label>
-                        <p class="mb-0">{{ job_post.get_job_type_display() }}</p>
-                    </div>
-                    {% if job_post.salary_range %}
-                    <div class="mb-0">
-                        <label class="fw-bold text-muted small">Salary Range</label>
-                        <p class="mb-0">{{ job_post.salary_range }}</p>
-                    </div>
-                    {% endif %}
-                </div>
+            <!-- Resume Upload -->
+            <div class="mb-4">
+              <label for="resume_file" class="form-label fw-bold" style="color:rgba(255,255,255,0.8);">
+                <i class="fas fa-file-upload me-2" style="color:var(--gold);"></i>Resume / CV <span style="color:#f87171;">*</span>
+              </label>
+              <input
+                type="file"
+                class="form-control"
+                id="resume_file"
+                name="resume_file"
+                accept=".pdf,.doc,.docx"
+                required
+                style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);">
+              <div class="invalid-feedback">Please upload your resume.</div>
+              <div class="form-text" style="color:rgba(255,255,255,0.4);font-size:12px;margin-top:6px;">
+                <i class="fas fa-info-circle me-1"></i>PDF, DOC, or DOCX. Max 16MB.
+              </div>
             </div>
+
+            <!-- Submit -->
+            <div class="row g-3">
+              <div class="col-md-6">
+                <button type="submit" class="btn-vp-primary w-100" style="justify-content:center;padding:14px;">
+                  <i class="fas fa-paper-plane"></i>
+                  <span>Submit Application</span>
+                </button>
+              </div>
+              <div class="col-md-6">
+                <a href="{{ url_for('jobs.job_board') }}" class="btn-vp-ghost w-100" style="justify-content:center;padding:14px;">
+                  <i class="fas fa-arrow-left"></i>
+                  <span>Back to Jobs</span>
+                </a>
+              </div>
+            </div>
+
+          </form>
         </div>
+      </div>
+
     </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+
+      <!-- Application Process -->
+      <div class="vp-dash-card mb-4">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-list-ol me-2"></i>Application Process</span>
+        </div>
+        <div class="vp-dash-card-body" style="padding:0;">
+          {% for step, label, desc, active in [
+            ('1', 'CV Analysis', 'We check your CV fit for this role', true),
+            ('2', 'Submit Application', 'Complete the form and upload your CV', false),
+            ('3', 'Employer Review', 'The employer reviews your application', false),
+            ('4', 'Interview / Response', "You'll be notified of their decision", false)
+          ] %}
+          <div style="display:flex;align-items:flex-start;gap:14px;padding:14px 20px;{% if not loop.last %}border-bottom:1px solid rgba(255,255,255,0.05);{% endif %}">
+            <div style="width:26px;height:26px;border-radius:50%;background:{% if active %}rgba(212,175,55,0.15){% else %}rgba(255,255,255,0.04){% endif %};border:1px solid {% if active %}rgba(212,175,55,0.3){% else %}rgba(255,255,255,0.08){% endif %};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-cond);font-weight:700;font-size:11px;color:{% if active %}var(--gold){% else %}rgba(255,255,255,0.25){% endif %};">
+              {{ step }}
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:{% if active %}rgba(255,255,255,0.9){% else %}rgba(255,255,255,0.4){% endif %};margin-bottom:2px;">{{ label }}</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.25);line-height:1.5;">{{ desc }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Job Details -->
+      <div class="vp-dash-card">
+        <div class="vp-dash-card-header">
+          <span><i class="fas fa-briefcase me-2"></i>Job Details</span>
+        </div>
+        <div class="vp-dash-card-body" style="padding:0;">
+          <div style="padding:13px 20px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;justify-content:space-between;">
+            <span style="font-size:12px;color:rgba(255,255,255,0.35);">Company</span>
+            <span style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500;text-align:right;max-width:60%;">{{ job_post.company_name }}</span>
+          </div>
+          <div style="padding:13px 20px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;justify-content:space-between;">
+            <span style="font-size:12px;color:rgba(255,255,255,0.35);">Location</span>
+            <span style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500;text-align:right;max-width:60%;">{{ job_post.location }}</span>
+          </div>
+          <div style="padding:13px 20px;{% if not job_post.salary_range %}{% else %}border-bottom:1px solid rgba(255,255,255,0.05);{% endif %}display:flex;justify-content:space-between;">
+            <span style="font-size:12px;color:rgba(255,255,255,0.35);">Type</span>
+            <span style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500;">{{ job_post.get_job_type_display() }}</span>
+          </div>
+          {% if job_post.salary_range %}
+          <div style="padding:13px 20px;display:flex;justify-content:space-between;">
+            <span style="font-size:12px;color:rgba(255,255,255,0.35);">Salary</span>
+            <span style="font-size:13px;color:#4ade80;font-weight:600;">{{ job_post.salary_range }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
+{% endblock %}
 
-<!-- Custom Timeline CSS -->
-<style>
-.timeline {
-    position: relative;
-    padding: 0;
-}
-
-.timeline-item {
-    position: relative;
-    padding-left: 40px;
-    margin-bottom: 20px;
-}
-
-.timeline-item::before {
-    content: '';
-    position: absolute;
-    left: 13px;
-    top: 30px;
-    height: calc(100% + 10px);
-    width: 2px;
-    background: #dee2e6;
-}
-
-.timeline-item:last-child::before {
-    display: none;
-}
-
-.timeline-marker {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    border: 3px solid #fff;
-    box-shadow: 0 0 0 2px #dee2e6;
-}
-
-.timeline-item.active .timeline-marker {
-    box-shadow: 0 0 0 2px #198754;
-}
-
-.timeline-content h6 {
-    margin-bottom: 5px;
-    font-size: 14px;
-}
-</style>
-
-<!-- Form Validation JavaScript -->
+{% block extra_scripts %}
 <script>
-(function() {
-    'use strict';
-    window.addEventListener('load', function() {
-        var forms = document.getElementsByClassName('needs-validation');
-        var validation = Array.prototype.filter.call(forms, function(form) {
-            form.addEventListener('submit', function(event) {
-                var coverLetter = document.getElementById('cover_letter');
-                var resumeFile = document.getElementById('resume_file');
-                
-                // Custom validation for cover letter length
-                if (coverLetter.value.length < 50) {
-                    coverLetter.setCustomValidity('Cover letter must be at least 50 characters long.');
-                } else {
-                    coverLetter.setCustomValidity('');
-                }
-                
-                // File type validation
-                if (resumeFile.files.length > 0) {
-                    var fileName = resumeFile.files[0].name.toLowerCase();
-                    var allowedExtensions = ['.pdf', '.doc', '.docx'];
-                    var isValidExtension = allowedExtensions.some(function(ext) {
-                        return fileName.endsWith(ext);
-                    });
-                    
-                    if (!isValidExtension) {
-                        resumeFile.setCustomValidity('Please upload a PDF, DOC, or DOCX file.');
-                    } else {
-                        resumeFile.setCustomValidity('');
-                    }
-                }
-                
-                if (form.checkValidity() === false) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                form.classList.add('was-validated');
-            }, false);
-        });
+(function () {
+  'use strict';
+
+  const jobId = {{ job_post.id }};
+
+  // ── CV Scan on page load ────────────────────────────────
+  function tag(text, color) {
+    return `<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${color}22;border:1px solid ${color}44;color:${color};">${text}</span>`;
+  }
+
+  function setStatus(text, color) {
+    const badge = document.getElementById('scanStatusBadge');
+    badge.textContent = text;
+    badge.style.background = color + '22';
+    badge.style.color = color;
+    badge.style.borderColor = color + '44';
+  }
+
+  function buildAssessment(score, matchedSkills, missingSkills) {
+    const items = [];
+
+    if (score >= 75) {
+      items.push('Your CV is a strong match for this role — your military background aligns well with the requirements.');
+      items.push('Your chances of being shortlisted are high. Ensure your cover letter reinforces your key strengths.');
+    } else if (score >= 50) {
+      items.push('Your CV shows partial alignment with this role. You meet some core requirements but there are gaps.');
+      items.push('Address the missing keywords in your cover letter to compensate for what\'s not explicit in your CV.');
+      if (missingSkills.length) {
+        items.push(`Consider explicitly mentioning experience with: <strong style="color:#fbbf24;">${missingSkills.slice(0,3).join(', ')}</strong> if applicable.`);
+      }
+      items.push('Your chances improve significantly with a tailored cover letter that bridges these gaps.');
+    } else {
+      items.push('Your CV does not closely match the stated requirements for this role as written.');
+      items.push('This does not mean you cannot do the job — but your CV needs to better communicate your relevant experience.');
+      if (missingSkills.length) {
+        items.push(`The role specifically requires: <strong style="color:#f87171;">${missingSkills.slice(0,4).join(', ')}</strong> — these are not clearly demonstrated in your CV.`);
+      }
+      items.push('We strongly recommend optimising your CV before applying. A professionally rewritten CV can transform your chances.');
+    }
+
+    return items;
+  }
+
+  fetch(`/jobs/${jobId}/check-cv`, {
+    method: 'POST',
+    headers: { 'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.content || '' },
+    credentials: 'same-origin',
+  })
+  .then(r => r.json())
+  .then(data => {
+    document.getElementById('scanLoading').style.display = 'none';
+
+    // No CV
+    if (data.error === 'no_cv' || data.error === 'cv_unreadable') {
+      document.getElementById('scanNoCv').style.display = '';
+      setStatus('No CV Found', '#fbbf24');
+      return;
+    }
+
+    if (data.error) {
+      document.getElementById('scanNoCv').style.display = '';
+      setStatus('Scan Failed', '#f87171');
+      return;
+    }
+
+    // Show result
+    document.getElementById('scanResult').style.display = '';
+
+    const score = data.score || 0;
+    const isMatch = data.is_match;
+    const matched = data.matched_skills || [];
+    const missing = data.missing_skills || [];
+
+    // Score bar
+    document.getElementById('scoreValue').textContent = score + '%';
+    const bar = document.getElementById('scoreBarFill');
+    setTimeout(() => { bar.style.width = score + '%'; }, 100);
+
+    if (score >= 75) {
+      bar.style.background = 'linear-gradient(90deg,#d4af37,#4ade80)';
+      setStatus('Strong Match', '#4ade80');
+    } else if (score >= 50) {
+      bar.style.background = 'linear-gradient(90deg,#d4af37,#fbbf24)';
+      setStatus('Partial Match', '#fbbf24');
+    } else {
+      bar.style.background = 'linear-gradient(90deg,#f87171,#ef4444)';
+      setStatus('Weak Match', '#f87171');
+    }
+
+    // Verdict box
+    const verdictBox  = document.getElementById('verdictBox');
+    const verdictIcon = document.getElementById('verdictIcon');
+    const verdictTitle = document.getElementById('verdictTitle');
+    const verdictText  = document.getElementById('verdictText');
+
+    if (score >= 75) {
+      verdictBox.style.cssText += ';background:rgba(74,222,128,0.06);border-left-color:#4ade80;';
+      verdictIcon.className = 'fas fa-check-circle fa-lg';
+      verdictIcon.style.color = '#4ade80';
+      verdictTitle.textContent = 'Strong Candidate — Good to Go';
+      verdictText.textContent = data.reasoning;
+    } else if (score >= 50) {
+      verdictBox.style.cssText += ';background:rgba(251,191,36,0.06);border-left-color:#fbbf24;';
+      verdictIcon.className = 'fas fa-exclamation-circle fa-lg';
+      verdictIcon.style.color = '#fbbf24';
+      verdictTitle.textContent = 'Partial Match — Proceed with a Strong Cover Letter';
+      verdictText.textContent = data.reasoning;
+    } else {
+      verdictBox.style.cssText += ';background:rgba(248,113,113,0.06);border-left-color:#f87171;';
+      verdictIcon.className = 'fas fa-times-circle fa-lg';
+      verdictIcon.style.color = '#f87171';
+      verdictTitle.textContent = 'Weak Match — CV Needs Work Before Applying';
+      verdictText.textContent = data.reasoning;
+    }
+
+    // Matched skills
+    if (matched.length) {
+      document.getElementById('matchedCol').style.display = '';
+      document.getElementById('matchedSkillsList').innerHTML =
+        matched.map(s => tag(s, '#4ade80')).join('');
+    }
+
+    // Missing skills
+    if (missing.length) {
+      document.getElementById('gapsCol').style.display = '';
+      document.getElementById('missingSkillsList').innerHTML =
+        missing.map(s => tag(s, '#f87171')).join('');
+    }
+
+    // Honest assessment
+    const items = buildAssessment(score, matched, missing);
+    if (items.length) {
+      document.getElementById('honestyBox').style.display = '';
+      document.getElementById('assessmentList').innerHTML =
+        items.map(i => `<li style="margin-bottom:4px;">${i}</li>`).join('');
+    }
+
+    // Optimization CTA if score < 70
+    if (score < 70) {
+      document.getElementById('optimizeCta').style.display = '';
+    }
+  })
+  .catch(() => {
+    document.getElementById('scanLoading').style.display = 'none';
+    document.getElementById('scanNoCv').style.display = '';
+    setStatus('Scan Unavailable', '#6c757d');
+  });
+
+  // ── Form validation ─────────────────────────────────────
+  var forms = document.getElementsByClassName('needs-validation');
+  Array.prototype.forEach.call(forms, function (form) {
+    form.addEventListener('submit', function (event) {
+      var coverLetter = document.getElementById('cover_letter');
+      var resumeFile  = document.getElementById('resume_file');
+
+      coverLetter.setCustomValidity(
+        coverLetter.value.trim().length < 50
+          ? 'Cover letter must be at least 50 characters.'
+          : ''
+      );
+
+      if (resumeFile.files.length > 0) {
+        var name = resumeFile.files[0].name.toLowerCase();
+        resumeFile.setCustomValidity(
+          ['.pdf', '.doc', '.docx'].some(function (e) { return name.endsWith(e); })
+            ? ''
+            : 'Please upload a PDF, DOC, or DOCX file.'
+        );
+      }
+
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
     }, false);
+  });
 })();
 </script>
 {% endblock %}

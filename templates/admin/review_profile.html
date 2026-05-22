@@ -1,255 +1,420 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}Review Profile: {{ profile.user.full_name }} - Admin{% endblock %}
 
-{% block content %}
-<div class="container py-4">
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">
-                        <i class="fas fa-user-check me-2"></i>Profile Review: {{ profile.user.full_name }}
-                    </h4>
-                </div>
-                <div class="card-body p-4">
-                    <!-- Current Status -->
-                    <div class="alert alert-{{ 'success' if profile.verification_status == 'approved' else 'danger' if profile.verification_status == 'rejected' else 'warning' }} mb-4">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-{{ 'check-circle' if profile.verification_status == 'approved' else 'times-circle' if profile.verification_status == 'rejected' else 'clock' }} fa-2x me-3"></i>
-                            <div>
-                                <h5 class="mb-1">Status: {{ profile.verification_status.title() }}</h5>
-                                {% if profile.admin_notes %}
-                                <p class="mb-0"><strong>Admin Notes:</strong> {{ profile.admin_notes }}</p>
-                                {% endif %}
-                                {% if profile.verified_by_admin %}
-                                <p class="mb-0"><small>Processed by: {{ profile.verified_by_admin.full_name }} on {{ profile.verified_at.strftime('%m/%d/%Y at %I:%M %p') if profile.verified_at else 'N/A' }}</small></p>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
+{% block admin_content %}
+<div class="container-fluid px-4 py-3">
 
-                    <!-- Personal Information -->
-                    <div class="mb-4">
-                        <h5 class="fw-bold text-primary mb-3"><i class="fas fa-user me-2"></i>Personal Information</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Full Name:</label>
-                                <p class="mb-0">{{ profile.user.full_name }}</p>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Email:</label>
-                                <p class="mb-0">{{ profile.user.email }}</p>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Age:</label>
-                                <p class="mb-0">{{ profile.age or "N/A" }} years old</p>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Account Created:</label>
-                                <p class="mb-0">{{ profile.user.created_at.strftime('%m/%d/%Y') }}</p>
-                            </div>
-                        </div>
-                    </div>
+  {# ── Back nav ── #}
+  <div class="mb-3">
+    <a href="{{ url_for('admin.verification_management') }}" class="text-muted small">
+      <i class="fas fa-arrow-left me-1"></i>Back to Verification Queue
+    </a>
+  </div>
 
-                    <!-- Military Service Information -->
-                    <div class="mb-4">
-                        <h5 class="fw-bold text-success mb-3"><i class="fas fa-flag-usa me-2"></i>Military Service</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Service Branch:</label>
-                                <p class="mb-0">{{ profile.service_branch or "N/A" }}</p>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Service Number:</label>
-                                <p class="mb-0">{{ profile.service_number }}</p>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Department/Unit:</label>
-                                <p class="mb-0">{{ profile.department }}</p>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Years of Service:</label>
-                                <p class="mb-0">{{ profile.years_of_service }} years</p>
-                            </div>
-                        </div>
-                    </div>
+  {# ── Page header ── #}
+  <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+    <h1 class="h4 fw-semibold mb-0">
+      <i class="fas fa-user-check me-2 text-primary"></i>
+      Profile Review — {{ profile.user.full_name }}
+    </h1>
+    <span class="badge fs-6
+      {% if profile.verification_status == 'approved' %}bg-success
+      {% elif profile.verification_status == 'rejected' %}bg-danger
+      {% else %}bg-warning text-dark{% endif %}">
+      {{ profile.verification_status | title }}
+    </span>
+  </div>
 
-                    <!-- Bio -->
-                    {% if profile.bio %}
-                    <div class="mb-4">
-                        <h5 class="fw-bold text-info mb-3"><i class="fas fa-edit me-2"></i>Professional Bio</h5>
-                        <div class="bg-light p-3 rounded">
-                            <p class="mb-0">{{ profile.bio }}</p>
-                        </div>
-                    </div>
-                    {% endif %}
+  <div class="row g-4">
 
-                    <!-- Resume -->
-                    <div class="col-md-6 mb-3">
-                        <div class="card">
-                            <div class="card-body text-center">
-                                <i class="fas fa-file fa-3x text-primary mb-2"></i>
-                                <h6 class="card-title">Resume</h6>
+    {# ══════════════════════════════════════════
+       LEFT COLUMN — profile detail
+    ══════════════════════════════════════════ #}
+    <div class="col-lg-8">
 
-                                {% if profile.resume_file %}
-                                <p class="card-text">
-                                    <small class="text-muted">{{ profile.resume_file }}</small>
-                                </p>
-
-                                <a href="{{ url_for('admin.view_document', profile_id=profile.id, document_type='resume') }}"
-                                   class="btn btn-primary btn-sm"
-                                   target="_blank">
-                                    <i class="fas fa-eye me-1"></i>View Document
-                                </a>
-
-                                {% else %}
-
-                                <p class="card-text text-danger">Not uploaded</p>
-
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Documents -->
-                    <div class="mb-4">
-                        <h5 class="fw-bold text-warning mb-3"><i class="fas fa-file-alt me-2"></i>Uploaded Documents</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <div class="card">
-                                    <div class="card-body text-center">
-                                        <i class="fas fa-file-pdf fa-3x text-danger mb-2"></i>
-                                        <h6 class="card-title">Discharge Certificate</h6>
-                                        {% if profile.discharge_document %}
-                                        <p class="card-text"><small class="text-muted">{{ profile.discharge_document }}</small></p>
-                                        <a href="{{ url_for('admin.view_document', profile_id=profile.id, document_type='discharge') }}" 
-                                           class="btn btn-primary btn-sm" target="_blank">
-                                            <i class="fas fa-eye me-1"></i>View Document
-                                        </a>
-                                        {% else %}
-                                        <p class="card-text text-danger">Not uploaded</p>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="card">
-                                    <div class="card-body text-center">
-                                        <i class="fas fa-id-card fa-3x text-info mb-2"></i>
-                                        <h6 class="card-title">ID Card/Photo</h6>
-                                        {% if profile.id_document %}
-                                        <p class="card-text"><small class="text-muted">{{ profile.id_document }}</small></p>
-                                        <a href="{{ url_for('admin.view_document', profile_id=profile.id, document_type='id') }}" 
-                                           class="btn btn-primary btn-sm" target="_blank">
-                                            <i class="fas fa-eye me-1"></i>View Document
-                                        </a>
-                                        {% else %}
-                                        <p class="card-text text-danger">Not uploaded</p>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Action Forms -->
-                    {% if profile.verification_status == 'pending' %}
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="card border-success">
-                                <div class="card-header bg-success text-white">
-                                    <h6 class="mb-0"><i class="fas fa-check me-2"></i>Approve Profile</h6>
-                                </div>
-                                <div class="card-body">
-                                    <form method="POST" action="{{ url_for('admin.approve_profile', profile_id=profile.id) }}">
-                                        <div class="mb-3">
-                                            <label for="approve_notes" class="form-label">Admin Notes (Optional)</label>
-                                            <textarea class="form-control" id="approve_notes" name="admin_notes" rows="3" 
-                                                      placeholder="Add any notes about the approval..."></textarea>
-                                        </div>
-                                        <button type="submit" class="btn btn-success w-100" onclick="return confirm('Are you sure you want to approve this profile?')">
-                                            <i class="fas fa-check me-2"></i>Approve Profile
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="card border-danger">
-                                <div class="card-header bg-danger text-white">
-                                    <h6 class="mb-0"><i class="fas fa-times me-2"></i>Reject Profile</h6>
-                                </div>
-                                <div class="card-body">
-                                    <form method="POST" action="{{ url_for('admin.reject_profile', profile_id=profile.id) }}">
-                                        <div class="mb-3">
-                                            <label for="reject_notes" class="form-label">Reason for Rejection *</label>
-                                            <textarea class="form-control" id="reject_notes" name="admin_notes" rows="3" 
-                                                      placeholder="Explain why this profile is being rejected..." required></textarea>
-                                        </div>
-                                        <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to reject this profile?')">
-                                            <i class="fas fa-times me-2"></i>Reject Profile
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
+      {# Admin notes banner (if already processed) #}
+      {% if profile.verification_status != 'pending' %}
+        <div class="alert alert-{{ 'success' if profile.verification_status == 'approved' else 'danger' }} mb-4 py-2">
+          <i class="fas fa-{{ 'check-circle' if profile.verification_status == 'approved' else 'times-circle' }} me-2"></i>
+          <strong>{{ profile.verification_status | title }}</strong>
+          {% if profile.admin_notes %} — {{ profile.admin_notes }}{% endif %}
+          {% if profile.verified_by_admin %}
+            <br><small class="text-muted">
+              Processed by {{ profile.verified_by_admin.full_name }}
+              {% if profile.verified_at %}on {{ profile.verified_at.strftime('%d %b %Y at %H:%M') }}{% endif %}
+            </small>
+          {% endif %}
         </div>
+      {% endif %}
 
-        <!-- Sidebar -->
-        <div class="col-lg-4">
-            <!-- Profile Summary -->
-            <div class="card shadow mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Profile Summary</h6>
-                </div>
-                <div class="card-body">
-                    <div class="text-center mb-3">
-                        <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-medal fa-2x"></i>
-                        </div>
-                        <h5 class="fw-bold mb-1">{{ profile.user.full_name }}</h5>
-                        <p class="text-muted mb-0">{{ profile.service_branch or "Veteran" }}</p>
-                    </div>
-                    
-                    <ul class="list-unstyled mb-0">
-                        <li class="mb-2">
-                            <i class="fas fa-calendar text-muted me-2"></i>
-                            <small>Submitted: {{ profile.created_at.strftime('%B %d, %Y') }}</small>
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-clock text-muted me-2"></i>
-                            <small>Last Updated: {{ profile.updated_at.strftime('%B %d, %Y') }}</small>
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-percentage text-muted me-2"></i>
-                            <small>Profile Completion: {{ profile.profile_completion_percentage }}%</small>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="card shadow">
-                <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h6>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a href="{{ url_for('admin.verification_management') }}" class="btn btn-outline-primary">
-                            <i class="fas fa-arrow-left me-2"></i>Back to Verification
-                        </a>
-                        <a href="{{ url_for('dashboard.admin') }}" class="btn btn-outline-secondary">
-                            <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
-                        </a>
-                    </div>
-                </div>
-            </div>
+      {# ── 1. Personal Information ── #}
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white fw-semibold py-3">
+          <i class="fas fa-user me-2 text-primary"></i>Personal Information
         </div>
-    </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="text-muted small">Full Name</div>
+              <div class="fw-semibold">{{ profile.user.full_name }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-muted small">Email</div>
+              <div>{{ profile.user.email }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-muted small">Phone</div>
+              <div>{{ profile.user.phone or '—' }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-muted small">Age</div>
+              <div>{{ profile.age or '—' }} years old</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-muted small">Location</div>
+              <div>{{ profile.location or '—' }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-muted small">NIN</div>
+              <div>
+                {% if profile.nin %}
+                  <span class="font-monospace">{{ profile.nin }}</span>
+                {% else %}
+                  <span class="text-danger">Not provided</span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-muted small">Account Type</div>
+              <div>
+                {% if profile.is_military_spouse %}
+                  <span class="badge bg-info">Military Spouse</span>
+                {% else %}
+                  <span class="badge bg-success">Veteran</span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-muted small">Account Created</div>
+              <div>{{ profile.user.created_at.strftime('%d %b %Y') }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# ── 2. Military Service ── #}
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white fw-semibold py-3">
+          <i class="fas fa-shield-alt me-2 text-success"></i>
+          {% if profile.is_military_spouse %}Spouse's Military Service{% else %}Military Service{% endif %}
+        </div>
+        <div class="card-body">
+          {% if profile.is_military_spouse %}
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="text-muted small">Spouse's Service Branch</div>
+                <div>{{ profile.spouse_service_branch or '—' }}</div>
+              </div>
+              <div class="col-md-6">
+                <div class="text-muted small">Spouse's Rank</div>
+                <div>{{ profile.spouse_rank or '—' }}</div>
+              </div>
+              <div class="col-md-6">
+                <div class="text-muted small">Spouse's Years of Service</div>
+                <div>{{ profile.spouse_years_of_service or '—' }}</div>
+              </div>
+              <div class="col-md-6">
+                <div class="text-muted small">Open to Relocation</div>
+                <div>{{ 'Yes' if profile.relocation_ready else 'No' }}</div>
+              </div>
+              {% if profile.employment_gap_explanation %}
+                <div class="col-12">
+                  <div class="text-muted small">Employment Gap Explanation</div>
+                  <div class="bg-light p-2 rounded small mt-1">{{ profile.employment_gap_explanation }}</div>
+                </div>
+              {% endif %}
+            </div>
+          {% else %}
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="text-muted small">Service Branch</div>
+                <div>{{ profile.get_service_branch_display() }}</div>
+              </div>
+              <div class="col-md-6">
+                <div class="text-muted small">Rank</div>
+                <div>{{ profile.rank or '—' }}</div>
+              </div>
+              <div class="col-md-6">
+                <div class="text-muted small">Service Number</div>
+                <div class="font-monospace">{{ profile.service_number or '—' }}</div>
+              </div>
+              <div class="col-md-6">
+                <div class="text-muted small">Department / Unit</div>
+                <div>{{ profile.department or '—' }}</div>
+              </div>
+              <div class="col-md-6">
+                <div class="text-muted small">Years of Service</div>
+                <div>{{ profile.years_of_service or '—' }} years</div>
+              </div>
+              <div class="col-md-6">
+                <div class="text-muted small">Discharge Type</div>
+                <div>{{ profile.discharge_type or '—' }}</div>
+              </div>
+              {% if profile.deployment_history %}
+                <div class="col-12">
+                  <div class="text-muted small">Deployment History</div>
+                  <div class="bg-light p-2 rounded small mt-1">{{ profile.deployment_history }}</div>
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {# ── 3. Skills & Bio ── #}
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white fw-semibold py-3">
+          <i class="fas fa-tools me-2 text-info"></i>Skills & Professional Info
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            {% if profile.bio %}
+              <div class="col-12">
+                <div class="text-muted small">Professional Bio</div>
+                <div class="bg-light p-3 rounded mt-1">{{ profile.bio }}</div>
+              </div>
+            {% endif %}
+            {% if profile.skills %}
+              <div class="col-12">
+                <div class="text-muted small mb-1">Skills</div>
+                <div class="d-flex flex-wrap gap-1">
+                  {% for skill in profile.skills.split(',') %}
+                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">
+                      {{ skill.strip() }}
+                    </span>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+            {% if profile.certifications %}
+              <div class="col-12">
+                <div class="text-muted small mb-1">Certifications</div>
+                <div class="d-flex flex-wrap gap-1">
+                  {% for cert in profile.certifications.split(',') %}
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                      {{ cert.strip() }}
+                    </span>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+            {% if not profile.bio and not profile.skills and not profile.certifications %}
+              <div class="col-12 text-muted small">No skills or bio provided.</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      {# ── 4. Documents ── #}
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white fw-semibold py-3">
+          <i class="fas fa-file-alt me-2 text-warning"></i>Uploaded Documents
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+
+            {# Resume #}
+            <div class="col-md-4">
+              <div class="card border text-center h-100">
+                <div class="card-body py-3">
+                  <i class="fas fa-file-pdf fa-2x text-primary mb-2"></i>
+                  <div class="fw-semibold small mb-1">Resume / CV</div>
+                  {% if profile.resume_file %}
+                    <div class="text-muted" style="font-size:11px;word-break:break-all;">{{ profile.resume_file }}</div>
+                    {% if profile.resume_last_updated %}
+                      <div class="text-muted" style="font-size:11px;">Updated {{ profile.resume_last_updated.strftime('%d %b %Y') }}</div>
+                    {% endif %}
+                    <a href="{{ url_for('admin.view_document', profile_id=profile.id, document_type='resume') }}"
+                       class="btn btn-primary btn-sm mt-2" target="_blank">
+                      <i class="fas fa-eye me-1"></i>View
+                    </a>
+                  {% else %}
+                    <div class="text-danger small mt-2">Not uploaded</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            {# Discharge certificate #}
+            <div class="col-md-4">
+              <div class="card border text-center h-100">
+                <div class="card-body py-3">
+                  <i class="fas fa-certificate fa-2x text-danger mb-2"></i>
+                  <div class="fw-semibold small mb-1">Discharge Certificate</div>
+                  {% if profile.discharge_document %}
+                    <div class="text-muted" style="font-size:11px;word-break:break-all;">{{ profile.discharge_document }}</div>
+                    <a href="{{ url_for('admin.view_document', profile_id=profile.id, document_type='discharge') }}"
+                       class="btn btn-primary btn-sm mt-2" target="_blank">
+                      <i class="fas fa-eye me-1"></i>View
+                    </a>
+                  {% else %}
+                    <div class="text-danger small mt-2">Not uploaded</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            {# ID document #}
+            <div class="col-md-4">
+              <div class="card border text-center h-100">
+                <div class="card-body py-3">
+                  <i class="fas fa-id-card fa-2x text-info mb-2"></i>
+                  <div class="fw-semibold small mb-1">ID Card / Photo</div>
+                  {% if profile.id_document %}
+                    <div class="text-muted" style="font-size:11px;word-break:break-all;">{{ profile.id_document }}</div>
+                    <a href="{{ url_for('admin.view_document', profile_id=profile.id, document_type='id') }}"
+                       class="btn btn-primary btn-sm mt-2" target="_blank">
+                      <i class="fas fa-eye me-1"></i>View
+                    </a>
+                  {% else %}
+                    <div class="text-danger small mt-2">Not uploaded</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      {# ── 5. Approve / Reject actions ── #}
+      {% if profile.verification_status == 'pending' %}
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="card border-success border-0 shadow-sm">
+              <div class="card-header bg-success text-white fw-semibold py-2">
+                <i class="fas fa-check me-2"></i>Approve Profile
+              </div>
+              <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.approve_profile', profile_id=profile.id) }}">
+                  <div class="mb-3">
+                    <label class="form-label small fw-semibold">Admin Notes (optional)</label>
+                    <textarea class="form-control form-control-sm" name="admin_notes" rows="3"
+                              placeholder="Any notes about the approval…"></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-success w-100"
+                          onclick="return confirm('Approve this profile?')">
+                    <i class="fas fa-check me-2"></i>Approve
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card border-danger border-0 shadow-sm">
+              <div class="card-header bg-danger text-white fw-semibold py-2">
+                <i class="fas fa-times me-2"></i>Reject Profile
+              </div>
+              <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.reject_profile', profile_id=profile.id) }}">
+                  <div class="mb-3">
+                    <label class="form-label small fw-semibold">Reason for Rejection <span class="text-danger">*</span></label>
+                    <textarea class="form-control form-control-sm" name="admin_notes" rows="3"
+                              placeholder="Explain why…" required></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-danger w-100"
+                          onclick="return confirm('Reject this profile?')">
+                    <i class="fas fa-times me-2"></i>Reject
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+    </div>{# end left column #}
+
+    {# ══════════════════════════════════════════
+       RIGHT COLUMN — summary sidebar
+    ══════════════════════════════════════════ #}
+    <div class="col-lg-4">
+
+      {# Profile summary card #}
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body text-center py-4">
+          <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+               style="width:72px;height:72px;">
+            <i class="fas fa-{{ 'heart' if profile.is_military_spouse else 'medal' }} fa-2x"></i>
+          </div>
+          <h5 class="fw-bold mb-0">{{ profile.user.full_name }}</h5>
+          <div class="text-muted small mb-2">
+            {% if profile.is_military_spouse %}Military Spouse
+            {% else %}{{ profile.get_service_branch_display() }}{% endif %}
+          </div>
+
+          {# Tier badge #}
+          <span class="badge {{ 'bg-warning text-dark' if profile.veteran_tier == 'basic' else 'bg-success' }} mb-3">
+            {{ (profile.veteran_tier or 'basic') | title }} Tier
+          </span>
+
+          <ul class="list-unstyled text-start small mb-0">
+            <li class="mb-2">
+              <i class="fas fa-calendar text-muted me-2"></i>
+              Submitted {{ profile.created_at.strftime('%d %b %Y') }}
+            </li>
+            <li class="mb-2">
+              <i class="fas fa-clock text-muted me-2"></i>
+              Updated {{ profile.updated_at.strftime('%d %b %Y') }}
+            </li>
+            <li class="mb-2">
+              <i class="fas fa-tasks text-muted me-2"></i>
+              Profile {{ profile.profile_completion_percentage() }}% complete
+            </li>
+            <li class="mb-2">
+              <i class="fas fa-rocket text-muted me-2"></i>
+              Job-Ready Package:
+              <span class="{{ 'text-success fw-semibold' if profile.job_ready_package_active else 'text-muted' }}">
+                {{ 'Active' if profile.job_ready_package_active else 'Inactive' }}
+              </span>
+            </li>
+            <li class="mb-2">
+              <i class="fas fa-bolt text-muted me-2"></i>
+              Profile Boost:
+              {% if profile.is_boosted() %}
+                <span class="text-success fw-semibold">
+                  Active ({{ profile.boost_days_remaining() }} day{{ 's' if profile.boost_days_remaining() != 1 }})
+                </span>
+              {% else %}
+                <span class="text-muted">Inactive</span>
+              {% endif %}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {# Quick actions #}
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white fw-semibold py-3">
+          <i class="fas fa-bolt me-2"></i>Quick Actions
+        </div>
+        <div class="card-body d-grid gap-2">
+          <a href="{{ url_for('admin.verification_management') }}" class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-arrow-left me-2"></i>Back to Verification
+          </a>
+          <a href="{{ url_for('dashboard.admin') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
+          </a>
+          {% if profile.user.email %}
+            <a href="mailto:{{ profile.user.email }}" class="btn btn-outline-info btn-sm">
+              <i class="fas fa-envelope me-2"></i>Email Veteran
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>{# end right column #}
+  </div>{# end row #}
 </div>
 {% endblock %}

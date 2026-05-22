@@ -1,19 +1,37 @@
 {% extends "layouts/dashboard_base.html" %}
 {% block dashboard_content %}
- 
+
+{% set profile = current_user.veteran_profile %}
+{% set is_spouse = profile and profile.is_military_spouse %}
+
 <div class="container-fluid p-0">
  
   <!-- ── WELCOME HEADER ──────────────────────────────────────── -->
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
     <div>
-      <p class="section-label mb-1">Veteran Dashboard</p>
+      <p class="section-label mb-1">
+        {{ 'Military Spouse Dashboard' if is_spouse else 'Veteran Dashboard' }}
+      </p>
       <h1 style="font-family:var(--font-display);font-size:clamp(24px,4vw,36px);font-weight:700;color:#ffffff;margin:0;">
         Welcome back, <em style="color:var(--gold);font-style:italic;">{{ current_user.first_name }}</em>
       </h1>
       <p style="color:rgba(255,255,255,0.4);font-size:13px;margin-top:4px;">
-        Explore jobs, programs, and resources tailored for you.
+        {% if is_spouse %}
+          Explore remote jobs, admin roles, logistics opportunities, and career resources tailored for military spouses.
+        {% else %}
+          Explore jobs, programs, and resources tailored for you.
+        {% endif %}
       </p>
     </div>
+    {% if is_spouse %}
+    <div class="alert alert-info border-0 py-2 mb-3"
+         role="alert"
+         style="background:rgba(96,165,250,0.08);color:#cfe7ff;border:1px solid rgba(96,165,250,0.18) !important;">
+      <i class="fas fa-heart me-2 text-info"></i>
+      <strong>Military Spouse Dashboard</strong> — jobs highlighted for you include
+      remote roles, admin positions, and logistics opportunities.
+    </div>
+    {% endif %}
     {% if veteran_tier == 'verified' %}
     <span class="vp-sidebar-badge" style="padding:6px 16px;font-size:11px;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.4);color:var(--gold);">
       <i class="fas fa-star me-1"></i>Job-Ready &mdash; Verified
@@ -27,8 +45,7 @@
  
   <!-- ── PROFILE STATUS ALERTS ────────────────────────────────── -->
   {% if current_user.veteran_profile %}
-    {% set profile = current_user.veteran_profile %}
-    {% if profile.verification_status == 'approved' %}
+  {% if profile.verification_status == 'approved' %}
     <div class="vp-dash-alert vp-dash-alert-success auto-dismiss">
       <i class="fas fa-check-circle"></i>
       <span>Profile verified! You can now apply for jobs.</span>
@@ -274,7 +291,10 @@
       <!-- Profile Status -->
       <div class="vp-dash-card">
         <div class="vp-dash-card-header">
-          <span><i class="fas fa-tasks me-2"></i>Your Profile Status</span>
+          <span>
+            <i class="fas fa-tasks me-2"></i>
+            {{ "Spouse Profile Status" if is_spouse else "Your Profile Status" }}
+          </span>
         </div>
         <div class="vp-dash-card-body">
           <div class="d-flex justify-content-between align-items-center mb-2">

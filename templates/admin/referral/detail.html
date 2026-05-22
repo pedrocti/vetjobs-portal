@@ -1,0 +1,140 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ link.campaign }} — Referral Detail{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid px-4 py-3">
+
+  <div class="mb-4">
+    <a href="{{ url_for('referral.index') }}" class="text-muted small">
+      <i class="fas fa-arrow-left me-1"></i>Back to referral links
+    </a>
+    <h1 class="h4 fw-semibold mt-2 mb-0">{{ link.campaign }}</h1>
+    {% if link.description %}
+      <p class="text-muted small mb-0">{{ link.description }}</p>
+    {% endif %}
+  </div>
+
+  {# ── Link URL ── #}
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <label class="form-label fw-semibold small text-muted text-uppercase">Referral URL</label>
+      <div class="d-flex gap-2 align-items-center">
+        <input type="text" class="form-control form-control-sm font-monospace"
+               id="refUrl" value="{{ link.full_url(base_url) }}" readonly>
+        <button class="btn btn-sm btn-outline-primary flex-shrink-0" onclick="copyUrl()">
+          <i class="fas fa-copy me-1"></i>Copy
+        </button>
+      </div>
+      <div class="mt-2 d-flex gap-3 small text-muted">
+        <span>Code: <code>{{ link.code }}</code></span>
+        <span>Status:
+          <span class="badge bg-{{ 'success' if link.is_valid() else 'secondary' }}">
+            {{ 'Active' if link.is_valid() else 'Inactive' }}
+          </span>
+        </span>
+        {% if link.expires_at %}
+          <span>Expires: {{ link.expires_at.strftime('%d %b %Y') }}</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {# ── Breakdown cards ── #}
+  {% set bd = link.breakdown() %}
+  <div class="row g-3 mb-4">
+    {% for label, val, color in [
+        ('Total Registrations', bd.total, 'primary'),
+        ('Veterans',            bd.veterans, 'success'),
+        ('Military Spouses',    bd.spouses, 'info'),
+        ('Employers',           bd.employers, 'warning'),
+    ] %}
+      <div class="col-6 col-md-3">
+        <div class="card border-0 bg-{{ color }} bg-opacity-10 h-100">
+          <div class="card-body py-3">
+            <div class="text-muted small">{{ label }}</div>
+            <div class="fs-3 fw-bold text-{{ color }}">{{ val }}</div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {# ── Conversion list ── #}
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white fw-semibold py-3">
+      Registrations via this link
+    </div>
+    <div class="card-body p-0">
+      {% if conversions %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Type</th>
+                <th>Registered</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for conv in conversions %}
+                <tr>
+                  <td class="text-muted small">{{ loop.index }}</td>
+                  <td>
+                    {% if conv.user %}
+                      {{ conv.user.full_name }}
+                    {% else %}
+                      <span class="text-muted">Unknown</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-muted small">
+                    {{ conv.user.email if conv.user else '—' }}
+                  </td>
+                  <td>
+                    {% if conv.is_spouse %}
+                      <span class="badge bg-info">Military Spouse</span>
+                    {% elif conv.user_type == 'veteran' %}
+                      <span class="badge bg-success">Veteran</span>
+                    {% elif conv.user_type == 'employer' %}
+                      <span class="badge bg-warning text-dark">Employer</span>
+                    {% else %}
+                      <span class="badge bg-secondary">{{ conv.user_type | title }}</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-muted small">
+                    {{ conv.registered_at.strftime('%d %b %Y, %H:%M') }}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-5 text-muted">
+          <i class="fas fa-user-plus fa-2x mb-3 opacity-25"></i>
+          <p class="mb-0">No registrations yet through this link.</p>
+          <p class="small">Share the URL above to start tracking signups.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+<script>
+function copyUrl() {
+  const el = document.getElementById('refUrl');
+  el.select();
+  navigator.clipboard.writeText(el.value).then(() => {
+    const btn = el.nextElementSibling;
+    btn.innerHTML = '<i class="fas fa-check me-1"></i>Copied!';
+    btn.classList.replace('btn-outline-primary', 'btn-success');
+    setTimeout(() => {
+      btn.innerHTML = '<i class="fas fa-copy me-1"></i>Copy';
+      btn.classList.replace('btn-success', 'btn-outline-primary');
+    }, 2000);
+  });
+}
+</script>
+{% endblock %}

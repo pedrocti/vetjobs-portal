@@ -175,10 +175,23 @@
             </a>
 
             {% if current_user.is_authenticated and current_user.is_veteran() %}
-            <a href="{{ url_for('applications.apply_to_job', job_id=job.id) }}"
-               class="btn-vp-primary" style="padding:10px 22px;font-size:11px;">
-              <i class="fas fa-paper-plane"></i><span>Apply Now</span>
-            </a>
+              {% if job.is_admin_posted %}
+              <a href="{{ url_for('jobs.job_details', job_id=job.id) }}"
+                 class="btn-vp-primary" style="padding:10px 22px;font-size:11px;">
+                <i class="fas fa-paper-plane"></i><span>Apply Now</span>
+              </a>
+              {% elif job.external_apply_url %}
+              <a href="{{ job.external_apply_url }}"
+                 target="_blank" rel="noopener noreferrer"
+                 class="btn-vp-primary" style="padding:10px 22px;font-size:11px;">
+                <i class="fas fa-external-link-alt"></i><span>Apply Now</span>
+              </a>
+              {% else %}
+              <a href="{{ url_for('applications.apply_to_job', job_id=job.id) }}"
+                 class="btn-vp-primary" style="padding:10px 22px;font-size:11px;">
+                <i class="fas fa-paper-plane"></i><span>Apply Now</span>
+              </a>
+              {% endif %}
             {% elif not current_user.is_authenticated %}
             <a href="{{ url_for('auth.login') }}"
                style="display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:var(--gold);color:var(--navy);font-family:var(--font-cond);font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;text-decoration:none;">

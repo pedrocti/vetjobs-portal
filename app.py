@@ -123,7 +123,10 @@ def create_app():
     from routes.training_programs import training_bp
     from routes.services import services_bp
     from routes.marketplace import marketplace_bp
-    import routes.admin.marketplace_admin  # registers admin marketplace routes
+    import routes.admin.marketplace_admin  
+    from routes.admin.ai_jobs import ai_jobs_bp
+    from routes.admin.referral import referral_bp
+    from routes.smart_apply import smart_apply_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix="/auth")
@@ -142,6 +145,10 @@ def create_app():
     app.register_blueprint(training_bp)
     app.register_blueprint(services_bp)
     app.register_blueprint(marketplace_bp, url_prefix='/marketplace')
+    app.register_blueprint(ai_jobs_bp)
+    app.register_blueprint(referral_bp)
+    app.register_blueprint(smart_apply_bp)
+    
 
     # ===============================
     # Error handlers

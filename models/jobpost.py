@@ -35,6 +35,13 @@ class JobPosting(db.Model):
     experience_level = db.Column(db.String(50))
     is_veteran_friendly = db.Column(db.Boolean, default=False)
 
+    # Application method fields
+    apply_email          = db.Column(db.String(255), nullable=True)   # email to send CV to
+    external_apply_url   = db.Column(db.String(500), nullable=True)   # external link to apply
+    how_to_apply         = db.Column(db.Text, nullable=True)          # human-readable instructions
+    deadline             = db.Column(db.DateTime, nullable=True)      # application closing date
+    is_admin_posted      = db.Column(db.Boolean, default=False)       # True = scraped/admin job
+
     # Employer (User)
     posted_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 

@@ -134,36 +134,28 @@
           <!-- Apply + Share row -->
           <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(212,175,55,0.12);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
 
-            <!-- ── APPLY BUTTON — auth-gated ── -->
+            <!-- ── APPLY BUTTON ── -->
             {% if not current_user.is_authenticated %}
-              <!-- Not logged in — always redirect to login regardless of apply type -->
               <a href="{{ url_for('auth.login', next=request.url) }}" class="btn-vp-primary">
                 <i class="fas fa-sign-in-alt"></i>
                 <span>Login to Apply</span>
               </a>
 
             {% elif not current_user.is_veteran() %}
-              <!-- Logged in but not a veteran -->
               <span style="display:inline-flex;align-items:center;gap:8px;padding:12px 22px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:2px;font-family:var(--font-cond);font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);">
                 <i class="fas fa-lock"></i>Veterans Only
               </span>
 
-            {% elif job.external_apply_url %}
-              <!-- Authenticated veteran — external apply -->
-              <a href="{{ job.external_apply_url }}"
-                 target="_blank" rel="noopener noreferrer"
-                 class="btn-vp-primary">
-                <i class="fas fa-external-link-alt"></i>
-                <span>Apply on Company Website</span>
-              </a>
-
             {% else %}
-              <!-- Authenticated veteran — internal apply -->
-              <a href="{{ url_for('applications.apply_to_job', job_id=job.id) }}"
-                 class="btn-vp-primary">
+              <button type="button"
+                      id="smartApplyBtn"
+                      data-job-id="{{ job.id }}"
+                      data-apply-method="{{ 'email' if job.apply_email else ('link' if job.external_apply_url else 'internal') }}"
+                      data-apply-url="{{ job.external_apply_url or url_for('applications.apply_to_job', job_id=job.id) }}"
+                      class="btn-vp-primary">
                 <i class="fas fa-paper-plane"></i>
                 <span>Apply Now</span>
-              </a>
+              </button>
             {% endif %}
 
             <!-- Share buttons -->
@@ -219,6 +211,18 @@
           </div>
           {% endif %}
 
+          {% if job.benefits %}
+          <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(212,175,55,0.1);">
+            <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;">
+              What We Offer
+            </div>
+            <div style="white-space:pre-line;line-height:1.9;color:rgba(255,255,255,0.72);font-size:15px;">
+              {{ job.benefits | safe }}
+            </div>
+          </div>
+          {% endif %}
+
+          {# What We Offer — shown when benefits info exists #}
           {% if job.benefits %}
           <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(212,175,55,0.1);">
             <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;">
@@ -325,7 +329,7 @@
         <div class="vp-dash-card mb-4">
           <div class="vp-dash-card-body" style="text-align:center;">
 
-            <!-- ── SIDEBAR APPLY — same auth gate ── -->
+            <!-- ── SIDEBAR APPLY ── -->
             {% if not current_user.is_authenticated %}
               <a href="{{ url_for('auth.login', next=request.url) }}"
                  class="btn-vp-primary w-100" style="justify-content:center;margin-bottom:12px;">
@@ -347,32 +351,32 @@
                 </div>
               </div>
 
-            {% elif job.external_apply_url %}
-              <a href="{{ job.external_apply_url }}"
-                 target="_blank" rel="noopener noreferrer"
-                 class="btn-vp-primary w-100" style="justify-content:center;margin-bottom:12px;">
-                <i class="fas fa-external-link-alt"></i>
-                <span>Apply on Company Website</span>
-              </a>
-
             {% else %}
-              <a href="{{ url_for('applications.apply_to_job', job_id=job.id) }}"
-                 class="btn-vp-primary w-100" style="justify-content:center;margin-bottom:12px;">
+              <button type="button"
+                      id="smartApplyBtnSidebar"
+                      data-job-id="{{ job.id }}"
+                      data-apply-method="{{ 'email' if job.apply_email else ('link' if job.external_apply_url else 'internal') }}"
+                      data-apply-url="{{ job.external_apply_url or url_for('applications.apply_to_job', job_id=job.id) }}"
+                      class="btn-vp-primary w-100" style="justify-content:center;margin-bottom:12px;">
                 <i class="fas fa-paper-plane"></i>
-                <span>Apply for this Job</span>
-              </a>
+                <span>Apply Now</span>
+              </button>
+              <p style="font-size:12px;color:rgba(255,255,255,0.35);margin:0;">
+                <i class="fas fa-shield-alt me-1" style="color:var(--gold);"></i>
+                CV scan included before applying
+              </p>
             {% endif %}
 
             <!-- Deadline notice -->
             {% if job.deadline is defined and job.deadline and now is defined %}
               {% set days_left = (job.deadline - now).days %}
               {% if days_left >= 0 %}
-              <p style="font-size:12px;color:rgba(255,255,255,0.4);margin:0;">
+              <p style="font-size:12px;color:rgba(255,255,255,0.4);margin:8px 0 0;">
                 <i class="fas fa-hourglass-half me-1" style="color:#fbbf24;"></i>
                 {{ days_left }} day{{ 's' if days_left != 1 }} left to apply
               </p>
               {% else %}
-              <p style="font-size:12px;color:#f87171;margin:0;">
+              <p style="font-size:12px;color:#f87171;margin:8px 0 0;">
                 <i class="fas fa-times-circle me-1"></i>Application period has closed
               </p>
               {% endif %}
@@ -416,6 +420,24 @@
                   &#8358;{{ "{:,}".format(job.salary_min) }}+
                 {% endif %}
               </span>
+            </div>
+            {% endif %}
+
+            {% if job.experience_level %}
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 20px;border-bottom:1px solid rgba(255,255,255,0.05);">
+              <span style="font-size:13px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:8px;">
+                <i class="fas fa-chart-line" style="color:#a78bfa;width:14px;text-align:center;"></i>Experience
+              </span>
+              <span style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500;">{{ job.experience_level }}</span>
+            </div>
+            {% endif %}
+
+            {% if job.industry %}
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 20px;border-bottom:1px solid rgba(255,255,255,0.05);">
+              <span style="font-size:13px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:8px;">
+                <i class="fas fa-industry" style="color:#60a5fa;width:14px;text-align:center;"></i>Industry
+              </span>
+              <span style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500;text-align:right;max-width:55%;">{{ job.industry }}</span>
             </div>
             {% endif %}
 
@@ -470,18 +492,15 @@
         <i class="fas fa-lock me-1"></i>Veterans Only
       </span>
 
-    {% elif job.external_apply_url %}
-      <a href="{{ job.external_apply_url }}"
-         target="_blank" rel="noopener noreferrer"
-         class="btn-vp-primary" style="flex:1;justify-content:center;">
-        <i class="fas fa-external-link-alt"></i><span>Apply on Company Website</span>
-      </a>
-
     {% else %}
-      <a href="{{ url_for('applications.apply_to_job', job_id=job.id) }}"
-         class="btn-vp-primary" style="flex:1;justify-content:center;">
+      <button type="button"
+              id="smartApplyBtnMobile"
+              data-job-id="{{ job.id }}"
+              data-apply-method="{{ 'email' if job.apply_email else ('link' if job.external_apply_url else 'internal') }}"
+              data-apply-url="{{ job.external_apply_url or url_for('applications.apply_to_job', job_id=job.id) }}"
+              class="btn-vp-primary" style="flex:1;justify-content:center;">
         <i class="fas fa-paper-plane"></i><span>Apply Now</span>
-      </a>
+      </button>
     {% endif %}
 
     <a href="{{ url_for('jobs.job_board') }}"
@@ -492,6 +511,314 @@
   </div>
 </div>
 
+
+<!-- ══════════════════════════════════════════════════════════
+     SMART APPLY MODAL
+     Only rendered for admin-posted jobs with authenticated veterans
+══════════════════════════════════════════════════════════ -->
+{% if current_user.is_authenticated and current_user.is_veteran() %}
+<div class="modal fade" id="smartApplyModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:480px;">
+    <div class="modal-content" style="background:#0d2137;border:1px solid rgba(212,175,55,0.2);border-radius:14px;">
+
+      <!-- Step: Scanning -->
+      <div id="stepScanning" class="modal-body text-center py-5">
+        <div class="spinner-border mb-3" style="color:var(--gold);" role="status"></div>
+        <p class="fw-semibold mb-1" style="color:#fff;">Scanning your CV…</p>
+        <p style="color:rgba(255,255,255,0.45);font-size:13px;margin:0;">
+          Checking how well your profile matches this role.
+        </p>
+      </div>
+
+      <!-- Step: Match result (good) -->
+      <div id="stepMatch" style="display:none;">
+        <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,0.07);padding:20px 24px 16px;">
+          <h5 class="modal-title fw-bold" style="color:#4ade80;font-size:16px;">
+            <i class="fas fa-check-circle me-2"></i>Good Match!
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" style="padding:20px 24px;">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <small style="color:rgba(255,255,255,0.4);">Match Score</small>
+            <small class="fw-bold" id="scoreLabel" style="color:#4ade80;">0%</small>
+          </div>
+          <div class="progress mb-3" style="height:8px;border-radius:6px;background:rgba(255,255,255,0.07);">
+            <div id="scoreBar" class="progress-bar" role="progressbar"
+                 style="width:0%;border-radius:6px;transition:width 0.9s ease;background:linear-gradient(90deg,#d4af37,#4ade80);"></div>
+          </div>
+          <div id="matchReasoning" class="mb-3 p-3 rounded"
+               style="background:rgba(74,222,128,0.07);border-left:3px solid rgba(74,222,128,0.4);font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;"></div>
+          <div id="matchedSkillsWrap" style="display:none;margin-bottom:10px;">
+            <small style="color:rgba(255,255,255,0.35);display:block;margin-bottom:6px;">Skills found in your CV:</small>
+            <div id="matchedSkillsTags"></div>
+          </div>
+          <div id="missingSkillsWrap" style="display:none;">
+            <small style="color:rgba(255,255,255,0.35);display:block;margin-bottom:6px;">Skills to highlight:</small>
+            <div id="missingSkillsTags"></div>
+          </div>
+        </div>
+        <div class="modal-footer flex-column gap-2" style="border-top:1px solid rgba(255,255,255,0.07);padding:16px 24px;" id="matchActions"></div>
+      </div>
+
+      <!-- Step: No match -->
+      <div id="stepNoMatch" style="display:none;">
+        <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,0.07);padding:20px 24px 16px;">
+          <h5 class="modal-title fw-bold" style="color:#f87171;font-size:16px;">
+            <i class="fas fa-exclamation-circle me-2"></i>CV Doesn't Quite Match
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" style="padding:20px 24px;">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <small style="color:rgba(255,255,255,0.4);">Match Score</small>
+            <small class="fw-bold" id="noMatchScoreLabel" style="color:#f87171;">0%</small>
+          </div>
+          <div class="progress mb-3" style="height:8px;border-radius:6px;background:rgba(255,255,255,0.07);">
+            <div id="noMatchScoreBar" class="progress-bar bg-danger" role="progressbar"
+                 style="width:0%;border-radius:6px;transition:width 0.9s ease;"></div>
+          </div>
+          <div id="noMatchReasoning" class="mb-3 p-3 rounded"
+               style="background:rgba(248,113,113,0.07);border-left:3px solid rgba(248,113,113,0.4);font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;"></div>
+          <p style="font-size:13px;color:rgba(255,255,255,0.45);margin:0;">
+            You can still proceed, or optimise your CV to improve your chances.
+          </p>
+        </div>
+        <div class="modal-footer flex-column gap-2" style="border-top:1px solid rgba(255,255,255,0.07);padding:16px 24px;" id="noMatchActions"></div>
+      </div>
+
+      <!-- Step: Error / no CV -->
+      <div id="stepError" style="display:none;">
+        <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,0.07);padding:20px 24px 16px;">
+          <h5 class="modal-title fw-bold" style="color:#fbbf24;font-size:16px;">
+            <i class="fas fa-exclamation-triangle me-2"></i>Action Required
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" style="padding:20px 24px;">
+          <p id="errorMessage" style="color:rgba(255,255,255,0.72);font-size:14px;line-height:1.6;margin:0;"></p>
+        </div>
+        <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,0.07);padding:16px 24px;" id="errorActions"></div>
+      </div>
+
+      <!-- Step: Submitting -->
+      <div id="stepSubmitting" style="display:none;" class="modal-body text-center py-5">
+        <div class="spinner-border mb-3" style="color:#4ade80;" role="status"></div>
+        <p class="fw-semibold mb-1" style="color:#fff;">Submitting your application…</p>
+        <p style="color:rgba(255,255,255,0.45);font-size:13px;margin:0;">
+          Sending your CV to the employer on your behalf.
+        </p>
+      </div>
+
+      <!-- Step: Done -->
+      <div id="stepDone" style="display:none;">
+        <div class="modal-body text-center py-5">
+          <i class="fas fa-check-circle fa-4x mb-3" style="color:#4ade80;"></i>
+          <h5 class="fw-bold mb-2" style="color:#fff;">Application Submitted!</h5>
+          <p id="doneMessage" style="color:rgba(255,255,255,0.55);font-size:14px;margin:0;line-height:1.6;"></p>
+        </div>
+        <div class="modal-footer justify-content-center gap-2"
+             style="border-top:1px solid rgba(255,255,255,0.07);padding:16px 24px;">
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+          <a href="/jobs" class="btn btn-primary">Browse More Jobs</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endif %}
+{# /Smart Apply Modal #}
+
+
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+  // Collect all smart apply triggers (main, sidebar, mobile)
+  const triggers = document.querySelectorAll(
+    '#smartApplyBtn, #smartApplyBtnSidebar, #smartApplyBtnMobile'
+  );
+  if (!triggers.length) return;
+
+  const modalEl = document.getElementById('smartApplyModal');
+  const modal   = new bootstrap.Modal(modalEl);
+
+  // Helper — show only one step panel
+  const steps = ['stepScanning','stepMatch','stepNoMatch','stepError','stepSubmitting','stepDone'];
+  function show(id) {
+    steps.forEach(s => {
+      document.getElementById(s).style.display = s === id ? '' : 'none';
+    });
+  }
+
+  // Skill badge helper
+  function badge(text, color) {
+    return `<span style="display:inline-block;background:${color};color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin:2px;">${text}</span>`;
+  }
+
+  // CSRF token
+  const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+  function runSmartApply(btn) {
+    const jobId       = btn.dataset.jobId;
+    const applyMethod = btn.dataset.applyMethod;
+    const applyUrl    = btn.dataset.applyUrl;
+
+    modal.show();
+    show('stepScanning');
+
+    fetch(`/jobs/${jobId}/check-cv`, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': csrf },
+      credentials: 'same-origin',
+    })
+    .then(r => r.json())
+    .then(data => {
+
+      // ── Errors (no CV, unreadable) ────────────────────────
+      if (data.error) {
+        show('stepError');
+        document.getElementById('errorMessage').textContent = data.message || 'An error occurred.';
+        let errHtml = '';
+        if (data.action_url) {
+          errHtml += `<a href="${data.action_url}" class="btn btn-warning w-100">
+                        <i class="fas fa-upload me-2"></i>Upload My CV
+                      </a>`;
+        }
+        errHtml += `<button class="btn btn-outline-secondary w-100" data-bs-dismiss="modal">Cancel</button>`;
+        document.getElementById('errorActions').innerHTML = errHtml;
+        return;
+      }
+
+      const score   = data.score || 0;
+      const isMatch = data.is_match;
+
+      // ── Populate score bars ───────────────────────────────
+      const scoreBarId  = isMatch ? 'scoreBar'        : 'noMatchScoreBar';
+      const scoreLblId  = isMatch ? 'scoreLabel'      : 'noMatchScoreLabel';
+      const reasoningId = isMatch ? 'matchReasoning'  : 'noMatchReasoning';
+
+      setTimeout(() => {
+        document.getElementById(scoreBarId).style.width = score + '%';
+      }, 100);
+      document.getElementById(scoreLblId).textContent  = score + '%';
+      document.getElementById(reasoningId).textContent = data.reasoning || '';
+
+      if (isMatch) {
+        // Matched skills
+        if (data.matched_skills && data.matched_skills.length) {
+          document.getElementById('matchedSkillsWrap').style.display = '';
+          document.getElementById('matchedSkillsTags').innerHTML =
+            data.matched_skills.map(s => badge(s, '#198754')).join('');
+        }
+        // Missing skills
+        if (data.missing_skills && data.missing_skills.length) {
+          document.getElementById('missingSkillsWrap').style.display = '';
+          document.getElementById('missingSkillsTags').innerHTML =
+            data.missing_skills.map(s => badge(s, '#6c757d')).join('');
+        }
+
+        // Action buttons
+        let html = '';
+        if (applyMethod === 'email') {
+          html = `<button id="submitEmailBtn" class="btn btn-success w-100 fw-bold">
+                    <i class="fas fa-paper-plane me-2"></i>Submit My Application
+                  </button>
+                  <button class="btn btn-outline-secondary w-100" data-bs-dismiss="modal">Cancel</button>`;
+        } else if (applyMethod === 'link') {
+          html = `<a href="${applyUrl}" target="_blank" rel="noopener"
+                     class="btn btn-primary w-100 fw-bold">
+                    <i class="fas fa-external-link-alt me-2"></i>Continue on Employer Site
+                  </a>
+                  <button class="btn btn-outline-secondary w-100" data-bs-dismiss="modal">Cancel</button>`;
+        } else {
+          const applyHref = applyUrl || `/applications/apply/${jobId}`;
+          html = `<a href="${applyHref}" class="btn btn-primary w-100 fw-bold">
+                    <i class="fas fa-paper-plane me-2"></i>Proceed to Apply
+                  </a>
+                  <button class="btn btn-outline-secondary w-100" data-bs-dismiss="modal">Cancel</button>`;
+        }
+        document.getElementById('matchActions').innerHTML = html;
+        show('stepMatch');
+
+        // Wire email submit
+        const emailBtn = document.getElementById('submitEmailBtn');
+        if (emailBtn) {
+          emailBtn.addEventListener('click', () => submitApplication(jobId));
+        }
+
+      } else {
+        // No match actions
+        let html = `<button class="btn btn-warning w-100 fw-bold"
+                            onclick="window.location='/cv-optimization'">
+                      <i class="fas fa-magic me-2"></i>Optimise My CV — ₦15,000
+                    </button>`;
+        if (applyMethod === 'email') {
+          html += `<button id="proceedAnywayBtn" class="btn btn-outline-secondary w-100">
+                     Proceed Anyway
+                   </button>`;
+        } else if (applyMethod === 'link') {
+          html += `<a href="${applyUrl}" target="_blank" rel="noopener"
+                      class="btn btn-outline-secondary w-100">
+                     Proceed to Employer Site Anyway
+                   </a>`;
+        } else {
+          const applyHrefAnyway = applyUrl || `/applications/apply/${jobId}`;
+          html += `<a href="${applyHrefAnyway}"
+                      class="btn btn-outline-secondary w-100">
+                     Proceed Anyway
+                   </a>`;
+        }
+        html += `<button class="btn btn-link w-100" style="color:rgba(255,255,255,0.4);"
+                         data-bs-dismiss="modal">Browse Other Jobs</button>`;
+        document.getElementById('noMatchActions').innerHTML = html;
+        show('stepNoMatch');
+
+        const proceedBtn = document.getElementById('proceedAnywayBtn');
+        if (proceedBtn) {
+          proceedBtn.addEventListener('click', () => submitApplication(jobId));
+        }
+      }
+    })
+    .catch(() => {
+      show('stepError');
+      document.getElementById('errorMessage').textContent =
+        'A network error occurred. Please check your connection and try again.';
+      document.getElementById('errorActions').innerHTML =
+        `<button class="btn btn-secondary w-100" data-bs-dismiss="modal">Close</button>`;
+    });
+  }
+
+  function submitApplication(jobId) {
+    show('stepSubmitting');
+    fetch(`/jobs/${jobId}/submit-application`, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': csrf },
+      credentials: 'same-origin',
+    })
+    .then(r => r.json())
+    .then(res => {
+      show('stepDone');
+      document.getElementById('doneMessage').textContent =
+        res.message || 'Your application has been submitted successfully. Good luck!';
+    })
+    .catch(() => {
+      show('stepDone');
+      document.getElementById('doneMessage').textContent =
+        'Something went wrong. Please try applying directly or contact support.';
+    });
+  }
+
+  // Attach all trigger buttons to the same modal
+  triggers.forEach(btn => {
+    btn.addEventListener('click', () => runSmartApply(btn));
+  });
+})();
+</script>
 
 <script>
 function copyJobLink(btn) {
@@ -517,5 +844,4 @@ function copyJobLink(btn) {
   });
 }
 </script>
-
 {% endblock %}

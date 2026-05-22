@@ -38,6 +38,10 @@ from .services import CVOptimizationRequest
 
 from .notification import Notification, BroadcastNotification, NotificationPreference
 
+from .scraped_job import ScrapedJob
+
+from .referral import ReferralLink, ReferralConversion
+
 
 
 # Search & Matching System Models

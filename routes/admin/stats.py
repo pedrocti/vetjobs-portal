@@ -122,6 +122,7 @@ def get_admin_stats():
 
             # ✅ Verification
             'pending_verifications': pending_verifications,
+            'open_requests': 0,
 
             # 💰 Payments (Core)
             'total_revenue': float(total_revenue),
@@ -148,7 +149,7 @@ def get_admin_stats():
         }
 
     except Exception as e:
-        current_app.logger.error(f"Error calculating admin stats: {e}")
+        import traceback; current_app.logger.error(f"Error calculating admin stats: {e}\n{traceback.format_exc()}")
 
         # =====================
         # 🛑 SAFE FALLBACK
@@ -173,6 +174,7 @@ def get_admin_stats():
 
             # ✅ Verification
             'pending_verifications': 0,
+            'open_requests': 0,
 
             # 💰 Payments
             'total_revenue': 0.0,

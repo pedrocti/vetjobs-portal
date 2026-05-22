@@ -3,6 +3,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from datetime import datetime, timedelta
 import logging
+from services.job_scraper import run_full_scrape
 
 logger = logging.getLogger(__name__)
 
@@ -280,6 +281,17 @@ def start_scheduler(app):
         id="employer_hiring_tips",
         name="Employer Hiring Tips",
         replace_existing=True
+    )
+
+    scheduler.add_job(
+         func=lambda: run_full_scrape(flask_app=app),
+         trigger='cron',
+         hour=7,
+         minute=0,
+         id='veteran_job_scraper',
+         name='Veteran Job Scraper',
+         replace_existing=True,
+         misfire_grace_time=3600,
     )
 
     scheduler.start()

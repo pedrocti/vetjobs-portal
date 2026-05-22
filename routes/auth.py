@@ -101,6 +101,32 @@ def register():
 
         db.session.commit()
 
+        # ── Record referral conversion if a ref code was provided ──
+        try:
+            ref_code = request.form.get('ref_code', '').strip()
+            if ref_code:
+                from models.referral import ReferralLink, ReferralConversion
+                ref_link = ReferralLink.query.filter_by(code=ref_code).first()
+                if ref_link and ref_link.is_valid():
+                    is_spouse = (
+                        user_type == 'veteran' and
+                        request.form.get('profile_type') == 'spouse'
+                    )
+                    conversion = ReferralConversion(
+                        link_id=ref_link.id,
+                        user_id=user.id,
+                        user_type=user.user_type,
+                        is_spouse=is_spouse,
+                    )
+                    db.session.add(conversion)
+                    db.session.commit()
+                    current_app.logger.info(
+                        f"[referral] User {user.id} registered via ref={ref_code}"
+                    )
+        except Exception as e:
+            current_app.logger.warning(f"[referral] Conversion record failed: {e}")
+            # non-fatal — registration still succeeds
+
         # ── Notify admins of new registration ─────────────────
         try:
             from services.notification_service import notification_service
@@ -135,7 +161,9 @@ def register():
         flash("Registration successful! Please check your email to verify your account.", "success")
         return redirect(url_for("auth.login"))
 
-    return render_template("auth/register.html")
+    # ── GET: render registration form ──────────────────────────
+    ref_code = request.args.get('ref', '')
+    return render_template("auth/register.html", ref_code=ref_code)
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -166,7 +194,6 @@ def verify_email(token):
     brevo = BrevoService()
 
     # ── Sync contact to Brevo CRM now that user is confirmed ──
-    # This is the correct moment — unverified users shouldn't be in your lists
     try:
         synced = brevo.add_contact(user)
         if synced:
@@ -305,7 +332,6 @@ def _redirect_after_login(user):
     Complete   → dashboard.
     """
     if user.user_type == "veteran":
-        # Use onboarding_completed flag for efficiency
         if not user.onboarding_completed:
             flash("Please complete your profile to access your dashboard.", "info")
             return redirect(url_for("veteran.complete_profile"))

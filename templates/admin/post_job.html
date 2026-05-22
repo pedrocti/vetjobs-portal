@@ -7,86 +7,201 @@
         <div class="col-lg-9 mx-auto">
 
             <!-- Header -->
-            <div class="d-flex align-items-center justify-content-between mb-4">
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
                 <div>
                     <h1 class="fw-bold mb-1">Post a Job</h1>
-                    <p class="text-muted mb-0">Admin post — goes live immediately, no review required.</p>
+                    <p class="text-muted mb-0">
+                        Admin post — goes live immediately, no review required.
+                    </p>
                 </div>
-                <a href="{{ url_for('admin.job_moderation') }}" class="btn btn-outline-secondary">
+
+                <a href="{{ url_for('admin.job_moderation') }}"
+                   class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>Back to Moderation
                 </a>
             </div>
 
+            <!-- Info Alert -->
+            <div class="alert alert-info mb-4">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Admin Mode:</strong>
+                Jobs posted here publish instantly and bypass moderation review.
+            </div>
+
             <form method="POST" enctype="multipart/form-data">
 
-                <!-- ── Job Information ── -->
+                <!-- Job Information -->
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-primary text-white py-3">
-                        <h5 class="mb-0"><i class="fas fa-briefcase me-2"></i>Job Information</h5>
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-briefcase me-2"></i>Job Information
+                        </h5>
                     </div>
+
                     <div class="card-body p-4">
 
-                        <div class="mb-3">
-                            <label for="job_title" class="form-label fw-semibold">Job Title <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="job_title" name="job_title"
+                        <!-- Job Title -->
+                        <div class="mb-4">
+                            <label for="job_title" class="form-label fw-semibold">
+                                Job Title <span class="text-danger">*</span>
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   id="job_title"
+                                   name="job_title"
                                    placeholder="e.g., Aviation Operations Supervisor"
-                                   value="{{ request.form.get('job_title', '') }}" required>
+                                   value="{{ request.form.get('job_title', '') }}"
+                                   required>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="company_name" class="form-label fw-semibold">Company Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="company_name" name="company_name"
+                        <!-- Company + Location -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="company_name" class="form-label fw-semibold">
+                                    Company Name <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="company_name"
+                                       name="company_name"
                                        placeholder="e.g., Shell Nigeria"
-                                       value="{{ request.form.get('company_name', '') }}" required>
+                                       value="{{ request.form.get('company_name', '') }}"
+                                       required>
                             </div>
+
                             <div class="col-md-6">
-                                <label for="location" class="form-label fw-semibold">Location <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="location" name="location"
-                                       placeholder="e.g., Lagos, Nigeria"
-                                       value="{{ request.form.get('location', '') }}" required>
+                                <label for="location" class="form-label fw-semibold">
+                                    Location <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="location"
+                                       name="location"
+                                       placeholder="e.g., Lagos, Nigeria or Remote"
+                                       value="{{ request.form.get('location', '') }}"
+                                       required>
                             </div>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label for="job_type" class="form-label fw-semibold">Job Type <span class="text-danger">*</span></label>
-                                <select class="form-select" id="job_type" name="job_type" required>
+                        <!-- Job Type + Industry + Experience -->
+                        <div class="row mb-4">
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <label for="job_type" class="form-label fw-semibold">
+                                    Job Type <span class="text-danger">*</span>
+                                </label>
+
+                                <select class="form-select"
+                                        id="job_type"
+                                        name="job_type"
+                                        required>
                                     <option value="">Select type</option>
-                                    <option value="full-time" {{ 'selected' if request.form.get('job_type') == 'full-time' }}>Full-time</option>
-                                    <option value="part-time" {{ 'selected' if request.form.get('job_type') == 'part-time' }}>Part-time</option>
-                                    <option value="contract" {{ 'selected' if request.form.get('job_type') == 'contract' }}>Contract</option>
+
+                                    <option value="full-time"
+                                        {{ 'selected' if request.form.get('job_type') == 'full-time' else '' }}>
+                                        Full-time
+                                    </option>
+
+                                    <option value="part-time"
+                                        {{ 'selected' if request.form.get('job_type') == 'part-time' else '' }}>
+                                        Part-time
+                                    </option>
+
+                                    <option value="contract"
+                                        {{ 'selected' if request.form.get('job_type') == 'contract' else '' }}>
+                                        Contract
+                                    </option>
+
+                                    <option value="remote"
+                                        {{ 'selected' if request.form.get('job_type') == 'remote' else '' }}>
+                                        Remote
+                                    </option>
+
+                                    <option value="internship"
+                                        {{ 'selected' if request.form.get('job_type') == 'internship' else '' }}>
+                                        Internship
+                                    </option>
                                 </select>
                             </div>
-                            <div class="col-md-4">
-                                <label for="industry" class="form-label fw-semibold">Industry</label>
-                                <input type="text" class="form-control" id="industry" name="industry"
-                                       placeholder="e.g., Oil & Gas, Aviation"
+
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <label for="industry" class="form-label fw-semibold">
+                                    Industry
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="industry"
+                                       name="industry"
+                                       placeholder="e.g., Oil & Gas"
                                        value="{{ request.form.get('industry', '') }}">
                             </div>
+
                             <div class="col-md-4">
-                                <label for="experience_level" class="form-label fw-semibold">Experience Level</label>
-                                <select class="form-select" id="experience_level" name="experience_level">
+                                <label for="experience_level" class="form-label fw-semibold">
+                                    Experience Level
+                                </label>
+
+                                <select class="form-select"
+                                        id="experience_level"
+                                        name="experience_level">
+
                                     <option value="">Select level</option>
-                                    <option value="entry" {{ 'selected' if request.form.get('experience_level') == 'entry' }}>Entry Level</option>
-                                    <option value="mid" {{ 'selected' if request.form.get('experience_level') == 'mid' }}>Mid Level</option>
-                                    <option value="senior" {{ 'selected' if request.form.get('experience_level') == 'senior' }}>Senior Level</option>
-                                    <option value="executive" {{ 'selected' if request.form.get('experience_level') == 'executive' }}>Executive</option>
+
+                                    <option value="entry"
+                                        {{ 'selected' if request.form.get('experience_level') == 'entry' else '' }}>
+                                        Entry Level
+                                    </option>
+
+                                    <option value="mid"
+                                        {{ 'selected' if request.form.get('experience_level') == 'mid' else '' }}>
+                                        Mid Level
+                                    </option>
+
+                                    <option value="senior"
+                                        {{ 'selected' if request.form.get('experience_level') == 'senior' else '' }}>
+                                        Senior Level
+                                    </option>
+
+                                    <option value="executive"
+                                        {{ 'selected' if request.form.get('experience_level') == 'executive' else '' }}>
+                                        Executive
+                                    </option>
                                 </select>
                             </div>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="salary_min" class="form-label fw-semibold">Salary Min (₦)</label>
-                                <input type="number" class="form-control" id="salary_min" name="salary_min"
-                                       placeholder="e.g., 3000000"
+                        <!-- Salary -->
+                        <div class="row mb-0">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="salary_min" class="form-label fw-semibold">
+                                    Salary Min (₦)
+                                </label>
+
+                                <input type="number"
+                                       class="form-control"
+                                       id="salary_min"
+                                       name="salary_min"
+                                       min="0"
+                                       step="1000"
+                                       placeholder="e.g., 300000"
                                        value="{{ request.form.get('salary_min', '') }}">
                             </div>
+
                             <div class="col-md-6">
-                                <label for="salary_max" class="form-label fw-semibold">Salary Max (₦)</label>
-                                <input type="number" class="form-control" id="salary_max" name="salary_max"
-                                       placeholder="e.g., 5000000"
+                                <label for="salary_max" class="form-label fw-semibold">
+                                    Salary Max (₦)
+                                </label>
+
+                                <input type="number"
+                                       class="form-control"
+                                       id="salary_max"
+                                       name="salary_max"
+                                       min="0"
+                                       step="1000"
+                                       placeholder="e.g., 800000"
                                        value="{{ request.form.get('salary_max', '') }}">
                             </div>
                         </div>
@@ -94,102 +209,177 @@
                     </div>
                 </div>
 
-                <!-- ── Admin-Only Fields ── -->
-                <div class="card shadow-sm mb-4 border-warning">
-                    <div class="card-header py-3" style="background:#1a1a2e; color:#fff;">
-                        <h5 class="mb-0"><i class="fas fa-user-shield me-2"></i>Admin Options</h5>
+                <!-- Admin Options -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user-shield me-2"></i>Admin Options
+                        </h5>
                     </div>
+
                     <div class="card-body p-4">
 
-                        <!-- Company Logo Upload -->
+                        <!-- Logo -->
                         <div class="mb-4">
                             <label for="company_logo" class="form-label fw-semibold">
                                 Company Logo
-                                <small class="text-muted fw-normal ms-1">(optional — falls back to platform logo)</small>
                             </label>
-                            <input type="file" class="form-control" id="company_logo" name="company_logo"
-                                   accept=".png,.jpg,.jpeg,.webp,.gif">
-                            <div class="form-text">PNG, JPG, WEBP or GIF. Max recommended size: 400×400px.</div>
-                        </div>
 
-                        <!-- External Apply URL -->
-                        <div class="mb-4">
-                            <label for="external_apply_url" class="form-label fw-semibold">
-                                External Apply Link
-                                <small class="text-muted fw-normal ms-1">(optional — for companies not registered on platform)</small>
-                            </label>
-                            <input type="url" class="form-control" id="external_apply_url" name="external_apply_url"
-                                   placeholder="https://company.com/careers/apply"
-                                   value="{{ request.form.get('external_apply_url', '') }}">
+                            <input type="file"
+                                   class="form-control"
+                                   id="company_logo"
+                                   name="company_logo"
+                                   accept=".png,.jpg,.jpeg,.webp,.gif">
+
                             <div class="form-text">
-                                When set, veterans will see an "Apply on Company Website" button instead of the internal apply form.
+                                Optional. Supported formats: PNG, JPG, JPEG, WEBP, GIF.
                             </div>
                         </div>
 
-                        <!-- Application Deadline -->
-                        <div class="mb-2">
+                        <!-- External Apply -->
+                        <div class="mb-4">
+                            <label for="external_apply_url" class="form-label fw-semibold">
+                                External Apply Link
+                            </label>
+
+                            <input type="url"
+                                   class="form-control"
+                                   id="external_apply_url"
+                                   name="external_apply_url"
+                                   placeholder="https://company.com/careers/apply"
+                                   value="{{ request.form.get('external_apply_url', '') }}">
+
+                            <div class="form-text">
+                                If provided, users will apply on the company's website.
+                            </div>
+                        </div>
+
+                        <!-- Deadline -->
+                        <div class="mb-0">
                             <label for="deadline" class="form-label fw-semibold">
                                 Application Deadline
-                                <small class="text-muted fw-normal ms-1">(optional)</small>
                             </label>
-                            <input type="date" class="form-control" id="deadline" name="deadline"
+
+                            <input type="date"
+                                   class="form-control"
+                                   id="deadline"
+                                   name="deadline"
                                    value="{{ request.form.get('deadline', '') }}"
-                                   style="max-width: 220px;">
-                            <div class="form-text">Shows a countdown and urgency badge on the job detail page.</div>
+                                   style="max-width: 250px;">
+
+                            <div class="form-text">
+                                Optional closing date for applications.
+                            </div>
                         </div>
 
                     </div>
                 </div>
 
-                <!-- ── Job Description ── -->
+                <!-- Description -->
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-success text-white py-3">
-                        <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Job Description</h5>
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-file-alt me-2"></i>Job Description
+                        </h5>
                     </div>
+
                     <div class="card-body p-4">
-                        <div class="mb-3">
-                            <label for="job_description" class="form-label fw-semibold">Description <span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="job_description" name="job_description" rows="8"
-                                      placeholder="Describe the role, responsibilities, and what makes this position attractive..." required>{{ request.form.get('job_description', '') }}</textarea>
+
+                        <div class="mb-0">
+                            <label for="job_description" class="form-label fw-semibold">
+                                Job Description <span class="text-danger">*</span>
+                            </label>
+
+                            <textarea class="form-control"
+                                      id="job_description"
+                                      name="job_description"
+                                      rows="8"
+                                      placeholder="Describe responsibilities, expectations, team structure and growth opportunities..."
+                                      required>{{ request.form.get('job_description', '') }}</textarea>
+
+                            <div class="form-text">
+                                Include responsibilities, expectations and growth opportunities.
+                            </div>
                         </div>
+
                     </div>
                 </div>
 
-                <!-- ── Requirements ── -->
+                <!-- Requirements -->
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-warning text-white py-3">
-                        <h5 class="mb-0"><i class="fas fa-list-check me-2"></i>Requirements</h5>
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list-check me-2"></i>Requirements
+                        </h5>
                     </div>
+
                     <div class="card-body p-4">
-                        <div class="mb-3">
-                            <label for="requirements" class="form-label fw-semibold">Requirements <span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="requirements" name="requirements" rows="6"
-                                      placeholder="List required skills, qualifications, and experience..." required>{{ request.form.get('requirements', '') }}</textarea>
+
+                        <div class="mb-0">
+                            <label for="requirements" class="form-label fw-semibold">
+                                Job Requirements <span class="text-danger">*</span>
+                            </label>
+
+                            <textarea class="form-control"
+                                      id="requirements"
+                                      name="requirements"
+                                      rows="6"
+                                      placeholder="List required skills, certifications, qualifications and experience..."
+                                      required>{{ request.form.get('requirements', '') }}</textarea>
+
+                            <div class="form-text">
+                                Clearly separate required and preferred qualifications.
+                            </div>
                         </div>
+
                     </div>
                 </div>
 
-                <!-- ── Benefits ── -->
+                <!-- Benefits -->
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-info text-white py-3">
-                        <h5 class="mb-0"><i class="fas fa-gift me-2"></i>What We Offer <small class="fw-normal">(optional)</small></h5>
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-gift me-2"></i>Benefits & Perks
+                        </h5>
                     </div>
+
                     <div class="card-body p-4">
-                        <div class="mb-3">
-                            <label for="benefits" class="form-label fw-semibold">Benefits & Perks</label>
-                            <textarea class="form-control" id="benefits" name="benefits" rows="5"
-                                      placeholder="List benefits, perks, growth opportunities...">{{ request.form.get('benefits', '') }}</textarea>
+
+                        <div class="mb-0">
+                            <label for="benefits" class="form-label fw-semibold">
+                                What We Offer
+                            </label>
+
+                            <textarea class="form-control"
+                                      id="benefits"
+                                      name="benefits"
+                                      rows="5"
+                                      placeholder="Health coverage, bonuses, housing, career growth, travel allowance, pension etc.">{{ request.form.get('benefits', '') }}</textarea>
                         </div>
+
                     </div>
                 </div>
 
-                <!-- ── Actions ── -->
-                <div class="d-flex gap-3 mb-5">
-                    <button type="submit" class="btn btn-success btn-lg px-5">
-                        <i class="fas fa-paper-plane me-2"></i>Post Job Now
+                <!-- Veteran Focus -->
+                <div class="alert alert-success mb-4">
+                    <i class="fas fa-medal me-2"></i>
+
+                    <strong>Veteran-Friendly Hiring:</strong>
+                    Highlight how military experience translates into this role and any veteran-specific benefits available.
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex flex-wrap gap-3 mb-5">
+                    <button type="submit"
+                            class="btn btn-success btn-lg px-4">
+                        <i class="fas fa-paper-plane me-2"></i>
+                        Post Job Now
                     </button>
-                    <a href="{{ url_for('admin.job_moderation') }}" class="btn btn-outline-secondary btn-lg">
-                        <i class="fas fa-times me-2"></i>Cancel
+
+                    <a href="{{ url_for('admin.job_moderation') }}"
+                       class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-times me-2"></i>
+                        Cancel
                     </a>
                 </div>
 
@@ -197,4 +387,32 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    function addCharacterCounter(textareaId) {
+        const textarea = document.getElementById(textareaId);
+
+        if (!textarea) return;
+
+        const counter = document.createElement('div');
+        counter.className = 'form-text text-end';
+        counter.style.fontSize = '0.875rem';
+
+        textarea.parentNode.appendChild(counter);
+
+        function updateCounter() {
+            counter.textContent = `${textarea.value.length} characters`;
+        }
+
+        textarea.addEventListener('input', updateCounter);
+        updateCounter();
+    }
+
+    addCharacterCounter('job_description');
+    addCharacterCounter('requirements');
+    addCharacterCounter('benefits');
+});
+</script>
 {% endblock %}

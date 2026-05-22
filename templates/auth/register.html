@@ -59,6 +59,7 @@
       </div>
 
       <form method="POST" novalidate id="regForm">
+        <input type="hidden" name="ref_code" value="{{ ref_code | default('') }}">
         {% if is_employer %}
           <input type="hidden" name="user_type" value="employer">
         {% endif %}
