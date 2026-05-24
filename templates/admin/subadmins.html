@@ -1,0 +1,154 @@
+{% extends "admin/base.html" %}
+{% block title %}Subadmins — Admin Panel{% endblock %}
+{% block admin_content %}
+<div style="max-width:900px;">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;">
+    <div>
+      <h1 style="font-family:var(--font-cond);font-size:22px;font-weight:800;color:rgba(255,255,255,0.9);letter-spacing:1px;margin:0;">SUBADMINS</h1>
+      <p style="font-family:var(--font-cond);font-size:11px;letter-spacing:2px;color:rgba(255,255,255,0.3);margin:4px 0 0;text-transform:uppercase;">Manage staff access & permissions</p>
+    </div>
+    <button onclick="document.getElementById('createModal').style.display='flex'"
+      style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:#60a5fa;color:#04080f;border:none;padding:10px 20px;cursor:pointer;">
+      + New Subadmin
+    </button>
+  </div>
+
+  <!-- Subadmin list -->
+  {% if subadmins %}
+  <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:40px;">
+    {% for sub in subadmins %}
+    {% set perms = sub.get_permissions() %}
+    <div style="background:#080f1e;border:1px solid rgba(255,255,255,0.06);padding:20px 24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-family:var(--font-cond);font-size:15px;font-weight:700;color:rgba(255,255,255,0.85);">{{ sub.full_name }}</div>
+          <div style="font-family:var(--font-cond);font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px;">{{ sub.email }} &nbsp;·&nbsp; @{{ sub.username }}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span style="font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;background:rgba(96,165,250,0.1);color:#60a5fa;border:1px solid rgba(96,165,250,0.2);">
+            {% if sub.active %}Active{% else %}Inactive{% endif %}
+          </span>
+          <button onclick="togglePerms({{ sub.id }})"
+            style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:0.5px;background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.08);padding:6px 14px;cursor:pointer;">
+            Edit Permissions
+          </button>
+          <form method="POST" action="{{ url_for('admin.delete_subadmin', user_id=sub.id) }}"
+            onsubmit="return confirm('Remove {{ sub.username }}? This cannot be undone.')">
+            <button type="submit"
+              style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:0.5px;background:rgba(239,68,68,0.08);color:#f87171;border:1px solid rgba(239,68,68,0.2);padding:6px 14px;cursor:pointer;">
+              Remove
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Permission badges -->
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;">
+        {% for perm, label, _ in permissions %}
+        <span style="font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;
+          {% if perms.get(perm) %}background:rgba(96,165,250,0.12);color:#60a5fa;border:1px solid rgba(96,165,250,0.25);
+          {% else %}background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.06);{% endif %}">
+          {% if perms.get(perm) %}✓{% else %}✗{% endif %} {{ label }}
+        </span>
+        {% endfor %}
+      </div>
+
+      <!-- Edit permissions form (hidden by default) -->
+      <div id="perms-{{ sub.id }}" style="display:none;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.05);">
+        <form method="POST" action="{{ url_for('admin.update_subadmin_permissions', user_id=sub.id) }}">
+          <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:16px;">
+            {% for perm, label, desc in permissions %}
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <input type="checkbox" name="perm_{{ perm }}" {% if perms.get(perm) %}checked{% endif %}
+                style="accent-color:#60a5fa;width:14px;height:14px;">
+              <span>
+                <span style="font-family:var(--font-cond);font-size:12px;font-weight:700;color:rgba(255,255,255,0.75);">{{ label }}</span>
+                <span style="font-family:var(--font-cond);font-size:10px;color:rgba(255,255,255,0.3);display:block;">{{ desc }}</span>
+              </span>
+            </label>
+            {% endfor %}
+          </div>
+          <button type="submit"
+            style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:#60a5fa;color:#04080f;border:none;padding:8px 20px;cursor:pointer;">
+            Save Permissions
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div style="background:#080f1e;border:1px solid rgba(255,255,255,0.06);padding:48px;text-align:center;margin-bottom:40px;">
+    <div style="font-family:var(--font-cond);font-size:13px;color:rgba(255,255,255,0.25);letter-spacing:1px;">No subadmins yet. Create one below.</div>
+  </div>
+  {% endif %}
+
+  <!-- Create modal -->
+  <div id="createModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#080f1e;border:1px solid rgba(255,255,255,0.08);padding:32px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+        <h2 style="font-family:var(--font-cond);font-size:16px;font-weight:800;letter-spacing:1px;color:rgba(255,255,255,0.85);margin:0;">CREATE SUBADMIN</h2>
+        <button onclick="document.getElementById('createModal').style.display='none'"
+          style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:18px;cursor:pointer;">✕</button>
+      </div>
+      <form method="POST" action="{{ url_for('admin.create_subadmin') }}">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);display:block;margin-bottom:6px;">First Name</label>
+            <input type="text" name="first_name" required
+              style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.8);font-family:var(--font-cond);font-size:13px;padding:10px 12px;outline:none;">
+          </div>
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);display:block;margin-bottom:6px;">Last Name</label>
+            <input type="text" name="last_name" required
+              style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.8);font-family:var(--font-cond);font-size:13px;padding:10px 12px;outline:none;">
+          </div>
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);display:block;margin-bottom:6px;">Username</label>
+          <input type="text" name="username" required
+            style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.8);font-family:var(--font-cond);font-size:13px;padding:10px 12px;outline:none;">
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);display:block;margin-bottom:6px;">Email</label>
+          <input type="email" name="email" required
+            style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.8);font-family:var(--font-cond);font-size:13px;padding:10px 12px;outline:none;">
+        </div>
+        <div style="margin-bottom:24px;">
+          <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);display:block;margin-bottom:6px;">Password</label>
+          <input type="password" name="password" required
+            style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.8);font-family:var(--font-cond);font-size:13px;padding:10px 12px;outline:none;">
+        </div>
+        <div style="margin-bottom:24px;">
+          <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;">Permissions</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            {% for perm, label, desc in permissions %}
+            <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:10px 14px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);">
+              <input type="checkbox" name="perm_{{ perm }}" style="accent-color:#60a5fa;width:14px;height:14px;flex-shrink:0;">
+              <span>
+                <span style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:rgba(255,255,255,0.75);display:block;">{{ label }}</span>
+                <span style="font-family:var(--font-cond);font-size:10px;color:rgba(255,255,255,0.3);">{{ desc }}</span>
+              </span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+        <button type="submit"
+          style="width:100%;font-family:var(--font-cond);font-size:13px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;background:#60a5fa;color:#04080f;border:none;padding:14px;cursor:pointer;">
+          Create Subadmin
+        </button>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function togglePerms(id) {
+  var el = document.getElementById("perms-" + id);
+  el.style.display = el.style.display === "none" ? "block" : "none";
+}
+</script>
+{% endblock %}

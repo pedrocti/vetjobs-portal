@@ -32,9 +32,9 @@
     border-right: 1px solid rgba(255,255,255,0.05);
     display: flex;
     flex-direction: column;
-    position: sticky;
+    position: fixed;
     top: 0;
-    height: 100vh;
+    bottom: 0;
     overflow-y: auto;
     scrollbar-width: none;
     z-index: 100;
@@ -171,6 +171,7 @@
 
   /* Main content */
   .vp-admin-main {
+    margin-left: 220px;
     flex: 1;
     min-width: 0;
     padding: 28px 28px 48px;
@@ -314,7 +315,8 @@
   @media (max-width: 767px) {
     .vp-admin-sidebar { display: none; }
     .vp-admin-hamburger { display: flex; }
-    .vp-admin-main { padding: 16px 16px 80px; }
+    .vp-admin-main {
+    margin-left: 0; padding: 16px 16px 80px; }
   }
 
   @media (min-width: 768px) {
@@ -370,7 +372,9 @@
     </a>
 
     <span class="vp-admin-group-label">System</span>
-    <a class="vp-admin-link {% if request.endpoint == 'admin.verification_management' %}active{% endif %}" href="{{ url_for('admin.verification_management') }}"><i class="fas fa-user-check"></i><span>Verifications</span></a>
+      
+      <a class="vp-admin-link {% if request.endpoint == 'admin.subadmins' %}active{% endif %}" href="{{ url_for('admin.subadmins') }}"><i class="fas fa-user-shield"></i><span>Subadmins</span></a>
+        <a class="vp-admin-link {% if request.endpoint == 'admin.verification_management' %}active{% endif %}" href="{{ url_for('admin.verification_management') }}"><i class="fas fa-user-check"></i><span>Verifications</span></a>
     <a class="vp-admin-link {% if request.endpoint == 'admin.email_settings' %}active{% endif %}" href="{{ url_for('admin.email_settings') }}"><i class="fas fa-envelope-open"></i><span>Email Settings</span></a>
     <a class="vp-admin-link {% if request.endpoint == 'admin.manage_settings' %}active{% endif %}" href="{{ url_for('admin.manage_settings') }}"><i class="fas fa-sliders"></i><span>Platform</span></a>
 
@@ -480,7 +484,11 @@
 
     <div class="vp-admin-group">
       <span class="vp-admin-group-label">System</span>
-      <a class="vp-admin-link {% if request.endpoint == 'admin.verification_management' %}active{% endif %}" href="{{ url_for('admin.verification_management') }}">
+      
+      <a class="vp-admin-link {% if request.endpoint == 'admin.subadmins' %}active{% endif %}" href="{{ url_for('admin.subadmins') }}">
+        <i class="fas fa-user-shield"></i><span>Subadmins</span>
+      </a>
+            <a class="vp-admin-link {% if request.endpoint == 'admin.verification_management' %}active{% endif %}" href="{{ url_for('admin.verification_management') }}">
         <i class="fas fa-user-check"></i><span>Verifications</span>
       </a>
       <a class="vp-admin-link {% if request.endpoint == 'admin.email_settings' %}active{% endif %}" href="{{ url_for('admin.email_settings') }}">

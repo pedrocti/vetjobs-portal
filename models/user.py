@@ -144,5 +144,39 @@ class User(UserMixin, db.Model):
             return True
         return False
 
+    # ═══════════════════════════════════════════════════════════════
+    # Subadmin permissions
+    # ═══════════════════════════════════════════════════════════════
+    admin_permissions = db.Column(db.Text, default="{}")
+
+    def is_subadmin(self):
+        return self.user_type == "subadmin"
+
+    def is_admin_or_subadmin(self):
+        return self.user_type in ("admin", "subadmin")
+
+    def has_permission(self, perm):
+        if self.user_type == "admin":
+            return True
+        if self.user_type != "subadmin":
+            return False
+        import json
+        try:
+            perms = json.loads(self.admin_permissions or "{}")
+        except Exception:
+            perms = {}
+        return perms.get(perm, False)
+
+    def get_permissions(self):
+        import json
+        try:
+            return json.loads(self.admin_permissions or "{}")
+        except Exception:
+            return {}
+
+    def set_permissions(self, perms_dict):
+        import json
+        self.admin_permissions = json.dumps(perms_dict)
+
     def __repr__(self):
         return f"<User {self.username} ({self.user_type})>"

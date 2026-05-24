@@ -20,4 +20,5 @@ message,
 testimonial,
 partners,
 admin_settings,
+subadmins,
 )
