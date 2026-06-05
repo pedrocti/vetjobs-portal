@@ -21,3 +21,6 @@ venv/
 *.log
 veteran_portal.db
 .env
+send_veterans.py
+test_email.py
+ssh
