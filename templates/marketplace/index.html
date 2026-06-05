@@ -6,7 +6,6 @@
 
   <!-- ── HERO ── -->
   <div style="background:linear-gradient(135deg,#0d1f3c 0%,#0a1628 100%);border-bottom:1px solid rgba(212,175,55,0.12);padding:clamp(60px,10vw,100px) 20px clamp(48px,8vw,80px);position:relative;overflow:hidden;">
-    <!-- Decorative background elements -->
     <div style="position:absolute;top:0;right:0;width:50%;height:100%;background:linear-gradient(270deg,rgba(212,175,55,0.04) 0%,transparent 60%);pointer-events:none;"></div>
     <div style="position:absolute;bottom:-60px;right:10%;width:300px;height:300px;border:1px solid rgba(212,175,55,0.06);border-radius:50%;pointer-events:none;"></div>
     <div style="position:absolute;bottom:-20px;right:15%;width:180px;height:180px;border:1px solid rgba(212,175,55,0.04);border-radius:50%;pointer-events:none;"></div>
@@ -52,7 +51,6 @@
                  alt="Verified Veterans"
                  style="width:100%;height:100%;object-fit:cover;opacity:0.6;mix-blend-mode:luminosity;">
             <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(10,22,40,0.9) 100%);"></div>
-            <!-- Overlay stats -->
             <div style="position:absolute;bottom:0;left:0;right:0;padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(212,175,55,0.1);">
               {% for value, label in [("100%","Identity Verified"),("24hr","Placement Time")] %}
               <div style="background:rgba(10,22,40,0.85);padding:14px 16px;text-align:center;">
@@ -62,7 +60,6 @@
               {% endfor %}
             </div>
           </div>
-          <!-- Floating verified badge -->
           <div style="position:absolute;top:-16px;right:-16px;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);padding:10px 16px;display:flex;align-items:center;gap:8px;">
             <i class="fas fa-shield-alt" style="color:#4ade80;font-size:14px;"></i>
             <div>
@@ -136,38 +133,69 @@
           </div>
         </div>
 
-        <!-- Path 2: Direct Placement -->
+        <!-- Path 2: Urgent Direct Placement — Drivers, Security, Operations only -->
         <div style="background:#0d1f3c;border:1px solid rgba(96,165,250,0.15);padding:48px 40px;position:relative;overflow:hidden;">
           <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,rgba(96,165,250,0.6),rgba(96,165,250,0.1));"></div>
-          <div style="width:56px;height:56px;background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:28px;">
-            <i class="fas fa-user-check" style="color:#60a5fa;font-size:22px;"></i>
+
+          <!-- Urgent badge -->
+          <div style="position:absolute;top:20px;right:20px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);padding:5px 12px;display:flex;align-items:center;gap:6px;">
+            <i class="fas fa-circle" style="color:#ef4444;font-size:7px;"></i>
+            <span style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#ef4444;">Urgent Available</span>
           </div>
-          <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#60a5fa;margin-bottom:12px;">For Individuals & Businesses</div>
+
+          <div style="width:56px;height:56px;background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:28px;">
+            <i class="fas fa-bolt" style="color:#60a5fa;font-size:22px;"></i>
+          </div>
+          <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#60a5fa;margin-bottom:12px;">Urgent Operations</div>
           <h3 style="font-family:var(--font-display);font-size:clamp(20px,2.5vw,26px);font-weight:700;color:#fff;margin-bottom:16px;line-height:1.2;">
-            Direct Placement Service
+            Need Vetted Military Personnel<br>Within 24 Hours?
           </h3>
-          <p style="font-size:14px;color:rgba(255,255,255,0.55);line-height:1.85;margin-bottom:32px;">
-            Need one person for a specific role — a driver, security detail, estate manager, technician? Submit your requirement and we handle everything. No job board, no long process.
+          <p style="font-size:14px;color:rgba(255,255,255,0.55);line-height:1.85;margin-bottom:28px;">
+            For businesses and individuals that need deployable, service-verified personnel fast — no long hiring cycles, no job board. We source, verify, and introduce within 24 hours.
           </p>
-          <ul style="list-style:none;padding:0;margin:0 0 36px;display:flex;flex-direction:column;gap:12px;">
-            {% for item in [
-              "Submit your requirement — no account needed",
-              "Our team manually selects the best match",
-              "All candidates identity and background verified",
-              "Introduction facilitated within 24 hours",
-              "Drivers, security, technicians, logistics & more",
-            ] %}
-            <li style="display:flex;align-items:flex-start;gap:12px;font-size:14px;color:rgba(255,255,255,0.65);line-height:1.6;">
-              <i class="fas fa-check" style="color:#60a5fa;font-size:11px;margin-top:4px;flex-shrink:0;"></i>{{ item }}
-            </li>
-            {% endfor %}
-          </ul>
+
+          <!-- Three role types — clean and focused -->
+          <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:32px;">
+
+            <div style="display:flex;align-items:center;gap:16px;padding:16px 18px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
+              <div style="width:40px;height:40px;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="fas fa-car" style="color:var(--gold);font-size:16px;"></i>
+              </div>
+              <div>
+                <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:#fff;">Military VIP Driver</div>
+                <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:3px;">Trained, vetted, and deployable for executives and VIP movement</div>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:16px;padding:16px 18px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
+              <div style="width:40px;height:40px;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="fas fa-shield-alt" style="color:var(--gold);font-size:16px;"></i>
+              </div>
+              <div>
+                <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:#fff;">Personal Security Detail</div>
+                <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:3px;">Close protection professionals with confirmed military background</div>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:16px;padding:16px 18px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
+              <div style="width:40px;height:40px;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="fas fa-users-cog" style="color:var(--gold);font-size:16px;"></i>
+              </div>
+              <div>
+                <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:#fff;">Operational Staff</div>
+                <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:3px;">Disciplined operational teams for projects, events, and site management</div>
+              </div>
+            </div>
+
+          </div>
+
           <a href="{{ url_for('marketplace.request_personnel') }}"
-             style="display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 24px;background:transparent;border:1px solid rgba(96,165,250,0.4);color:#60a5fa;font-family:var(--font-cond);font-size:13px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;transition:all 0.2s;width:100%;box-sizing:border-box;"
-             onmouseover="this.style.background='rgba(96,165,250,0.1)'"
-             onmouseout="this.style.background='transparent'">
-            <i class="fas fa-paper-plane"></i>Submit a Request
+             style="display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:15px 24px;background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.4);color:#60a5fa;font-family:var(--font-cond);font-size:13px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;transition:all 0.2s;width:100%;box-sizing:border-box;"
+             onmouseover="this.style.background='rgba(96,165,250,0.18)'"
+             onmouseout="this.style.background='rgba(96,165,250,0.1)'">
+            <i class="fas fa-paper-plane"></i>Request Now — We Respond in 24hrs
           </a>
+
           {% if total_offers %}
           <div style="margin-top:16px;text-align:center;font-family:var(--font-cond);font-size:11px;color:rgba(255,255,255,0.3);">
             <i class="fas fa-circle" style="color:#4ade80;font-size:7px;margin-right:5px;"></i>
@@ -202,49 +230,6 @@
             <h5 style="font-family:var(--font-display);font-size:18px;color:#fff;margin-bottom:12px;">{{ title }}</h5>
             <p style="font-size:14px;color:rgba(255,255,255,0.45);line-height:1.8;margin:0;">{{ desc }}</p>
           </div>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-
-  <!-- ── AVAILABLE ROLES ── -->
-  <div style="padding:clamp(60px,8vw,80px) 20px;border-bottom:1px solid rgba(255,255,255,0.06);">
-    <div class="container" style="max-width:1100px;">
-      <div class="text-center" style="margin-bottom:48px;">
-        <p style="font-family:var(--font-cond);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:10px;">Direct Placement Categories</p>
-        <h3 style="font-family:var(--font-display);font-size:clamp(20px,3vw,28px);color:#fff;margin-bottom:12px;">Professionals Available for Placement</h3>
-        <p style="font-size:14px;color:rgba(255,255,255,0.35);max-width:500px;margin:0 auto;">All professionals are service-verified, background-checked and ready for deployment.</p>
-      </div>
-      <div class="row g-3">
-        {% set cat_icons = {
-          'driver': 'fa-car',
-          'security': 'fa-shield-alt',
-          'electrician': 'fa-bolt',
-          'technician': 'fa-tools',
-          'mechanic': 'fa-wrench',
-          'logistics': 'fa-truck',
-          'it': 'fa-laptop-code',
-          'other': 'fa-ellipsis-h',
-        } %}
-        {% for slug, label in categories %}
-        <div class="col-6 col-md-4 col-lg-3">
-          <a href="{{ url_for('marketplace.browse', category=slug) }}"
-             style="display:flex;align-items:center;gap:16px;padding:20px 22px;background:#0d1f3c;border:1px solid rgba(255,255,255,0.07);text-decoration:none;transition:all 0.2s ease;"
-             onmouseover="this.style.borderColor='rgba(212,175,55,0.3)';this.style.background='rgba(212,175,55,0.05)'"
-             onmouseout="this.style.borderColor='rgba(255,255,255,0.07)';this.style.background='#0d1f3c'">
-            <div style="width:40px;height:40px;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-              <i class="fas {{ cat_icons.get(slug, 'fa-user') }}" style="color:var(--gold);font-size:16px;"></i>
-            </div>
-            <div>
-              <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:rgba(255,255,255,0.85);">{{ label }}</div>
-              {% if offers_by_cat.get(slug) %}
-              <div style="font-size:11px;color:rgba(74,222,128,0.6);margin-top:3px;">{{ offers_by_cat[slug] }} available</div>
-              {% else %}
-              <div style="font-size:11px;color:rgba(255,255,255,0.2);margin-top:3px;">Taking requests</div>
-              {% endif %}
-            </div>
-          </a>
         </div>
         {% endfor %}
       </div>

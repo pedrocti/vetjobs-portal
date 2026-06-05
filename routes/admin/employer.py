@@ -168,6 +168,52 @@ def reject_employer(employer_id):
 
     return redirect(url_for('admin.employer_management'))
 
+@admin_bp.route('/user/<int:user_id>/delete', methods=['POST'])
+@login_required
+def delete_user(user_id):
+    """Permanently delete a user and their profile."""
+    if not current_user.is_admin():
+        flash('Access denied. Administrators only.', 'error')
+        return redirect(url_for('main.index'))
+    user = User.query.get_or_404(user_id)
+    admin_reason = request.form.get('admin_reason', '').strip()
+    if not admin_reason:
+        flash('Please provide a reason for deletion.', 'error')
+        return redirect(request.referrer or url_for('admin.veteran_management'))
+    try:
+        name = user.full_name
+        from sqlalchemy import text
+        uid = user.id
+        db.session.expunge(user)
+        with db.engine.begin() as conn:
+            conn.execute(text('DELETE FROM veteran_profiles WHERE user_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM veteran_profile WHERE user_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM employer_profile WHERE user_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM password_reset_tokens WHERE user_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM notification WHERE user_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM notification_preference WHERE user_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM security_log WHERE user_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM search_logs WHERE user_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM referral_conversions WHERE user_id = :uid'), {'uid': uid})
+            # referral_links skipped to protect influencer campaigns
+            conn.execute(text('DELETE FROM service_offers WHERE user_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM cv_optimization_requests WHERE user_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM subscription WHERE user_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM payment WHERE user_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM payments WHERE user_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM message WHERE sender_id = :uid OR recipient_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM job_applications WHERE veteran_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM saved_jobs WHERE veteran_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM saved_veterans WHERE employer_id = :uid OR veteran_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM matching_scores WHERE veteran_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM training_applications WHERE veteran_id = :uid'), {'uid': uid})
+            conn.execute(text('DELETE FROM users WHERE id = :uid'), {'uid': uid})
+        flash(f'User {name} has been permanently deleted. Reason: {admin_reason}', 'success')
+    except Exception as e:
+        flash(f'Error deleting user: {str(e)}', 'error')
+    return redirect(url_for('admin.veteran_management'))
+
+
 @admin_bp.route('/user/<int:user_id>/toggle-status', methods=['POST'])
 @login_required
 def toggle_user_status(user_id):

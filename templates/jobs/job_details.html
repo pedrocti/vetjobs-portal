@@ -565,7 +565,7 @@
       <div id="stepNoMatch" style="display:none;">
         <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,0.07);padding:20px 24px 16px;">
           <h5 class="modal-title fw-bold" style="color:#f87171;font-size:16px;">
-            <i class="fas fa-exclamation-circle me-2"></i>CV Doesn't Quite Match
+            <i class="fas fa-exclamation-circle me-2"></i>CV Does Not Match This Role
           </h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
@@ -581,7 +581,8 @@
           <div id="noMatchReasoning" class="mb-3 p-3 rounded"
                style="background:rgba(248,113,113,0.07);border-left:3px solid rgba(248,113,113,0.4);font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;"></div>
           <p style="font-size:13px;color:rgba(255,255,255,0.45);margin:0;">
-            You can still proceed, or optimise your CV to improve your chances.
+            To protect your chances and our platform's credibility, we do not submit CVs that don't match the role.
+            Please optimise your CV or upload one that better reflects your qualifications for this position.
           </p>
         </div>
         <div class="modal-footer flex-column gap-2" style="border-top:1px solid rgba(255,255,255,0.07);padding:16px 24px;" id="noMatchActions"></div>
@@ -752,36 +753,40 @@
         }
 
       } else {
-        // No match actions
-        let html = `<button class="btn btn-warning w-100 fw-bold"
-                            onclick="window.location='/cv-optimization'">
-                      <i class="fas fa-magic me-2"></i>Optimise My CV — ₦15,000
-                    </button>`;
-        if (applyMethod === 'email') {
-          html += `<button id="proceedAnywayBtn" class="btn btn-outline-secondary w-100">
-                     Proceed Anyway
-                   </button>`;
-        } else if (applyMethod === 'link') {
+        // No match — blocked from submitting, shown clear options only
+        // For external link jobs, we still allow them to visit the employer site
+        // For email jobs (we send on their behalf), we BLOCK submission entirely
+        let html = '';
+
+        // Primary action: optimise CV
+        html += `<button class="btn btn-warning w-100 fw-bold"
+                         onclick="window.location='{{ url_for('services.cv_optimize_page') }}'">
+                   <i class="fas fa-magic me-2"></i>Optimise My CV{% if cv_price is defined %} — ₦{{ "{:,}".format(cv_price|int) }}{% endif %}
+                 </button>`;
+
+        // Secondary action: upload a better CV then re-scan
+        html += `<a href="/dashboard/veteran#cv-upload" class="btn btn-outline-primary w-100">
+                   <i class="fas fa-upload me-2"></i>Upload a Better CV &amp; Re-scan
+                 </a>`;
+
+        // For link jobs only: allow visit (employer decides, not us sending email)
+        if (applyMethod === 'link') {
           html += `<a href="${applyUrl}" target="_blank" rel="noopener"
                       class="btn btn-outline-secondary w-100">
-                     Proceed to Employer Site Anyway
-                   </a>`;
-        } else {
-          const applyHrefAnyway = applyUrl || `/applications/apply/${jobId}`;
-          html += `<a href="${applyHrefAnyway}"
-                      class="btn btn-outline-secondary w-100">
-                     Proceed Anyway
+                     <i class="fas fa-external-link-alt me-2"></i>Visit Employer Site Anyway
                    </a>`;
         }
+        // Email jobs: NO proceed anyway — we do not send unmatched CVs on behalf of veterans
+
         html += `<button class="btn btn-link w-100" style="color:rgba(255,255,255,0.4);"
-                         data-bs-dismiss="modal">Browse Other Jobs</button>`;
+                         data-bs-dismiss="modal">
+                   <i class="fas fa-search me-1"></i>Browse Other Jobs
+                 </button>`;
+
         document.getElementById('noMatchActions').innerHTML = html;
         show('stepNoMatch');
 
-        const proceedBtn = document.getElementById('proceedAnywayBtn');
-        if (proceedBtn) {
-          proceedBtn.addEventListener('click', () => submitApplication(jobId));
-        }
+
       }
     })
     .catch(() => {

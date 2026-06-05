@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import current_user
-from models import JobPosting, VeteranProfile
+from models import PaymentSetting, JobPosting, VeteranProfile
 from app import db
 
 jobs_bp = Blueprint('jobs', __name__)
@@ -69,7 +69,8 @@ def job_details(job_id):
         flash('Job posting not available.', 'error')
         return redirect(url_for('jobs.job_board'))
 
-    return render_template('jobs/job_details.html', job=job)
+    cv_price = PaymentSetting.get_setting('cv_optimization_fee', 5000)
+    return render_template('jobs/job_details.html', job=job, cv_price=cv_price)
 
 
 @jobs_bp.route('/search')

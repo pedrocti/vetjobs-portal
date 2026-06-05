@@ -53,12 +53,40 @@ DETAIL_DELAY    = 1.0   # seconds between detail page fetches
 MAX_PER_SOURCE  = 20    # max listings to fetch details for, per source
 
 VETERAN_KEYWORDS = [
-    'security', 'driver', 'logistics', 'operations', 'administrative',
-    'hse', 'health safety', 'fleet', 'warehouse', 'supply chain',
-    'facility', 'close protection', 'supervisor', 'military',
-    'navy', 'army', 'officer', 'guard', 'maritime', 'procurement',
-    'transport', 'dispatch', 'enforcement', 'intelligence', 'surveillance',
-    'patrol', 'protection', 'safety', 'stevedore', 'marine',
+    # Security & Protection
+    'security', 'guard', 'close protection', 'patrol', 'surveillance',
+    'enforcement', 'intelligence', 'protection',
+    # Logistics & Transport
+    'driver', 'logistics', 'supply chain', 'warehouse', 'fleet',
+    'transport', 'dispatch', 'stevedore', 'procurement',
+    # Operations & Management
+    'operations', 'supervisor', 'officer', 'administrative', 'facility',
+    'manager', 'coordinator', 'inspector',
+    # HSE & Safety
+    'hse', 'health safety', 'safety', 'environment', 'compliance',
+    # Military & Maritime
+    'military', 'navy', 'army', 'marine', 'maritime', 'naval',
+    # Engineering & Technical
+    'engineer', 'technician', 'mechanical', 'electrical', 'civil',
+    'structural', 'instrumentation', 'maintenance', 'technical',
+    # Construction
+    'construction', 'site engineer', 'quantity surveyor', 'foreman',
+    'project manager', 'surveyor', 'contractor',
+    # Health & Medical
+    'nurse', 'paramedic', 'medical officer', 'health officer',
+    'pharmacist', 'laboratory', 'radiographer',
+    # Aviation & Avionics
+    'aviation', 'avionics', 'aircraft', 'pilot', 'air traffic',
+    'aeronautical', 'airport',
+    # IT & Communications
+    'it officer', 'network', 'communications', 'signals', 'cyber',
+    'systems administrator', 'database',
+    # Finance & Admin
+    'accountant', 'finance officer', 'auditor', 'budget',
+    'human resources', 'hr officer', 'training',
+    # Oil & Gas
+    'oil', 'gas', 'petroleum', 'rig', 'offshore', 'pipeline',
+    'drilling', 'refinery',
 ]
 
 def is_veteran_relevant(title: str) -> bool:
@@ -284,8 +312,13 @@ HNJ_CATEGORIES = [
     ('Administration',      'https://www.hotnigerianjobs.com/field/201/'),
     ('Logistics Transport', 'https://www.hotnigerianjobs.com/industry/123/'),
     ('Maritime Services',   'https://www.hotnigerianjobs.com/field/244/'),
-    ('Security Industry',   'https://www.hotnigerianjobs.com/industry/132/'),
-    ('Law Enforcement',     'https://www.hotnigerianjobs.com/field/253/'),
+    ('Engineering',         'https://www.hotnigerianjobs.com/field/225/'),
+    ('Construction',        'https://www.hotnigerianjobs.com/field/214/'),
+    ('Health & Medical',    'https://www.hotnigerianjobs.com/field/233/'),
+    ('Oil & Gas',           'https://www.hotnigerianjobs.com/industry/128/'),
+    ('Information Tech',    'https://www.hotnigerianjobs.com/field/236/'),
+    ('Project Management',  'https://www.hotnigerianjobs.com/field/249/'),
+    ('Aviation',            'https://www.hotnigerianjobs.com/industry/104/'),
 ]
 
 def scrape_hotnigerianjobs(session: requests.Session) -> list[dict]:
@@ -411,6 +444,14 @@ MYJOBMAG_CATEGORIES = [
     ('Operations',      'https://www.myjobmag.com/jobs-by-field/management'),
     ('Admin',           'https://www.myjobmag.com/jobs-by-field/administration-office-management'),
     ('Engineering',     'https://www.myjobmag.com/jobs-by-field/engineering-technical'),
+    ('Construction',    'https://www.myjobmag.com/jobs-by-field/building-construction'),
+    ('Health',          'https://www.myjobmag.com/jobs-by-field/medical-health'),
+    ('Oil & Gas',       'https://www.myjobmag.com/jobs-by-field/oil-and-gas-energy'),
+    ('Aviation',        'https://www.myjobmag.com/jobs-by-field/aviation-airline'),
+    ('Maritime',        'https://www.myjobmag.com/jobs-by-field/marine-offshore'),
+    ('IT & Comms',      'https://www.myjobmag.com/jobs-by-field/ict-telecom'),
+    ('Finance',         'https://www.myjobmag.com/jobs-by-field/finance-accounting'),
+    ('Project Mgmt',    'https://www.myjobmag.com/jobs-by-field/project-management'),
 ]
 
 def scrape_myjobmag(session: requests.Session) -> list[dict]:
@@ -527,6 +568,16 @@ MYSALARYSCALE_URLS = [
     'https://mysalaryscale.com/jobs/?s=hse+officer',
     'https://mysalaryscale.com/jobs/?s=driver',
     'https://mysalaryscale.com/jobs/?s=operations+officer',
+    'https://mysalaryscale.com/jobs/?s=mechanical+engineer',
+    'https://mysalaryscale.com/jobs/?s=civil+engineer',
+    'https://mysalaryscale.com/jobs/?s=project+manager',
+    'https://mysalaryscale.com/jobs/?s=health+officer',
+    'https://mysalaryscale.com/jobs/?s=oil+gas',
+    'https://mysalaryscale.com/jobs/?s=maritime',
+    'https://mysalaryscale.com/jobs/?s=aviation',
+    'https://mysalaryscale.com/jobs/?s=it+officer',
+    'https://mysalaryscale.com/jobs/?s=construction',
+    'https://mysalaryscale.com/jobs/?s=maintenance+technician',
 ]
 
 def scrape_mysalaryscale(session: requests.Session) -> list[dict]:
@@ -583,6 +634,14 @@ JOBGURUS_URLS = [
     'https://www.jobgurus.com.ng/search?q=driver&l=Nigeria',
     'https://www.jobgurus.com.ng/search?q=logistics+officer&l=Nigeria',
     'https://www.jobgurus.com.ng/search?q=hse+officer&l=Nigeria',
+    'https://www.jobgurus.com.ng/search?q=engineer&l=Nigeria',
+    'https://www.jobgurus.com.ng/search?q=project+manager&l=Nigeria',
+    'https://www.jobgurus.com.ng/search?q=medical+officer&l=Nigeria',
+    'https://www.jobgurus.com.ng/search?q=maritime&l=Nigeria',
+    'https://www.jobgurus.com.ng/search?q=aviation&l=Nigeria',
+    'https://www.jobgurus.com.ng/search?q=oil+gas&l=Nigeria',
+    'https://www.jobgurus.com.ng/search?q=construction&l=Nigeria',
+    'https://www.jobgurus.com.ng/search?q=technician&l=Nigeria',
 ]
 
 def scrape_jobgurus(session: requests.Session) -> list[dict]:
@@ -683,6 +742,14 @@ DELONJOBS_URLS = [
     'https://jobs.delon.ng/?s=logistics',
     'https://jobs.delon.ng/?s=driver',
     'https://jobs.delon.ng/?s=operations',
+    'https://jobs.delon.ng/?s=engineer',
+    'https://jobs.delon.ng/?s=medical',
+    'https://jobs.delon.ng/?s=construction',
+    'https://jobs.delon.ng/?s=maritime',
+    'https://jobs.delon.ng/?s=oil+gas',
+    'https://jobs.delon.ng/?s=technician',
+    'https://jobs.delon.ng/?s=aviation',
+    'https://jobs.delon.ng/?s=project+manager',
 ]
 
 def scrape_delonjobs(session: requests.Session) -> list[dict]:

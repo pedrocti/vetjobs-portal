@@ -19,27 +19,50 @@ from models import (
 
 @admin_bp.route('/jobs')
 @login_required
+
 def job_moderation():
-    """Admin job moderation page."""
-    if not current_user.is_admin():
-        flash('Access denied. Administrators only.', 'error')
-        return redirect(url_for('main.index'))
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
 
-    # Get all job posts that need moderation
-    pending_jobs = JobPosting.query.filter_by(status='pending').all()
-    approved_jobs = JobPosting.query.filter_by(status='approved').all()
-    rejected_jobs = JobPosting.query.filter_by(status='rejected').all()
-    flagged_jobs = JobPosting.query.filter_by(status='flagged').all()
+    pending_pagination = (
+        JobPosting.query
+        .filter_by(status='pending')
+        .order_by(JobPosting.created_at.desc())
+        .paginate(page=page, per_page=per_page, error_out=False)
+    )
 
-    # Get comprehensive admin stats
-    stats = get_admin_stats()
+    approved_jobs = (
+        JobPosting.query
+        .filter_by(status='approved')
+        .order_by(JobPosting.created_at.desc())
+        
+        .all()
+    )
 
-    return render_template('admin/job_moderation.html', 
-                         pending_jobs=pending_jobs,
-                         approved_jobs=approved_jobs,
-                         rejected_jobs=rejected_jobs,
-                         flagged_jobs=flagged_jobs,
-                         stats=stats)
+    rejected_jobs = (
+        JobPosting.query
+        .filter_by(status='rejected')
+        .order_by(JobPosting.created_at.desc())
+        .limit(5)
+        .all()
+    )
+
+    flagged_jobs = (
+        JobPosting.query
+        .filter_by(status='flagged')
+        .order_by(JobPosting.created_at.desc())
+        .all()
+    )
+
+    return render_template(
+        'admin/job_moderation.html',
+        pending_jobs=pending_pagination.items,
+        pending_pagination=pending_pagination,
+        approved_jobs=approved_jobs,
+        rejected_jobs=rejected_jobs,
+        flagged_jobs=flagged_jobs
+    )
+
 
 @admin_bp.route('/job/<int:job_id>')
 @login_required

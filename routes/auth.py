@@ -35,29 +35,41 @@ def register():
         password   = request.form.get("password")
         confirm    = request.form.get("confirm_password")
 
+        form_data = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "username": username,
+            "email": email,
+            "phone": phone,
+            "country": country,
+            "user_type": user_type,
+        }
+
+        def re_render(message, go_to_step=None):
+            flash(message, "danger")
+            return render_template("auth/register.html", form_data=form_data, error_step=go_to_step)
+
         if not all([username, email, password, user_type]):
-            flash("Please complete all required fields.", "danger")
-            return redirect(url_for("auth.register"))
+            return re_render("Please complete all required fields.")
 
         if password is None:
-            flash("Password is required.", "danger")
-            return redirect(url_for("auth.register"))
+            return re_render("Password is required.", go_to_step="final")
 
         password = password.strip()
 
         if password != confirm:
-            flash("Passwords do not match.", "danger")
-            return redirect(url_for("auth.register"))
+            return re_render("Passwords do not match.", go_to_step="final")
 
         if len(password) < 8:
-            flash("Password must be at least 8 characters long.", "danger")
-            return redirect(url_for("auth.register"))
+            return re_render("Password must be at least 8 characters long.", go_to_step="final")
 
         if User.query.filter(
             (User.username == username) | (User.email == email)
         ).first():
-            flash("Username or email is already taken.", "danger")
-            return redirect(url_for("auth.register"))
+            return re_render("Username or email is already taken.", go_to_step=0)
+
+        if phone and User.query.filter_by(phone=phone).first():
+            return re_render("A account with that phone number already exists.", go_to_step=1)
 
         # ── Create user ────────────────────────────────────────
         user = User()
@@ -69,6 +81,7 @@ def register():
         user.created_at    = datetime.utcnow()
         user.password_hash = generate_password_hash(password)
         user.is_verified   = False
+        user.phone         = phone or None
 
         db.session.add(user)
         db.session.flush()

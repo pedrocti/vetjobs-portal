@@ -1,52 +1,78 @@
-{% extends "base.html" %}
-{% block title %}Add Resource{% endblock %}
-{% block content %}
-<div class="container my-5">
-  <h3 class="mb-4 text-primary">Add New Resource</h3>
-  <form method="POST" enctype="multipart/form-data">
+{% extends "admin/base.html" %}
+{% block title %}Add Resource — Admin{% endblock %}
 
-    <!-- Title -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Title</label>
-      <input type="text" name="title" class="form-control" required>
-    </div>
+{% block admin_content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <div>
+    <h4 class="fw-bold mb-0" style="color:#fff;">Add Resource</h4>
+    <small style="color:rgba(255,255,255,0.4);">Create a new resource for veterans and military spouses</small>
+  </div>
+  <a href="{{ url_for('admin_resources.list_resources') }}" class="btn btn-sm btn-outline-secondary">
+    <i class="fas fa-arrow-left me-1"></i> Back to Resources
+  </a>
+</div>
 
-    <!-- Category -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Category</label>
-      <select name="category" class="form-select" required>
-        <option value="career">Career Resources</option>
-        <option value="resume">Resume Builder</option>
-        <option value="interview">Interview Tips</option>
-        <option value="networking">Networking Events</option>
-      </select>
-    </div>
+<div class="card" style="background:rgba(15,32,64,0.6);border:1px solid rgba(212,175,55,0.12);">
+  <div class="card-body p-4">
+    <form method="POST" enctype="multipart/form-data">
 
-    <!-- Description -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Description</label>
-      <textarea name="description" class="form-control" rows="6" placeholder="Enter a brief description..." required></textarea>
-    </div>
+      <div class="mb-3">
+        <label class="form-label" style="color:rgba(255,255,255,0.7);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Title <span style="color:#ef4444;">*</span></label>
+        <input type="text" name="title" class="form-control" required
+               placeholder="e.g. How to Write a Civilian CV"
+               style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;">
+      </div>
 
-    <!-- Internal Link -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Internal Link (optional)</label>
-      <input type="text" name="link" class="form-control" placeholder="/resources/career-guide">
-    </div>
+      <div class="mb-3">
+        <label class="form-label" style="color:rgba(255,255,255,0.7);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Category <span style="color:#ef4444;">*</span></label>
+        <select name="category" class="form-select"
+                style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;">
+          <option value="career">Career Resources</option>
+          <option value="resume">Resume Builder</option>
+          <option value="interview">Interview Tips</option>
+          <option value="networking">Networking Events</option>
+        </select>
+      </div>
 
-    <!-- External Link -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">External Link (optional)</label>
-      <input type="url" name="external_link" class="form-control" placeholder="https://example.com/article">
-    </div>
+      <div class="mb-3">
+        <label class="form-label" style="color:rgba(255,255,255,0.7);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Description</label>
+        <textarea name="description" class="form-control" rows="6"
+                  placeholder="Describe what this resource covers and who it's for..."
+                  style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;"></textarea>
+      </div>
 
-    <!-- Image Upload -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Upload Image (optional)</label>
-      <input type="file" name="image" class="form-control">
-    </div>
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label" style="color:rgba(255,255,255,0.7);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Internal Link <span style="opacity:.5">(optional)</span></label>
+          <input type="text" name="link" class="form-control"
+                 placeholder="e.g. /resources/resume-builder"
+                 style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;">
+          <small style="color:rgba(255,255,255,0.3);">Path to a page on this site</small>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" style="color:rgba(255,255,255,0.7);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">External URL <span style="opacity:.5">(optional)</span></label>
+          <input type="url" name="external_link" class="form-control"
+                 placeholder="https://example.com/resource"
+                 style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;">
+          <small style="color:rgba(255,255,255,0.3);">Link to an external website</small>
+        </div>
+      </div>
 
-    <button class="btn btn-success px-4">Save Resource</button>
-  </form>
+      <div class="mb-4">
+        <label class="form-label" style="color:rgba(255,255,255,0.7);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Image <span style="opacity:.5">(optional)</span></label>
+        <input type="file" name="image" accept="image/*" class="form-control"
+               style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);">
+        <small style="color:rgba(255,255,255,0.3);">JPG, PNG or WebP — recommended 800x500px</small>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary px-4">
+          <i class="fas fa-plus me-2"></i>Publish Resource
+        </button>
+        <a href="{{ url_for('admin_resources.list_resources') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+      </div>
+
+    </form>
+  </div>
 </div>
 {% endblock %}

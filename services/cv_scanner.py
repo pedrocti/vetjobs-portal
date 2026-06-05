@@ -72,9 +72,9 @@ def extract_cv_text(resume_file_path: str) -> Optional[str]:
     if not os.path.isabs(full_path):
         # Try multiple possible upload locations
         candidates = [
-            os.path.join('/home/runner/workspace/static/uploads/resumes', resume_file_path.lstrip('/')),
-            os.path.join('/home/runner/workspace/static/uploads', resume_file_path.lstrip('/')),
-            os.path.join('/home/runner/workspace', resume_file_path.lstrip('/')),
+            os.path.join('/var/www/vetjobportal/static/uploads/resumes', resume_file_path.lstrip('/')),
+            os.path.join('/var/www/vetjobportal/static/uploads/resumes', resume_file_path.lstrip('/')),
+            os.path.join('/var/www/vetjobportal/static/uploads/resumes', resume_file_path.lstrip('/')),
         ]
         for candidate in candidates:
             if os.path.exists(candidate):
@@ -132,22 +132,54 @@ def extract_cv_text(resume_file_path: str) -> Optional[str]:
 
 
 def _keyword_match(cv_text: str, job_title: str, job_requirements: str, job_description: str) -> dict:
-    """Fast keyword-based CV match scoring."""
+    """
+    Strict keyword-based CV match scoring.
+
+    Scoring rules:
+    - Base score: percentage of REQUIRED skill groups found in the CV (max 80)
+    - Title match bonus: +10 if core job title words appear in CV
+    - Military bonus: +5 only if military group is ALSO a job requirement
+      (prevents inflating score for unrelated roles just because candidate is a veteran)
+    - Threshold: 65 (raised from 50 to reduce false positives)
+    - If the job has health/medical/nursing keywords and the CV has none: hard fail
+    """
     cv_lower = cv_text.lower()
     job_text = f"{job_title} {job_requirements} {job_description}".lower()
 
-    # Find which skill groups the job needs
+    # ── Identify what skill groups the JOB requires ──────────
     job_needs = {}
     for group, keywords in SKILL_GROUPS.items():
         job_hits = [kw for kw in keywords if kw in job_text]
         if job_hits:
             job_needs[group] = job_hits
 
+    # If no specific groups detected, use soft skills only (not military bonus)
     if not job_needs:
-        # Generic job — check soft skills and military background
-        job_needs = {'soft_skills': SKILL_GROUPS['soft_skills'], 'military': SKILL_GROUPS['military']}
+        job_needs = {'soft_skills': SKILL_GROUPS['soft_skills']}
 
-    # Check which needed skills the CV has
+    # ── Hard-fail: detect medical/health roles and check CV ──
+    HEALTH_SIGNALS = [
+        'nurs', 'doctor', 'physician', 'pharmacist', 'medical officer',
+        'clinical', 'midwife', 'radiographer', 'physiotherapist',
+        'laboratory', 'health worker', 'community health',
+    ]
+    job_is_health = any(sig in job_text for sig in HEALTH_SIGNALS)
+    cv_has_health = any(sig in cv_lower for sig in HEALTH_SIGNALS)
+
+    if job_is_health and not cv_has_health:
+        return {
+            'score': 15,
+            'is_match': False,
+            'reasoning': (
+                'This role requires healthcare or medical qualifications. '
+                'Your CV does not show relevant medical or clinical experience. '
+                'Please only apply if you have the required healthcare background.'
+            ),
+            'matched_skills': [],
+            'missing_skills': ['nursing/medical qualification', 'clinical experience', 'healthcare background'],
+        }
+
+    # ── Check which required groups appear in the CV ─────────
     matched_groups = {}
     missing_groups = {}
     for group, needed_kws in job_needs.items():
@@ -157,36 +189,48 @@ def _keyword_match(cv_text: str, job_title: str, job_requirements: str, job_desc
         else:
             missing_groups[group] = needed_kws[:3]
 
-    # Score calculation
+    # ── Score calculation ─────────────────────────────────────
     total_needed = len(job_needs)
     total_matched = len(matched_groups)
 
     if total_needed == 0:
-        score = 50
+        score = 40
     else:
-        base_score = int((total_matched / total_needed) * 70)
-        # Bonus: military background always helps
-        if 'military' in matched_groups:
-            base_score = min(base_score + 20, 100)
-        # Bonus: direct role keyword in CV
+        # Base: proportion of required groups found in CV
+        base_score = int((total_matched / total_needed) * 80)
+
+        # Title match bonus: core job title words in CV
         title_words = [w for w in job_title.lower().split() if len(w) > 3]
         title_hits = [w for w in title_words if w in cv_lower]
         if title_hits:
             base_score = min(base_score + 10, 100)
+
+        # Military bonus ONLY when the job itself requires military/security skills
+        # (prevents admin/nursing CVs getting boosted just for being veterans)
+        if 'military' in matched_groups and 'military' in job_needs:
+            base_score = min(base_score + 5, 100)
+
         score = base_score
 
-    # Build reasoning
+    # ── Build honest reasoning ────────────────────────────────
     reasons = []
     if matched_groups:
-        matched_labels = list(matched_groups.keys())[:3]
-        reasons.append(f"Your CV shows relevant experience in: {', '.join(matched_labels)}")
+        matched_labels = [g for g in matched_groups if g != 'military'][:3]
+        if matched_labels:
+            reasons.append(f"Your CV shows relevant experience in: {', '.join(matched_labels)}")
+        elif 'military' in matched_groups:
+            reasons.append("Your military background is noted, but this role needs specific civilian skills")
     if missing_groups:
         missing_labels = list(missing_groups.keys())[:2]
-        reasons.append(f"The role requires: {', '.join(missing_labels)} — not clearly shown in your CV")
+        reasons.append(
+            f"The role specifically requires {', '.join(missing_labels)} experience "
+            f"which is not clearly shown in your CV"
+        )
 
-    is_match = score >= 50
+    # Threshold raised to 65 for stricter matching
+    is_match = score >= 65
     reasoning = '. '.join(reasons) if reasons else (
-        "Your CV shows a good general fit for this role." if is_match
+        "Your CV shows a strong fit for this role." if is_match
         else "Your CV does not clearly match the specific requirements of this role."
     )
 
@@ -207,7 +251,11 @@ def _claude_match(cv_text: str, job_title: str, job_requirements: str, job_descr
 
         client = anthropic.Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
 
-        prompt = f"""You are an expert Nigerian HR consultant reviewing a veteran's CV for a job application.
+        prompt = f"""You are a strict Nigerian HR consultant reviewing a veteran's CV for a civilian job application.
+
+Your job is to give an HONEST and ACCURATE assessment. Do NOT be generous.
+A veteran applying for a nursing, medical, legal, or engineering role with an unrelated CV should score very low.
+Military background alone is NOT sufficient for specialist roles.
 
 JOB TITLE: {job_title}
 
@@ -220,13 +268,19 @@ JOB DESCRIPTION:
 CANDIDATE'S CV:
 {cv_text[:2000]}
 
-Analyse whether this CV is a good match for this role. Respond ONLY with JSON (no markdown):
+Carefully assess:
+1. Does the CV show direct experience or qualifications for THIS specific role?
+2. Are the key required skills actually present in the CV?
+3. Military background is a plus ONLY if the role requires security, leadership, logistics, or operations.
+4. For healthcare, legal, engineering, or technical roles: the candidate MUST show relevant qualifications.
+
+Respond ONLY with JSON (no markdown, no extra text):
 {{
-  "score": <integer 0-100>,
-  "is_match": <true if score >= 55>,
-  "reasoning": "<2 sentences explaining the match or mismatch>",
-  "matched_skills": ["skill1", "skill2"],
-  "missing_skills": ["skill1", "skill2"]
+  "score": <integer 0-100, be strict and accurate>,
+  "is_match": <true ONLY if score >= 65>,
+  "reasoning": "<2 honest sentences. If it's a mismatch, clearly state what specific qualifications or experience are missing>",
+  "matched_skills": ["only skills genuinely present in CV that match the role"],
+  "missing_skills": ["critical skills the role needs that are absent from the CV"]
 }}"""
 
         msg = client.messages.create(

@@ -1,53 +1,80 @@
-{% extends "base.html" %}
-{% block title %}Edit Resource{% endblock %}
-{% block content %}
-<div class="container my-5">
-  <h3 class="text-primary mb-4">Edit Resource</h3>
-  <form method="POST" enctype="multipart/form-data">
+{% extends "admin/base.html" %}
+{% block title %}Edit Resource — Admin{% endblock %}
 
-    <!-- Title -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Title</label>
-      <input type="text" name="title" class="form-control" value="{{ resource.title }}" required>
-    </div>
+{% block admin_content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <div>
+    <h4 class="fw-bold mb-0" style="color:#fff;">Edit Resource</h4>
+    <small style="color:rgba(255,255,255,0.4);">Update an existing resource for veterans</small>
+  </div>
+  <a href="{{ url_for('admin_resources.list_resources') }}" class="btn btn-sm btn-outline-secondary">
+    <i class="fas fa-arrow-left me-1"></i> Back to Resources
+  </a>
+</div>
 
-    <!-- Category -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Category</label>
-      <select name="category" class="form-select">
-        <option value="career" {% if resource.category == 'career' %}selected{% endif %}>Career Resources</option>
-        <option value="resume" {% if resource.category == 'resume' %}selected{% endif %}>Resume Builder</option>
-        <option value="interview" {% if resource.category == 'interview' %}selected{% endif %}>Interview Tips</option>
-        <option value="networking" {% if resource.category == 'networking' %}selected{% endif %}>Networking Events</option>
-      </select>
-    </div>
+<div class="card" style="background:rgba(15,32,64,0.6);border:1px solid rgba(212,175,55,0.12);">
+  <div class="card-body p-4">
+    <form method="POST" enctype="multipart/form-data">
 
-    <!-- Description -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Description</label>
-      <textarea name="description" class="form-control" rows="6">{{ resource.description }}</textarea>
-    </div>
+      <div class="mb-3">
+        <label class="form-label" style="color:rgba(255,255,255,0.7);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Title</label>
+        <input type="text" name="title" class="form-control"
+               style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;"
+               value="{{ resource.title }}" required>
+      </div>
 
-    <!-- Internal & External Links -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Internal Link (optional)</label>
-      <input type="text" name="link" class="form-control" value="{{ resource.link or '' }}">
-    </div>
-    <div class="mb-3">
-      <label class="form-label fw-semibold">External Link (optional)</label>
-      <input type="url" name="external_link" class="form-control" value="{{ resource.external_link or '' }}">
-    </div>
+      <div class="mb-3">
+        <label class="form-label" style="color:rgba(255,255,255,0.7);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Category</label>
+        <select name="category" class="form-select"
+                style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;">
+          <option value="career"     {% if resource.category == 'career' %}selected{% endif %}>Career Resources</option>
+          <option value="resume"     {% if resource.category == 'resume' %}selected{% endif %}>Resume Builder</option>
+          <option value="interview"  {% if resource.category == 'interview' %}selected{% endif %}>Interview Tips</option>
+          <option value="networking" {% if resource.category == 'networking' %}selected{% endif %}>Networking Events</option>
+        </select>
+      </div>
 
-    <!-- Image Upload -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Change Image (optional)</label>
-      {% if resource.image_url %}
-        <div><img src="{{ resource.image_url }}" alt="" width="150" class="rounded mb-2"></div>
-      {% endif %}
-      <input type="file" name="image" class="form-control">
-    </div>
+      <div class="mb-3">
+        <label class="form-label" style="color:rgba(255,255,255,0.7);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Description</label>
+        <textarea name="description" class="form-control" rows="6"
+                  style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;">{{ resource.description }}</textarea>
+      </div>
 
-    <button class="btn btn-primary px-4">Update Resource</button>
-  </form>
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label" style="color:rgba(255,255,255,0.7);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Internal Link <span style="opacity:.5">(optional)</span></label>
+          <input type="text" name="link" class="form-control"
+                 style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;"
+                 value="{{ resource.link or '' }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" style="color:rgba(255,255,255,0.7);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">External URL <span style="opacity:.5">(optional)</span></label>
+          <input type="url" name="external_link" class="form-control"
+                 style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;"
+                 value="{{ resource.external_link or '' }}">
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label" style="color:rgba(255,255,255,0.7);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Change Image <span style="opacity:.5">(optional)</span></label>
+        {% if resource.image_url %}
+          <div class="mb-2">
+            <img src="{{ resource.image_url }}" alt="Current image" width="160"
+                 style="border-radius:4px;border:1px solid rgba(255,255,255,0.1);">
+          </div>
+        {% endif %}
+        <input type="file" name="image" class="form-control"
+               style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);">
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary px-4">
+          <i class="fas fa-save me-2"></i>Update Resource
+        </button>
+        <a href="{{ url_for('admin_resources.list_resources') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+      </div>
+
+    </form>
+  </div>
 </div>
 {% endblock %}

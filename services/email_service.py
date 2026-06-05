@@ -629,6 +629,85 @@ class EmailService:
     # JOB APPLICATION EMAIL
     # ─────────────────────────────────────────────────────────
 
+
+    # CV FEEDBACK EMAIL
+    def send_cv_feedback_email(self, user, cv_analysis):
+        if not cv_analysis:
+            return False
+        first_name = user.first_name
+        score = cv_analysis.get('score', 0)
+        strengths = cv_analysis.get('strength_summary', '')
+        issues = cv_analysis.get('issues', [])
+        target_roles = cv_analysis.get('target_roles', [])
+        subject = '{}, we reviewed your CV — here is what we found'.format(first_name)
+        if score >= 70: score_color, score_label = '#4CAF50', 'Good foundation'
+        elif score >= 50: score_color, score_label = '#D4AF37', 'Needs improvement'
+        else: score_color, score_label = '#E57373', 'Needs significant work'
+        issues_rows = ''
+        for i in issues:
+            issues_rows += '<tr><td style="padding:10px 0;border-bottom:1px solid rgba(212,175,55,0.08)">'
+            issues_rows += '<p style="margin:0 0 3px;font-size:14px;font-weight:700;color:#fff">{}</p>'.format(i.get('point',''))
+            issues_rows += '<p style="margin:0;font-size:13px;color:rgba(255,255,255,0.55);line-height:1.5">{}</p>'.format(i.get('detail',''))
+            issues_rows += '</td></tr>'
+        roles_html = ''
+        if target_roles:
+            badges = ''.join('<span style="display:inline-block;margin:4px 6px 4px 0;padding:4px 12px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);border-radius:2px;font-size:12px;color:#D4AF37">{}</span>'.format(r) for r in target_roles)
+            roles_html = '<p style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:1px;text-transform:uppercase;margin:28px 0 10px">Roles You Could Target</p><div>{}</div>'.format(badges)
+        html = self._build_cv_feedback_html(first_name, score, score_color, score_label, strengths, issues_rows, roles_html)
+        text = 'VetJobPortal CV Review\n\nDear {},\n\nScore: {}/100 ({})\n\nStrengths:\n{}\n\nIssues:\n'.format(first_name, score, score_label, strengths)
+        text += '\n'.join('* {}: {}'.format(i.get('point',''), i.get('detail','')) for i in issues)
+        text += '\n\nTarget Roles: {}\n\n1. Fix it yourself using the feedback above.\n2. CV Optimization Service: https://vetjobportal.com/cv-optimize\n\nThe VetJobPortal Team'.format(', '.join(target_roles))
+        return self.send_email(user.email, subject, html, text)
+
+    def _build_cv_feedback_html(self, first_name, score, score_color, score_label, strengths, issues_rows, roles_html):
+        from datetime import datetime
+        return '''<!DOCTYPE html><html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#04080f;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#04080f;padding:40px 20px;"><tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#0a1628;border:1px solid rgba(212,175,55,0.2);border-radius:12px;overflow:hidden;">
+<tr><td style="height:3px;background:linear-gradient(90deg,transparent,#D4AF37,#f0d060,#D4AF37,transparent);"></td></tr>
+<tr><td style="background:#080f20;padding:32px 40px;text-align:center;border-bottom:1px solid rgba(212,175,55,0.12);">
+  <p style="font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#D4AF37;margin:0 0 8px;">VETJOBPORTAL</p>
+  <p style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#fff;margin:0;">Your CV Review Is Ready</p>
+</td></tr>
+<tr><td style="padding:36px 40px;">
+  <p style="font-size:15px;color:rgba(255,255,255,0.8);margin:0 0 20px;">Dear <strong style="color:#fff;">''' + first_name + '''</strong>,</p>
+  <p style="font-size:15px;color:rgba(255,255,255,0.65);line-height:1.8;margin:0 0 28px;">Your account has been verified. You are now part of Nigeria&#39;s first dedicated military-to-civilian career platform. We reviewed your uploaded CV and here is our honest assessment.</p>
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;margin-bottom:28px;">
+    <tr><td style="padding:20px 24px;">
+      <p style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin:0 0 8px;">Civilian Readiness Score</p>
+      <p style="font-size:36px;font-weight:700;color:''' + score_color + ''';margin:0 0 4px;line-height:1;">''' + str(score) + '''<span style="font-size:18px;color:rgba(255,255,255,0.3);">/100</span></p>
+      <p style="font-size:12px;color:''' + score_color + ''';margin:0;">''' + score_label + '''</p>
+    </td></tr>
+  </table>
+  <p style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4CAF50;font-weight:700;margin:0 0 10px;">&#10022; What Is Working For You</p>
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(76,175,80,0.06);border-left:3px solid #4CAF50;margin-bottom:28px;">
+    <tr><td style="padding:16px 20px;"><p style="font-size:14px;color:rgba(255,255,255,0.75);line-height:1.7;margin:0;">''' + strengths + '''</p></td></tr>
+  </table>
+  <p style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#D4AF37;font-weight:700;margin:0 0 10px;">&#9888; What Needs To Be Fixed</p>
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(212,175,55,0.04);border-left:3px solid #D4AF37;margin-bottom:8px;">
+    <tr><td style="padding:4px 20px 8px;"><table width="100%" cellpadding="0" cellspacing="0">''' + issues_rows + '''</table></td></tr>
+  </table>
+  <p style="font-size:13px;color:rgba(255,255,255,0.45);line-height:1.7;margin:16px 0 28px;">Your experience earns you a strong civilian position. Do not let a poorly formatted document be the reason employers miss that.</p>
+  ''' + roles_html + '''
+  <table width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0;"><tr><td style="height:1px;background:rgba(255,255,255,0.06);"></td></tr></table>
+  <p style="font-family:Georgia,serif;font-size:17px;font-weight:700;color:#fff;margin:0 0 20px;">Here Is What You Can Do Next</p>
+  <p style="font-size:14px;color:#fff;font-weight:700;margin:0 0 6px;">1. Fix it yourself</p>
+  <p style="font-size:13px;color:rgba(255,255,255,0.55);line-height:1.6;margin:0 0 20px;">Use the feedback above. Rewrite each bullet to answer: what was the result of what I did? Add a job title, correct errors, add LinkedIn URL.</p>
+  <p style="font-size:14px;color:#fff;font-weight:700;margin:0 0 6px;">2. Let our team handle it professionally</p>
+  <p style="font-size:13px;color:rgba(255,255,255,0.55);line-height:1.6;margin:0 0 28px;">Our <strong style="color:#D4AF37;">CV Optimization Service</strong> rewrites, reformats and positions your CV for the civilian roles you are targeting.</p>
+  <div style="text-align:center;margin:0 0 28px;">
+    <a href="https://vetjobportal.com/cv-optimize" style="display:inline-block;padding:16px 40px;background:#D4AF37;color:#0a1628;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;">Get My CV Optimized</a>
+    <p style="font-size:11px;color:rgba(255,255,255,0.3);margin:10px 0 0;">Professional rewrite &nbsp;&#183;&nbsp; Civilian-ready format &nbsp;&#183;&nbsp; Fast turnaround</p>
+  </div>
+  <p style="font-size:14px;color:rgba(255,255,255,0.65);line-height:1.8;margin:0;">We are rooting for you, <strong style="color:#fff;">''' + first_name + '''</strong>.<br><br><strong style="color:#fff;">The VetJobPortal Team</strong><br><a href="https://vetjobportal.com" style="color:#D4AF37;text-decoration:none;">vetjobportal.com</a></p>
+</td></tr>
+<tr><td style="background:#04080f;padding:24px 40px;text-align:center;border-top:1px solid rgba(212,175,55,0.08);">
+  <p style="font-size:11px;color:rgba(255,255,255,0.25);margin:0;">&copy; VetJobPortal &nbsp;|&nbsp; Connecting Nigerian Veterans With Opportunity</p>
+</td></tr>
+<tr><td style="height:2px;background:linear-gradient(90deg,transparent,#D4AF37,transparent);"></td></tr>
+</table></td></tr></table></body></html>'''
+
     def send_application_confirmation_email(self, user, job_title, company_name):
         subject = f"Application Submitted — {job_title}"
         body = (

@@ -185,7 +185,45 @@
                                 </tr>
                                 {% endfor %}
                             </tbody>
-                        </table>
+                        
+</table>
+
+<div class="d-flex justify-content-between align-items-center p-3 border-top">
+    <div class="text-muted small">
+        Showing page {{ pending_pagination.page }} of {{ pending_pagination.pages }}
+    </div>
+
+    <div>
+        {% if pending_pagination.has_prev %}
+            <a href="{{ url_for('admin.job_moderation', page=pending_pagination.prev_num) }}"
+               class="btn btn-outline-primary btn-sm me-2">
+               Previous
+            </a>
+        {% endif %}
+
+        {% if pending_pagination.has_next %}
+            <a href="{{ url_for('admin.job_moderation', page=pending_pagination.next_num) }}"
+               class="btn btn-primary btn-sm">
+               Next
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+                    <div class="d-flex justify-content-between align-items-center p-3 border-top">
+                        <div class="text-muted small">
+                            Showing page {{ pending_pagination.page }} of {{ pending_pagination.pages }}
+                        </div>
+                        <div>
+                            {% if pending_pagination.has_prev %}
+                                <a href="{{ url_for('admin.job_moderation', page=pending_pagination.prev_num) }}" class="btn btn-outline-primary btn-sm me-2">Previous</a>
+                            {% endif %}
+
+                            {% if pending_pagination.has_next %}
+                                <a href="{{ url_for('admin.job_moderation', page=pending_pagination.next_num) }}" class="btn btn-primary btn-sm">Next</a>
+                            {% endif %}
+                        </div>
+                    </div>
                     </div>
                     {% else %}
                     <div class="text-center py-4">
@@ -223,7 +261,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for job in approved_jobs[:10] %}
+                                {% for job in approved_jobs %}
                                 <tr>
                                     <td>
                                         <div>
@@ -309,6 +347,20 @@
                                 {% endif %}
                             </tbody>
                         </table>
+                    <div class="d-flex justify-content-between align-items-center p-3 border-top">
+                        <div class="text-muted small">
+                            Showing page {{ pending_pagination.page }} of {{ pending_pagination.pages }}
+                        </div>
+                        <div>
+                            {% if pending_pagination.has_prev %}
+                                <a href="{{ url_for('admin.job_moderation', page=pending_pagination.prev_num) }}" class="btn btn-outline-primary btn-sm me-2">Previous</a>
+                            {% endif %}
+
+                            {% if pending_pagination.has_next %}
+                                <a href="{{ url_for('admin.job_moderation', page=pending_pagination.next_num) }}" class="btn btn-primary btn-sm">Next</a>
+                            {% endif %}
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -354,6 +406,20 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+                    <div class="d-flex justify-content-between align-items-center p-3 border-top">
+                        <div class="text-muted small">
+                            Showing page {{ pending_pagination.page }} of {{ pending_pagination.pages }}
+                        </div>
+                        <div>
+                            {% if pending_pagination.has_prev %}
+                                <a href="{{ url_for('admin.job_moderation', page=pending_pagination.prev_num) }}" class="btn btn-outline-primary btn-sm me-2">Previous</a>
+                            {% endif %}
+
+                            {% if pending_pagination.has_next %}
+                                <a href="{{ url_for('admin.job_moderation', page=pending_pagination.next_num) }}" class="btn btn-primary btn-sm">Next</a>
+                            {% endif %}
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -395,6 +461,20 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+                    <div class="d-flex justify-content-between align-items-center p-3 border-top">
+                        <div class="text-muted small">
+                            Showing page {{ pending_pagination.page }} of {{ pending_pagination.pages }}
+                        </div>
+                        <div>
+                            {% if pending_pagination.has_prev %}
+                                <a href="{{ url_for('admin.job_moderation', page=pending_pagination.prev_num) }}" class="btn btn-outline-primary btn-sm me-2">Previous</a>
+                            {% endif %}
+
+                            {% if pending_pagination.has_next %}
+                                <a href="{{ url_for('admin.job_moderation', page=pending_pagination.next_num) }}" class="btn btn-primary btn-sm">Next</a>
+                            {% endif %}
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>

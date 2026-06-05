@@ -1523,6 +1523,14 @@ html, body {
 .vp-input-with-icon {
   padding-left: 44px !important;
 }
+.vp-input-icon.vp-pw-toggle {
+  pointer-events: all;
+  cursor: pointer;
+  z-index: 3;
+}
+input.vp-input-with-icon.has-toggle {
+  padding-right: 44px !important;
+}
 
 /* ── Auth options row ── */
 .vp-auth-options {

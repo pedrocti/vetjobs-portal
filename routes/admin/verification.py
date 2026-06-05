@@ -87,6 +87,20 @@ def approve_profile(profile_id):
 
         try:
             notification_service.notify_veteran_approved(profile.user)
+            # ── CV Feedback Email (auto-fires on approval) ──
+            try:
+                from services.cv_analysis_service import analyse_veteran_cv
+                from services.email_service import EmailService
+                cv_analysis = analyse_veteran_cv(profile)
+                if cv_analysis:
+                    EmailService().send_cv_feedback_email(profile.user, cv_analysis)
+                    current_app.logger.info('[CV FEEDBACK] Sent to {} score={}'.format(profile.user.email, cv_analysis.get('score')))
+                else:
+                    current_app.logger.info('[CV FEEDBACK] Skipped for {} — no CV'.format(profile.user.email))
+            except Exception as e:
+                current_app.logger.error('[CV FEEDBACK ERROR] {}'.format(e))
+            # ── End CV Feedback ──
+
         except Exception as e:
             current_app.logger.error(f"Veteran approval notification failed: {e}")
 
