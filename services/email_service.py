@@ -74,14 +74,20 @@ class EmailService:
     def send_email(self, to_email, subject, html_content=None, text_content=None):
         """
         Send email using SMTP (from admin dashboard config).
-        Falls back to SendGrid if SMTP not configured.
-        Logs email if neither is available.
+        Falls back to Brevo API if SMTP not configured.
+        Falls back to SendGrid if Brevo not configured.
+        Logs email if no delivery method available.
         """
         # Reload settings fresh each call so admin changes apply immediately
         self._load_settings()
 
         if self.smtp_enabled and self.smtp_host and self.smtp_username and self.smtp_password:
             return self._send_smtp(to_email, subject, html_content, text_content)
+
+        # Brevo API fallback (primary fallback — already configured on this platform)
+        brevo_key = os.environ.get('BREVO_API_KEY')
+        if brevo_key:
+            return self._send_brevo(to_email, subject, html_content, text_content, brevo_key)
 
         if self.sendgrid_api_key:
             return self._send_sendgrid(to_email, subject, html_content, text_content)
@@ -93,6 +99,48 @@ class EmailService:
                 f"To: {to_email} | Subject: {subject}"
             )
         return False
+
+    def _send_brevo(self, to_email, subject, html_content=None, text_content=None, api_key=None):
+        """Send via Brevo transactional API — used as SMTP fallback."""
+        import requests as _requests
+        try:
+            payload = {
+                "sender": {
+                    "name": self.from_name or "VetJobPortal",
+                    "email": self.from_email or "support@vetjobportal.com"
+                },
+                "to": [{"email": to_email}],
+                "subject": subject,
+            }
+            if html_content:
+                payload["htmlContent"] = html_content
+            if text_content:
+                payload["textContent"] = text_content
+
+            response = _requests.post(
+                "https://api.brevo.com/v3/smtp/email",
+                headers={
+                    "accept": "application/json",
+                    "content-type": "application/json",
+                    "api-key": api_key,
+                },
+                json=payload,
+                timeout=10,
+            )
+            if response.status_code in (200, 201, 202):
+                if current_app:
+                    current_app.logger.info(f"[BREVO SENT] To: {to_email} | Subject: {subject}")
+                return True
+            else:
+                if current_app:
+                    current_app.logger.error(
+                        f"[BREVO ERROR] {response.status_code} | {response.text[:200]}"
+                    )
+                return False
+        except Exception as e:
+            if current_app:
+                current_app.logger.error(f"[BREVO EXCEPTION] {e}")
+            return False
 
     # ─────────────────────────────────────────────────────────
     # SMTP SENDER

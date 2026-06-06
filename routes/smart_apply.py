@@ -210,7 +210,7 @@ def submit_application(job_id):
             try:
                 from services.brevo_service import BrevoService
                 brevo = BrevoService()
-                brevo._request('POST', '/smtp/email', json={
+                brevo._request('POST', 'https://api.brevo.com/v3/smtp/email', json={
                     "sender": {"name": "VetJobPortal", "email": "support@vetjobportal.com"},
                     "to": [{"email": veteran_email, "name": veteran_name}],
                     "subject": f"Application Submitted — {job.title} at {job.company_name}",
