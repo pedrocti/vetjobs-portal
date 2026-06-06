@@ -101,6 +101,15 @@
       <div class="vp-dash-stat">
         <div>
           <div class="vp-dash-stat-number">{{ stats.total_applications }}</div>
+          <div style="margin-top:6px;">
+            <span style="font-size:11px;color:#4ade80;font-weight:700;">
+              +{{ stats.today_applications }} today
+            </span>
+            &nbsp;·&nbsp;
+            <span style="font-size:11px;color:#60a5fa;">
+              {{ stats.submitted_applications }} via smart apply
+            </span>
+          </div>
           <div class="vp-dash-stat-label">Applications</div>
           <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;">
             {{ stats.accepted_applications }} accepted

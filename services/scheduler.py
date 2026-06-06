@@ -232,6 +232,210 @@ def send_employer_hiring_tips(app):
             logger.exception(f"[SCHEDULER] send_employer_hiring_tips job failed: {e}")
 
 
+
+
+# ─────────────────────────────────────────────────────────────
+# JOB 5 — DAILY APPLICATION SUMMARY EMAIL TO ADMIN
+# Runs at 8:00 PM Lagos time every day
+# Sends: total applications today, which jobs, any failures
+# ─────────────────────────────────────────────────────────────
+def send_daily_application_summary(app):
+    with app.app_context():
+        try:
+            from models import JobApplication, JobPosting, User
+            from app import db
+            from sqlalchemy import func
+            import requests as _requests
+            import os
+
+            today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+
+            # Get today's applications
+            applications = db.session.query(
+                JobApplication, JobPosting, User
+            ).join(
+                JobPosting, JobApplication.job_id == JobPosting.id
+            ).join(
+                User, JobApplication.veteran_id == User.id
+            ).filter(
+                JobApplication.created_at >= today_start
+            ).all()
+
+            total = len(applications)
+
+            if total == 0:
+                logger.info("[SCHEDULER] No applications today — skipping summary email")
+                return
+
+            # Build job breakdown
+            job_breakdown = {}
+            for app_record, job, veteran in applications:
+                key = f"{job.title} at {job.company_name}"
+                if key not in job_breakdown:
+                    job_breakdown[key] = []
+                job_breakdown[key].append(veteran.full_name or veteran.email)
+
+            rows = ""
+            for job_title, applicants in job_breakdown.items():
+                rows += f"""
+                <tr>
+                  <td style="padding:10px;border-bottom:1px solid #eee;font-size:14px;">{job_title}</td>
+                  <td style="padding:10px;border-bottom:1px solid #eee;font-size:14px;text-align:center;">{len(applicants)}</td>
+                  <td style="padding:10px;border-bottom:1px solid #eee;font-size:13px;color:#666;">{', '.join(applicants)}</td>
+                </tr>"""
+
+            html = f"""
+            <div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;">
+              <div style="background:#0d2137;padding:24px;text-align:center;">
+                <h2 style="color:#d4af37;margin:0;">Daily Application Summary</h2>
+                <p style="color:rgba(255,255,255,0.6);margin:8px 0 0;font-size:14px;">
+                  {datetime.utcnow().strftime('%A, %d %B %Y')}
+                </p>
+              </div>
+              <div style="padding:24px;background:#f9f9f9;">
+                <div style="background:#fff;border-left:4px solid #d4af37;padding:16px;margin-bottom:24px;border-radius:4px;">
+                  <p style="margin:0;font-size:28px;font-weight:700;color:#0d2137;">{total}</p>
+                  <p style="margin:4px 0 0;font-size:14px;color:#666;">Total applications submitted today</p>
+                </div>
+                <h3 style="color:#0d2137;font-size:16px;margin:0 0 12px;">Breakdown by Job</h3>
+                <table width="100%" style="border-collapse:collapse;background:#fff;border:1px solid #eee;border-radius:4px;">
+                  <thead>
+                    <tr style="background:#0d2137;">
+                      <th style="padding:10px;color:#d4af37;font-size:12px;text-align:left;">Job</th>
+                      <th style="padding:10px;color:#d4af37;font-size:12px;text-align:center;">Count</th>
+                      <th style="padding:10px;color:#d4af37;font-size:12px;text-align:left;">Applicants</th>
+                    </tr>
+                  </thead>
+                  <tbody>{rows}</tbody>
+                </table>
+                <p style="font-size:12px;color:#999;margin-top:24px;">
+                  VetJobPortal Admin System — automated daily report
+                </p>
+              </div>
+            </div>"""
+
+            api_key = os.environ.get('BREVO_API_KEY')
+            if not api_key:
+                logger.error("[SCHEDULER] No Brevo API key — cannot send daily summary")
+                return
+
+            response = _requests.post(
+                "https://api.brevo.com/v3/smtp/email",
+                headers={
+                    "accept": "application/json",
+                    "content-type": "application/json",
+                    "api-key": api_key,
+                },
+                json={
+                    "sender": {"name": "VetJobPortal System", "email": "support@vetjobportal.com"},
+                    "to": [{"email": "support@vetjobportal.com", "name": "Admin"}],
+                    "subject": f"[VetJobPortal] Daily Summary — {total} Application{'s' if total != 1 else ''} Today",
+                    "htmlContent": html,
+                },
+                timeout=10,
+            )
+
+            if response.status_code in (200, 201):
+                logger.info(f"[SCHEDULER] Daily summary sent — {total} applications today")
+            else:
+                logger.error(f"[SCHEDULER] Daily summary failed: {response.status_code} {response.text[:200]}")
+
+        except Exception as e:
+            logger.exception(f"[SCHEDULER] send_daily_application_summary failed: {e}")
+
+
+# ─────────────────────────────────────────────────────────────
+# EXCEPTION ALERT — Suspicious activity or submission failure
+# Called directly from smart_apply.py (not a scheduled job)
+# ─────────────────────────────────────────────────────────────
+def send_admin_exception_alert(app, alert_type, details):
+    """
+    Send immediate alert email to admin for exceptions.
+
+    alert_types:
+      - 'suspicious_activity'  : veteran applying to 10+ jobs in 1 hour
+      - 'submission_failure'   : email to employer failed to send
+    """
+    with app.app_context():
+        try:
+            import requests as _requests
+            import os
+
+            if alert_type == 'suspicious_activity':
+                subject = "[ALERT] Suspicious Application Activity Detected"
+                color = "#ef4444"
+                icon = "⚠️"
+                body = f"""
+                <p style="font-size:15px;color:#333;">A veteran has submitted an unusually high number of applications.</p>
+                <div style="background:#fff3f3;border-left:4px solid #ef4444;padding:16px;margin:16px 0;border-radius:4px;">
+                  {details}
+                </div>
+                <p style="font-size:13px;color:#666;">
+                  Please review this account in the
+                  <a href="https://vetjobportal.com/admin/veterans" style="color:#0d2137;">Veterans Management</a>
+                  section.
+                </p>"""
+
+            elif alert_type == 'submission_failure':
+                subject = "[ALERT] Application Submission Failure"
+                color = "#f97316"
+                icon = "❌"
+                body = f"""
+                <p style="font-size:15px;color:#333;">An application submission via email failed.</p>
+                <div style="background:#fff8f3;border-left:4px solid #f97316;padding:16px;margin:16px 0;border-radius:4px;">
+                  {details}
+                </div>
+                <p style="font-size:13px;color:#666;">
+                  The veteran may need to be contacted manually to complete their application.
+                </p>"""
+            else:
+                subject = f"[ALERT] VetJobPortal System Alert: {alert_type}"
+                color = "#6366f1"
+                icon = "ℹ️"
+                body = f"<p>{details}</p>"
+
+            html = f"""
+            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+              <div style="background:#0d2137;padding:20px;text-align:center;">
+                <h2 style="color:{color};margin:0;">{icon} {subject.replace('[ALERT] ','')}</h2>
+                <p style="color:rgba(255,255,255,0.5);font-size:12px;margin:6px 0 0;">
+                  {datetime.utcnow().strftime('%d %b %Y at %H:%M UTC')}
+                </p>
+              </div>
+              <div style="padding:24px;background:#f9f9f9;">
+                {body}
+              </div>
+            </div>"""
+
+            api_key = os.environ.get('BREVO_API_KEY')
+            if not api_key:
+                logger.error("[ALERT] No Brevo API key — cannot send admin alert")
+                return
+
+            response = _requests.post(
+                "https://api.brevo.com/v3/smtp/email",
+                headers={
+                    "accept": "application/json",
+                    "content-type": "application/json",
+                    "api-key": api_key,
+                },
+                json={
+                    "sender": {"name": "VetJobPortal Alerts", "email": "support@vetjobportal.com"},
+                    "to": [{"email": "support@vetjobportal.com", "name": "Admin"}],
+                    "subject": subject,
+                    "htmlContent": html,
+                },
+                timeout=10,
+            )
+
+            if response.status_code in (200, 201):
+                logger.info(f"[ALERT] Admin alert sent: {alert_type}")
+            else:
+                logger.error(f"[ALERT] Admin alert failed: {response.status_code}")
+
+        except Exception as e:
+            logger.exception(f"[ALERT] send_admin_exception_alert failed: {e}")
+
 # ─────────────────────────────────────────────────────────────
 # SCHEDULER INIT
 # Call this from create_app() in app.py
@@ -292,6 +496,16 @@ def start_scheduler(app):
          name='Veteran Job Scraper',
          replace_existing=True,
          misfire_grace_time=3600,
+    )
+
+    # Run at 8:00 PM Lagos time daily
+    scheduler.add_job(
+        func=send_daily_application_summary,
+        trigger=CronTrigger(hour=20, minute=0),
+        args=[app],
+        id="daily_application_summary",
+        name="Daily Application Summary",
+        replace_existing=True
     )
 
     scheduler.start()

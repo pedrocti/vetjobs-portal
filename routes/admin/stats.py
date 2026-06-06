@@ -43,6 +43,15 @@ def get_admin_stats():
         pending_app_reviews = JobApplication.query.filter_by(status='pending').count()
         accepted_applications = JobApplication.query.filter_by(status='accepted').count()
 
+        # Today's applications (midnight to now)
+        today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        today_applications = JobApplication.query.filter(
+            JobApplication.created_at >= today_start
+        ).count()
+
+        # Submitted via smart apply (status='submitted')
+        submitted_applications = JobApplication.query.filter_by(status='submitted').count()
+
         # =====================
         # ✅ Verification
         # =====================
@@ -119,6 +128,8 @@ def get_admin_stats():
             'total_applications': total_applications,
             'pending_app_reviews': pending_app_reviews,
             'accepted_applications': accepted_applications,
+            'today_applications': today_applications,
+            'submitted_applications': submitted_applications,
 
             # ✅ Verification
             'pending_verifications': pending_verifications,
@@ -171,6 +182,8 @@ def get_admin_stats():
             'total_applications': 0,
             'pending_app_reviews': 0,
             'accepted_applications': 0,
+            'today_applications': 0,
+            'submitted_applications': 0,
 
             # ✅ Verification
             'pending_verifications': 0,

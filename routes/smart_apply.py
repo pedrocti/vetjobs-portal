@@ -276,6 +276,38 @@ def submit_application(job_id):
     veteran_email = current_user.email
     veteran_phone = getattr(profile, 'phone', '') or ''
 
+    # ── Suspicious activity check ────────────────────────────
+    # Alert admin if veteran submits 10+ applications within 1 hour
+    try:
+        from datetime import timedelta
+        one_hour_ago = datetime.utcnow() - timedelta(hours=1)
+        from models import JobApplication as _JA
+        recent_count = _JA.query.filter(
+            _JA.veteran_id == current_user.id,
+            _JA.created_at >= one_hour_ago
+        ).count()
+        if recent_count >= 10:
+            try:
+                from flask import current_app
+                from services.scheduler import send_admin_exception_alert
+                import threading
+                details = (
+                    f"<strong>Veteran:</strong> {veteran_name} ({veteran_email})<br>"
+                    f"<strong>Applications in last hour:</strong> {recent_count}<br>"
+                    f"<strong>User ID:</strong> {current_user.id}"
+                )
+                t = threading.Thread(
+                    target=send_admin_exception_alert,
+                    args=[current_app._get_current_object(), 'suspicious_activity', details]
+                )
+                t.daemon = True
+                t.start()
+                logger.warning(f"[smart_apply] Suspicious activity alert sent for user {current_user.id} — {recent_count} apps in 1hr")
+            except Exception as alert_err:
+                logger.error(f"[smart_apply] Could not send suspicious activity alert: {alert_err}")
+    except Exception as e:
+        logger.warning(f"[smart_apply] Suspicious activity check failed: {e}")
+
     # Send via Brevo
     success, message = _send_application_via_brevo(
         job=job,
@@ -376,6 +408,25 @@ def submit_application(job_id):
         })
 
     else:
+        # Alert admin of submission failure
+        try:
+            from flask import current_app
+            from services.scheduler import send_admin_exception_alert
+            import threading
+            details = (
+                f"<strong>Veteran:</strong> {veteran_name} ({veteran_email})<br>"
+                f"<strong>Job:</strong> {job.title} at {job.company_name}<br>"
+                f"<strong>Employer email:</strong> {job.apply_email}<br>"
+                f"<strong>Error:</strong> {message}"
+            )
+            t = threading.Thread(
+                target=send_admin_exception_alert,
+                args=[current_app._get_current_object(), 'submission_failure', details]
+            )
+            t.daemon = True
+            t.start()
+        except Exception as alert_err:
+            logger.error(f"[smart_apply] Could not send failure alert: {alert_err}")
         return jsonify({'success': False, 'message': message}), 500
 
 
