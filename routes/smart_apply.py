@@ -305,7 +305,7 @@ def submit_application(job_id):
                     job_id=job_id,
                     veteran_id=current_user.id,
                     status='submitted',
-                    applied_at=datetime.utcnow(),
+                    resume_file=os.path.basename(cv_path),
                     cover_letter=f"Application submitted via VetJobPortal on behalf of {veteran_name}.",
                 )
                 db.session.add(app_record)
@@ -327,50 +327,54 @@ def submit_application(job_id):
             except Exception as e:
                 logger.warning(f"[smart_apply] Notification failed: {e}")
 
-            # Confirmation email to veteran via Brevo
-            try:
-                from services.brevo_service import BrevoService
-                brevo = BrevoService()
-                brevo._request('POST', 'https://api.brevo.com/v3/smtp/email', json={
-                    "sender": {"name": "VetJobPortal", "email": "support@vetjobportal.com"},
-                    "to": [{"email": veteran_email, "name": veteran_name}],
-                    "subject": f"Application Submitted — {job.title} at {job.company_name}",
-                    "htmlContent": f"""
-                    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
-                      <div style="background:#0d2137;padding:24px;text-align:center;">
-                        <h2 style="color:#d4af37;margin:0;">Application Submitted ✅</h2>
-                      </div>
-                      <div style="padding:24px;background:#f9f9f9;">
-                        <p>Dear <strong>{veteran_name}</strong>,</p>
-                        <p>Your application for <strong>{job.title}</strong> at
-                        <strong>{job.company_name}</strong> has been successfully submitted
-                        on your behalf by VetJobPortal.</p>
-                        <div style="background:#fff;border-left:4px solid #d4af37;padding:16px;margin:20px 0;">
-                          <p style="margin:0;"><strong>Job:</strong> {job.title}</p>
-                          <p style="margin:8px 0 0;"><strong>Company:</strong> {job.company_name}</p>
-                          <p style="margin:8px 0 0;"><strong>Location:</strong> {job.location}</p>
-                          <p style="margin:8px 0 0;"><strong>Applied:</strong> {datetime.utcnow().strftime('%d %b %Y')}</p>
-                        </div>
-                        <p>Your CV was sent professionally on your behalf. If the employer
-                        is interested, they will contact you directly at <strong>{veteran_email}</strong>.</p>
-                        <p>Keep applying to more roles on VetJobPortal to maximise your chances.</p>
-                        <p style="color:#888;font-size:12px;margin-top:32px;">
-                          VetJobPortal — Nigeria's #1 platform for military veteran employment
-                        </p>
-                      </div>
-                    </div>
-                    """
-                })
-            except Exception as e:
-                logger.warning(f"[smart_apply] Confirmation email failed: {e}")
-
         except Exception as e:
             logger.warning(f"[smart_apply] Could not log application: {e}")
+
+        # Confirmation email to veteran - runs independently of DB block
+        try:
+            # Rollback any failed DB transaction so session is clean
+            try:
+                from extensions import db as _db
+                _db.session.rollback()
+            except Exception:
+                pass
+            from services.brevo_service import BrevoService
+            brevo = BrevoService()
+            html_body = (
+                f'<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">' +
+                f'<div style="background:#0d2137;padding:24px;text-align:center;">' +
+                f'<h2 style="color:#d4af37;margin:0;">Application Submitted</h2></div>' +
+                f'<div style="padding:24px;background:#f9f9f9;">' +
+                f'<p>Dear <strong>{veteran_name}</strong>,</p>' +
+                f'<p>Your application for <strong>{job.title}</strong> at ' +
+                f'<strong>{job.company_name}</strong> has been submitted on your behalf by VetJobPortal.</p>' +
+                f'<div style="background:#fff;border-left:4px solid #d4af37;padding:16px;margin:20px 0;">' +
+                f'<p style="margin:0;"><strong>Job:</strong> {job.title}</p>' +
+                f'<p style="margin:8px 0 0;"><strong>Company:</strong> {job.company_name}</p>' +
+                f'<p style="margin:8px 0 0;"><strong>Location:</strong> {job.location}</p>' +
+                f'<p style="margin:8px 0 0;"><strong>Applied:</strong> {datetime.utcnow().strftime("%d %b %Y")}</p></div>' +
+                f'<p>If the employer is interested they will contact you at <strong>{veteran_email}</strong>.</p>' +
+                f'<p style="color:#888;font-size:12px;">VetJobPortal - Nigeria&#39;s #1 platform for military veteran employment</p>' +
+                f'</div></div>'
+            )
+            confirm_resp = brevo._request("POST", "https://api.brevo.com/v3/smtp/email", json={
+                "sender": {"name": "VetJobPortal", "email": "support@vetjobportal.com"},
+                "to": [{"email": veteran_email, "name": veteran_name}],
+                "subject": f"Application Submitted - {job.title} at {job.company_name}",
+                "htmlContent": html_body,
+            })
+            if confirm_resp:
+                logger.info(f"[smart_apply] Confirmation email sent to {veteran_email}")
+            else:
+                logger.error(f"[smart_apply] Confirmation email FAILED for {veteran_email}")
+        except Exception as e:
+            logger.warning(f"[smart_apply] Confirmation email failed: {e}")
 
         return jsonify({
             'success': True,
             'message': f'Your application has been submitted to {job.company_name} on your behalf. A confirmation has been sent to {veteran_email}. Good luck!'
         })
+
     else:
         return jsonify({'success': False, 'message': message}), 500
 

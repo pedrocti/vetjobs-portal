@@ -14,9 +14,15 @@ from extensions import db, Base
 # Logging setup
 # ===============================
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format='%(asctime)s %(levelname)s %(name)s %(message)s'
 )
+
+# Suppress noisy third-party loggers
+logging.getLogger("pdfminer").setLevel(logging.WARNING)
+logging.getLogger("PIL").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+
 
 login_manager = LoginManager()
 migrate = Migrate()
