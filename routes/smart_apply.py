@@ -127,6 +127,101 @@ def check_cv(job_id):
     })
 
 
+
+
+# ─────────────────────────────────────────────────────────────
+# STEP 1B — RESCAN WITH UPLOADED CV (no-match recovery)
+# POST /jobs/<job_id>/rescan-cv
+# Accepts a temporary CV upload, scans it, saves to /tmp if it
+# passes. Does NOT save to the veteran's profile.
+# ─────────────────────────────────────────────────────────────
+
+@smart_apply_bp.route('/<int:job_id>/rescan-cv', methods=['POST'])
+@login_required
+def rescan_cv(job_id):
+    from models.jobpost import JobPosting
+    from services.cv_scanner import scan_cv_against_job
+    import tempfile, uuid
+
+    job = JobPosting.query.get_or_404(job_id)
+
+    if current_user.user_type != 'veteran':
+        return jsonify({'error': 'Only veterans can apply.'}), 403
+
+    uploaded_file = request.files.get('cv_file')
+    if not uploaded_file or uploaded_file.filename == '':
+        return jsonify({'error': 'no_file', 'message': 'No file was uploaded.'}), 400
+
+    # Validate extension
+    allowed = {'.pdf', '.doc', '.docx'}
+    import os as _os
+    ext = _os.path.splitext(uploaded_file.filename)[1].lower()
+    if ext not in allowed:
+        return jsonify({
+            'error': 'invalid_file',
+            'message': 'Please upload a PDF or Word document (.pdf, .doc, .docx).'
+        }), 400
+
+    # Save to /tmp with unique key — NOT to profile uploads
+    temp_key = f"tempcv_{current_user.id}_{job_id}_{uuid.uuid4().hex}{ext}"
+    temp_path = _os.path.join(tempfile.gettempdir(), temp_key)
+
+    try:
+        uploaded_file.save(temp_path)
+    except Exception as e:
+        logger.error(f"[rescan_cv] Could not save temp file: {e}")
+        return jsonify({'error': 'save_failed', 'message': 'Could not process your file. Please try again.'}), 500
+
+    # Scan the temp CV
+    result = scan_cv_against_job(
+        resume_file_path=temp_path,
+        job_title=job.title,
+        job_requirements=job.requirements,
+        job_description=job.description,
+    )
+
+    if result.get('error') == 'cv_unreadable':
+        # Clean up unreadable file
+        try: _os.remove(temp_path)
+        except: pass
+        return jsonify({
+            'error': 'cv_unreadable',
+            'message': 'We could not read your uploaded CV. Please ensure it is a valid PDF or Word document.'
+        }), 400
+
+    # If no match, delete temp file — no point keeping it
+    if not result.get('is_match'):
+        try: _os.remove(temp_path)
+        except: pass
+        return jsonify({
+            'score':          result['score'],
+            'is_match':       False,
+            'reasoning':      result['reasoning'],
+            'matched_skills': result.get('matched_skills', []),
+            'missing_skills': result.get('missing_skills', []),
+            'temp_cv_key':    None,
+        })
+
+    # Match — keep temp file, return key to frontend
+    # Frontend will pass this key when submitting the application
+    apply_method = None
+    if job.is_admin_posted:
+        if job.apply_email:
+            apply_method = 'email'
+        elif job.external_apply_url:
+            apply_method = 'link'
+
+    return jsonify({
+        'score':          result['score'],
+        'is_match':       True,
+        'reasoning':      result['reasoning'],
+        'matched_skills': result.get('matched_skills', []),
+        'missing_skills': result.get('missing_skills', []),
+        'temp_cv_key':    temp_key,
+        'apply_method':   apply_method,
+        'apply_url':      job.external_apply_url if apply_method == 'link' else None,
+    })
+
 # ─────────────────────────────────────────────────────────────
 # STEP 2A — SUBMIT APPLICATION VIA BREVO EMAIL
 # POST /jobs/<job_id>/submit-application
@@ -151,7 +246,25 @@ def submit_application(job_id):
     if not profile:
         return jsonify({'error': 'Veteran profile not found.'}), 400
 
-    cv_path = _get_cv_path(profile)
+    # Check if veteran uploaded a temp CV during rescan flow
+    import tempfile as _tempfile, os as _os
+    temp_cv_key = request.form.get('temp_cv_key') or (request.json or {}).get('temp_cv_key')
+    temp_cv_path = None
+    using_temp_cv = False
+
+    if temp_cv_key:
+        # Validate key format to prevent path traversal
+        if temp_cv_key.startswith(f'tempcv_{current_user.id}_{job_id}_') and '/' not in temp_cv_key and '\\' not in temp_cv_key:
+            candidate = _os.path.join(_tempfile.gettempdir(), temp_cv_key)
+            if _os.path.exists(candidate):
+                temp_cv_path = candidate
+                using_temp_cv = True
+
+    if using_temp_cv:
+        cv_path = temp_cv_path
+    else:
+        cv_path = _get_cv_path(profile)
+
     if not cv_path:
         return jsonify({
             'error': 'no_cv',
@@ -173,6 +286,14 @@ def submit_application(job_id):
     )
 
     if success:
+        # Clean up temp CV immediately after sending — not stored anywhere
+        if using_temp_cv and temp_cv_path:
+            try:
+                _os.remove(temp_cv_path)
+                logger.info(f"[smart_apply] Temp CV deleted after send: {temp_cv_path}")
+            except Exception as e:
+                logger.warning(f"[smart_apply] Could not delete temp CV: {e}")
+
         # Log the application in DB + send notifications
         try:
             from models import JobApplication

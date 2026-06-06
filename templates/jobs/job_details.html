@@ -580,10 +580,29 @@
           </div>
           <div id="noMatchReasoning" class="mb-3 p-3 rounded"
                style="background:rgba(248,113,113,0.07);border-left:3px solid rgba(248,113,113,0.4);font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;"></div>
-          <p style="font-size:13px;color:rgba(255,255,255,0.45);margin:0;">
+          <p style="font-size:13px;color:rgba(255,255,255,0.45);margin:0 0 16px;">
             To protect your chances and our platform's credibility, we do not submit CVs that don't match the role.
-            Please optimise your CV or upload one that better reflects your qualifications for this position.
+            Upload a stronger CV below to re-scan instantly — it will only be used for this application.
           </p>
+          <!-- Inline CV upload for rescan -->
+          <div id="rescanUploadWrap" style="border:1px dashed rgba(255,255,255,0.15);border-radius:8px;padding:16px;background:rgba(255,255,255,0.02);">
+            <p style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin:0 0 10px;">
+              <i class="fas fa-upload me-2"></i>Upload a Better CV for This Job
+            </p>
+            <input type="file" id="rescanFileInput" accept=".pdf,.doc,.docx"
+                   style="display:block;width:100%;font-size:13px;color:rgba(255,255,255,0.6);
+                          background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+                          border-radius:4px;padding:8px;">
+            <small style="color:rgba(255,255,255,0.25);font-size:11px;margin-top:6px;display:block;">
+              PDF or Word only &nbsp;·&nbsp; Not saved to your profile &nbsp;·&nbsp; Used for this application only
+            </small>
+            <button id="rescanBtn" class="btn btn-primary w-100 mt-3" style="font-size:13px;">
+              <i class="fas fa-search me-2"></i>Scan This CV
+            </button>
+            <div id="rescanStatus" style="display:none;margin-top:10px;font-size:13px;color:rgba(255,255,255,0.6);text-align:center;">
+              <div class="spinner-border spinner-border-sm me-2" role="status"></div>Scanning…
+            </div>
+          </div>
         </div>
         <div class="modal-footer flex-column gap-2" style="border-top:1px solid rgba(255,255,255,0.07);padding:16px 24px;" id="noMatchActions"></div>
       </div>
@@ -764,10 +783,7 @@
                    <i class="fas fa-magic me-2"></i>Optimise My CV{% if cv_price is defined %} — ₦{{ "{:,}".format(cv_price|int) }}{% endif %}
                  </button>`;
 
-        // Secondary action: upload a better CV then re-scan
-        html += `<a href="/dashboard/veteran#cv-upload" class="btn btn-outline-primary w-100">
-                   <i class="fas fa-upload me-2"></i>Upload a Better CV &amp; Re-scan
-                 </a>`;
+        // Secondary action handled by inline upload above — no redirect needed
 
         // For link jobs only: allow visit (employer decides, not us sending email)
         if (applyMethod === 'link') {
@@ -786,6 +802,120 @@
         document.getElementById('noMatchActions').innerHTML = html;
         show('stepNoMatch');
 
+        // ── Wire up inline rescan ──────────────────────────────
+        const rescanBtn   = document.getElementById('rescanBtn');
+        const rescanInput = document.getElementById('rescanFileInput');
+        const rescanStatus = document.getElementById('rescanStatus');
+
+        if (rescanBtn) {
+          rescanBtn.addEventListener('click', () => {
+            const file = rescanInput.files[0];
+            if (!file) {
+              rescanInput.style.borderColor = '#f87171';
+              return;
+            }
+            rescanInput.style.borderColor = 'rgba(255,255,255,0.1)';
+
+            // Show scanning state
+            rescanBtn.disabled = true;
+            rescanStatus.style.display = 'block';
+
+            const fd = new FormData();
+            fd.append('cv_file', file);
+            fd.append('X-CSRFToken', csrf);
+
+            fetch(`/jobs/${jobId}/rescan-cv`, {
+              method: 'POST',
+              headers: { 'X-CSRFToken': csrf },
+              credentials: 'same-origin',
+              body: fd,
+            })
+            .then(r => r.json())
+            .then(rescanData => {
+              rescanBtn.disabled = false;
+              rescanStatus.style.display = 'none';
+
+              if (rescanData.error) {
+                rescanStatus.style.display = 'block';
+                rescanStatus.style.color = '#f87171';
+                rescanStatus.innerHTML = `<i class="fas fa-exclamation-circle me-1"></i>${rescanData.message || 'Could not scan file.'}`;
+                return;
+              }
+
+              const newScore   = rescanData.score || 0;
+              const newIsMatch = rescanData.is_match;
+
+              if (newIsMatch) {
+                // Passed — move to match screen with temp CV key
+                const tempKey = rescanData.temp_cv_key;
+
+                setTimeout(() => {
+                  document.getElementById('scoreBar').style.width = newScore + '%';
+                }, 100);
+                document.getElementById('scoreLabel').textContent  = newScore + '%';
+                document.getElementById('matchReasoning').textContent = rescanData.reasoning || '';
+
+                if (rescanData.matched_skills && rescanData.matched_skills.length) {
+                  document.getElementById('matchedSkillsWrap').style.display = '';
+                  document.getElementById('matchedSkillsTags').innerHTML =
+                    rescanData.matched_skills.map(s => badge(s, '#198754')).join('');
+                }
+
+                // Build submit button that passes temp_cv_key
+                let matchHtml = '';
+                const newApplyMethod = rescanData.apply_method || applyMethod;
+                const newApplyUrl    = rescanData.apply_url    || applyUrl;
+
+                if (newApplyMethod === 'email') {
+                  matchHtml = `<button id="submitEmailBtnRescan" class="btn btn-success w-100 fw-bold">
+                                 <i class="fas fa-paper-plane me-2"></i>Submit This CV Now
+                               </button>
+                               <small class="text-center" style="color:rgba(255,255,255,0.35);font-size:11px;">
+                                 This uploaded CV will be sent — not your saved profile CV
+                               </small>
+                               <button class="btn btn-outline-secondary w-100" data-bs-dismiss="modal">Cancel</button>`;
+                } else if (newApplyMethod === 'link') {
+                  matchHtml = `<a href="${newApplyUrl}" target="_blank" rel="noopener"
+                                  class="btn btn-primary w-100 fw-bold">
+                                 <i class="fas fa-external-link-alt me-2"></i>Continue on Employer Site
+                               </a>
+                               <button class="btn btn-outline-secondary w-100" data-bs-dismiss="modal">Cancel</button>`;
+                } else {
+                  matchHtml = `<a href="${newApplyUrl || '/applications/apply/' + jobId}"
+                                  class="btn btn-primary w-100 fw-bold">
+                                 <i class="fas fa-paper-plane me-2"></i>Proceed to Apply
+                               </a>
+                               <button class="btn btn-outline-secondary w-100" data-bs-dismiss="modal">Cancel</button>`;
+                }
+
+                document.getElementById('matchActions').innerHTML = matchHtml;
+                show('stepMatch');
+
+                // Wire rescan submit button with temp key
+                const rescanSubmitBtn = document.getElementById('submitEmailBtnRescan');
+                if (rescanSubmitBtn) {
+                  rescanSubmitBtn.addEventListener('click', () => submitApplicationWithTempCV(jobId, tempKey));
+                }
+
+              } else {
+                // Still no match — update score display and keep upload form visible
+                document.getElementById('noMatchScoreBar').style.width = newScore + '%';
+                document.getElementById('noMatchScoreLabel').textContent = newScore + '%';
+                document.getElementById('noMatchReasoning').textContent = rescanData.reasoning || '';
+                rescanStatus.style.display = 'block';
+                rescanStatus.style.color = '#f87171';
+                rescanStatus.innerHTML = `<i class="fas fa-times-circle me-1"></i>This CV still does not match. Score: ${newScore}%. Try a more relevant CV.`;
+              }
+            })
+            .catch(() => {
+              rescanBtn.disabled = false;
+              rescanStatus.style.display = 'block';
+              rescanStatus.style.color = '#f87171';
+              rescanStatus.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Upload failed. Please check your connection.';
+            });
+          });
+        }
+
 
       }
     })
@@ -795,6 +925,29 @@
         'A network error occurred. Please check your connection and try again.';
       document.getElementById('errorActions').innerHTML =
         `<button class="btn btn-secondary w-100" data-bs-dismiss="modal">Close</button>`;
+    });
+  }
+
+  function submitApplicationWithTempCV(jobId, tempKey) {
+    show('stepSubmitting');
+    const fd = new FormData();
+    fd.append('temp_cv_key', tempKey);
+    fetch(`/jobs/${jobId}/submit-application`, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': csrf },
+      credentials: 'same-origin',
+      body: fd,
+    })
+    .then(r => r.json())
+    .then(res => {
+      show('stepDone');
+      document.getElementById('doneMessage').textContent =
+        res.message || 'Your application has been submitted successfully. Good luck!';
+    })
+    .catch(() => {
+      show('stepDone');
+      document.getElementById('doneMessage').textContent =
+        'Something went wrong. Please try applying directly or contact support.';
     });
   }
 
