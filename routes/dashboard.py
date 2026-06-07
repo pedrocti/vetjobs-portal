@@ -197,7 +197,11 @@ def employer():
             JobApplication.status == "interview",
         )
         .count(),
-        "total_veterans": User.query.filter_by(user_type="veteran").count(),
+        # Veterans who applied to THIS employer's jobs — not platform total
+        "veterans_reached": JobApplication.query.join(JobPosting)
+        .filter(JobPosting.posted_by == current_user.id)
+        .distinct(JobApplication.veteran_id)
+        .count(),
     }
 
     # ── Recent applications ────────────────────────────────────
