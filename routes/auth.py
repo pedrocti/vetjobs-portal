@@ -102,10 +102,11 @@ def register():
             company_name_reg = request.form.get("company_name", "").strip()
             if company_name_reg:
                 profile.company_name = company_name_reg
-            # Pre-populate recruiter contact from User record
+            # Pre-populate recruiter and company contact from User record
             profile.recruiter_name  = f"{first_name} {last_name}".strip() or username
             profile.recruiter_email = email
             profile.recruiter_phone = phone or ""
+            profile.company_email   = email  # default to registration email, editable later
 
             subscription = Subscription.create_for_user(user, plan_type="free")
 

@@ -71,10 +71,14 @@
                      placeholder="Your registered company name" required maxlength="200">
             </div>
             <div class="col-md-6">
-              <label class="form-label">Company Email <span class="vp-required">*</span></label>
+              <label class="form-label">Company Contact Email</label>
               <input type="email" class="form-control" name="company_email"
-                     value="{{ profile.company_email if profile else '' }}"
-                     placeholder="company@organisation.com" required maxlength="120">
+                     value="{{ profile.company_email or current_user.email }}"
+                     placeholder="company@organisation.com" maxlength="120">
+              <small class="vp-form-hint">
+                <i class="fas fa-info-circle me-1"></i>
+                Using your registration email — update if your company has a different address
+              </small>
             </div>
             <div class="col-md-6">
               <label class="form-label">Industry <span class="vp-required">*</span></label>
