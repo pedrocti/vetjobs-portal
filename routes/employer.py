@@ -231,10 +231,16 @@ def handle_employer_profile_form(profile, is_edit=False):
     profile.company_name = company_name
     profile.industry = industry
     profile.company_logo = company_logo
-    profile.recruiter_name = recruiter_name
+
+    # Auto-populate recruiter fields from User record if not explicitly provided
+    # This prevents the duplicate data entry problem
+    from flask_login import current_user as _cu
+    profile.recruiter_name = recruiter_name or (
+        f"{_cu.first_name} {_cu.last_name}".strip() if _cu.first_name else _cu.username
+    )
     profile.recruiter_position = recruiter_position
-    profile.recruiter_email = recruiter_email
-    profile.recruiter_phone = recruiter_phone
+    profile.recruiter_email = recruiter_email or _cu.email
+    profile.recruiter_phone = recruiter_phone or _cu.phone or ''
     profile.company_email       = sanitize_input(request.form.get('company_email',       ''), 120).lower()
     profile.company_website     = sanitize_input(request.form.get('company_website',     ''), 200)
     profile.company_size        = sanitize_input(request.form.get('company_size',        ''), 50)

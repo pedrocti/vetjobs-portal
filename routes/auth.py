@@ -98,6 +98,14 @@ def register():
             profile.user_id    = user.id
             profile.created_at = datetime.utcnow()
             profile.updated_at = datetime.utcnow()
+            # Pre-populate from registration form so complete_profile is pre-filled
+            company_name_reg = request.form.get("company_name", "").strip()
+            if company_name_reg:
+                profile.company_name = company_name_reg
+            # Pre-populate recruiter contact from User record
+            profile.recruiter_name  = f"{first_name} {last_name}".strip() or username
+            profile.recruiter_email = email
+            profile.recruiter_phone = phone or ""
 
             subscription = Subscription.create_for_user(user, plan_type="free")
 
@@ -157,16 +165,25 @@ def register():
             current_app.logger.error(f"Admin registration notification failed: {e}")
 
         # ── Send verification email via Brevo ──────────────────
-        # NOTE: Brevo contact sync happens AFTER verification (confirm user is real)
+        # Employers get a separate branded email — veterans get the standard one
         try:
             token       = user.generate_verification_token()
             verify_link = build_external_url("auth.verify_email", token=token)
-            sent        = BrevoService().send_verification_email(user, verify_link)
+            brevo_svc   = BrevoService()
+
+            if user_type == "employer":
+                sent = brevo_svc.send_employer_verification_email(user, verify_link)
+            else:
+                sent = brevo_svc.send_verification_email(user, verify_link)
 
             if not sent:
                 current_app.logger.error(
                     f"[AUTH] Verification email failed for {user.email} — "
                     "check Brevo API key, template #11 is Active, sender is verified."
+                )
+            else:
+                current_app.logger.info(
+                    f"[AUTH] Verification email sent to {user.email} (type={user_type})"
                 )
         except Exception as e:
             current_app.logger.error(f"[AUTH] Verification email exception: {e}")
